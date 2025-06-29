@@ -53,6 +53,26 @@ const Navbar = () => {
     setShowCommunityQuickPost(false);
   };
 
+  const handleGamingClick = () => {
+    closeAllDropdowns();
+    setShowGamingDropdown(true);
+  };
+
+  const handleNotificationsClick = () => {
+    closeAllDropdowns();
+    setShowNotifications(true);
+  };
+
+  const handleCreateClick = () => {
+    closeAllDropdowns();
+    setShowCreatePanel(true);
+  };
+
+  const handleCommunityQuickPostClick = () => {
+    closeAllDropdowns();
+    setShowCommunityQuickPost(true);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,12 +93,16 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2 relative">
             {/* Gaming Hub */}
-            <GamingDropdown
-              isOpen={showGamingDropdown}
-              onClose={closeAllDropdowns}
-            />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleGamingClick}
+              className={showGamingDropdown ? "bg-slate-100" : ""}
+            >
+              <Gamepad2 className="w-5 h-5" />
+            </Button>
 
             <Unauthenticated>
               <SignInButton mode="modal">
@@ -88,17 +112,25 @@ const Navbar = () => {
             
             <Authenticated>
               {/* Community Quick Post */}
-              <CommunityQuickPost
-                isOpen={showCommunityQuickPost}
-                onClose={closeAllDropdowns}
-              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCommunityQuickPostClick}
+                className={showCommunityQuickPost ? "bg-slate-100" : ""}
+              >
+                <Users className="w-5 h-5" />
+              </Button>
 
               {/* Notifications */}
               <div className="relative">
-                <NotificationDropdown
-                  isOpen={showNotifications}
-                  onClose={closeAllDropdowns}
-                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleNotificationsClick}
+                  className={showNotifications ? "bg-slate-100" : ""}
+                >
+                  <Bell className="w-5 h-5" />
+                </Button>
                 {unreadCount && unreadCount > 0 && (
                   <Badge 
                     variant="destructive" 
@@ -110,10 +142,14 @@ const Navbar = () => {
               </div>
 
               {/* Create */}
-              <CreatePanel
-                isOpen={showCreatePanel}
-                onClose={closeAllDropdowns}
-              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCreateClick}
+                className={showCreatePanel ? "bg-slate-100" : ""}
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
 
               {/* Settings */}
               <Button variant="ghost" size="icon">
@@ -166,19 +202,31 @@ const Navbar = () => {
               <Authenticated>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Gaming Hub */}
-                  <Button variant="secondary" className="flex items-center justify-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleGamingClick}
+                  >
                     <Gamepad2 className="w-4 h-4" />
                     Gaming
                   </Button>
 
                   {/* Community Quick Post */}
-                  <Button variant="secondary" className="flex items-center justify-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleCommunityQuickPostClick}
+                  >
                     <Users className="w-4 h-4" />
                     Quick Post
                   </Button>
 
                   {/* Notifications */}
-                  <Button variant="secondary" className="flex items-center justify-center gap-2 relative">
+                  <Button 
+                    variant="secondary" 
+                    className="flex items-center justify-center gap-2 relative"
+                    onClick={handleNotificationsClick}
+                  >
                     <Bell className="w-4 h-4" />
                     Notifications
                     {unreadCount && unreadCount > 0 && (
@@ -192,7 +240,10 @@ const Navbar = () => {
                   </Button>
 
                   {/* Create */}
-                  <Button className="flex items-center justify-center gap-2">
+                  <Button 
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleCreateClick}
+                  >
                     <Plus className="w-4 h-4" />
                     Create
                   </Button>
@@ -223,6 +274,27 @@ const Navbar = () => {
           </div>
         )}
       </div>
+
+      {/* Dropdown Components */}
+      <GamingDropdown
+        isOpen={showGamingDropdown}
+        onClose={closeAllDropdowns}
+      />
+      
+      <NotificationDropdown
+        isOpen={showNotifications}
+        onClose={closeAllDropdowns}
+      />
+      
+      <CreatePanel
+        isOpen={showCreatePanel}
+        onClose={closeAllDropdowns}
+      />
+      
+      <CommunityQuickPost
+        isOpen={showCommunityQuickPost}
+        onClose={closeAllDropdowns}
+      />
     </nav>
   );
 };
