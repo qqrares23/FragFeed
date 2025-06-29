@@ -20,19 +20,7 @@ export const upsertFromClerk = internalMutation({
 
     const user = await userByExternalId(ctx, data.id);
     if (user === null) {
-      await ctx.db.insert("users", {
-        ...userAttributes,
-        isOnline: true,
-        lastSeen: Date.now(),
-        showOnlineStatus: true,
-        profileVisibility: "public",
-        notificationSettings: {
-          newPosts: true,
-          comments: true,
-          mentions: true,
-          communityUpdates: true,
-        },
-      });
+      await ctx.db.insert("users", userAttributes);
     } else {
       await ctx.db.patch(user._id, userAttributes);
     }
@@ -97,9 +85,6 @@ export const getPublicUser = query({
       website: user.website,
       profilePictureUrl,
       bannerImageUrl,
-      isOnline: user.isOnline,
-      lastSeen: user.lastSeen,
-      showOnlineStatus: user.showOnlineStatus,
       steamProfile: user.steamProfile,
       riotProfile: user.riotProfile,
       epicProfile: user.epicProfile,
@@ -127,83 +112,6 @@ export const updateProfile = mutation({
     if (args.bannerImage !== undefined) updateData.bannerImage = args.bannerImage;
     
     await ctx.db.patch(user._id, updateData);
-  },
-});
-
-export const updateOnlineStatus = mutation({
-  args: { isOnline: v.boolean() },
-  handler: async (ctx, args) => {
-    const user = await getCurrentUserOrThrow(ctx);
-    
-    await ctx.db.patch(user._id, {
-      isOnline: args.isOnline,
-      lastSeen: Date.now(),
-    });
-  },
-});
-
-export const updatePrivacySettings = mutation({
-  args: {
-    showOnlineStatus: v.optional(v.boolean()),
-    profileVisibility: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const user = await getCurrentUserOrThrow(ctx);
-    
-    const updateData: any = {};
-    if (args.showOnlineStatus !== undefined) updateData.showOnlineStatus = args.showOnlineStatus;
-    if (args.profileVisibility !== undefined) updateData.profileVisibility = args.profileVisibility;
-    
-    await ctx.db.patch(user._id, updateData);
-  },
-});
-
-export const updateNotificationSettings = mutation({
-  args: {
-    newPosts: v.optional(v.boolean()),
-    comments: v.optional(v.boolean()),
-    mentions: v.optional(v.boolean()),
-    communityUpdates: v.optional(v.boolean()),
-  },
-  handler: async (ctx, args) => {
-    const user = await getCurrentUserOrThrow(ctx);
-    
-    const currentSettings = user.notificationSettings || {
-      newPosts: true,
-      comments: true,
-      mentions: true,
-      communityUpdates: true,
-    };
-    
-    const newSettings = {
-      newPosts: args.newPosts !== undefined ? args.newPosts : currentSettings.newPosts,
-      comments: args.comments !== undefined ? args.comments : currentSettings.comments,
-      mentions: args.mentions !== undefined ? args.mentions : currentSettings.mentions,
-      communityUpdates: args.communityUpdates !== undefined ? args.communityUpdates : currentSettings.communityUpdates,
-    };
-    
-    await ctx.db.patch(user._id, {
-      notificationSettings: newSettings,
-    });
-  },
-});
-
-export const getUserSettings = query({
-  args: {},
-  handler: async (ctx) => {
-    const user = await getCurrentUser(ctx);
-    if (!user) return null;
-    
-    return {
-      showOnlineStatus: user.showOnlineStatus ?? true,
-      profileVisibility: user.profileVisibility ?? "public",
-      notificationSettings: user.notificationSettings ?? {
-        newPosts: true,
-        comments: true,
-        mentions: true,
-        communityUpdates: true,
-      },
-    };
   },
 });
 

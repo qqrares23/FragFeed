@@ -10,16 +10,6 @@ export default defineSchema({
     bio: v.optional(v.string()),
     location: v.optional(v.string()),
     website: v.optional(v.string()),
-    isOnline: v.optional(v.boolean()),
-    lastSeen: v.optional(v.number()),
-    showOnlineStatus: v.optional(v.boolean()),
-    profileVisibility: v.optional(v.string()), // "public" | "private"
-    notificationSettings: v.optional(v.object({
-      newPosts: v.boolean(),
-      comments: v.boolean(),
-      mentions: v.boolean(),
-      communityUpdates: v.boolean(),
-    })),
     steamProfile: v.optional(v.object({
       steamId: v.string(),
       username: v.string(),
