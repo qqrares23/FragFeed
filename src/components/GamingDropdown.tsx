@@ -1,6 +1,18 @@
 import { useState, useEffect } from "react";
-import { FaGamepad, FaSteam, FaNewspaper, FaExternalLinkAlt, FaTwitch, FaDiscord } from "react-icons/fa";
+import { Gamepad2, ExternalLink, Twitch, MessageSquare } from "lucide-react";
 import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
+import { FaSteam } from "react-icons/fa";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface CheapSharkDeal {
   internalName: string;
@@ -180,106 +192,6 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
           category: "Hardware",
           platform: "PC"
         },
-        {
-          title: "Indie Game Spotlight: Pizza Tower Wins Independent Game Award",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/1174746/pexels-photo-1174746.jpeg",
-          description: "The critically acclaimed indie platformer Pizza Tower takes home the prestigious Independent Game Festival award for excellence in design.",
-          publishedAt: new Date(Date.now() - 259200000).toISOString(),
-          source: { name: "Indie Focus" },
-          category: "Awards",
-          platform: "PC/Console"
-        },
-        {
-          title: "PlayStation VR2: Top 10 Must-Play Games",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/8728380/pexels-photo-8728380.jpeg",
-          description: "Explore the best virtual reality experiences available on PlayStation VR2, from immersive adventures to innovative puzzle games.",
-          publishedAt: new Date(Date.now() - 345600000).toISOString(),
-          source: { name: "PlayStation Blog" },
-          category: "VR",
-          platform: "PlayStation"
-        },
-        {
-          title: "Mobile Gaming Revenue Hits Record $120 Billion in 2024",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg",
-          description: "Mobile gaming continues to dominate the industry with innovative gameplay mechanics and successful free-to-play monetization strategies.",
-          publishedAt: new Date(Date.now() - 432000000).toISOString(),
-          source: { name: "Mobile Gaming Today" },
-          category: "Industry",
-          platform: "Mobile"
-        },
-        {
-          title: "Game Development: Unity 2025.1 Features AI-Powered Tools",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg",
-          description: "Unity Technologies announces revolutionary AI-powered development tools that streamline game creation and reduce development time by 40%.",
-          publishedAt: new Date(Date.now() - 518400000).toISOString(),
-          source: { name: "Unity Technologies" },
-          category: "Development",
-          platform: "Development"
-        },
-        {
-          title: "Accessibility in Gaming: Microsoft's Adaptive Controller 2.0",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/7915437/pexels-photo-7915437.jpeg",
-          description: "Microsoft unveils the next generation of their adaptive controller, making gaming more accessible for players with disabilities worldwide.",
-          publishedAt: new Date(Date.now() - 604800000).toISOString(),
-          source: { name: "Microsoft Gaming" },
-          category: "Accessibility",
-          platform: "Xbox/PC"
-        },
-        {
-          title: "Retro Gaming: Nintendo Direct Announces Classic Game Collection",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/371924/pexels-photo-371924.jpeg",
-          description: "Nintendo surprises fans with a comprehensive collection of classic NES, SNES, and N64 games coming to Nintendo Switch Online.",
-          publishedAt: new Date(Date.now() - 691200000).toISOString(),
-          source: { name: "Nintendo" },
-          category: "Retro",
-          platform: "Nintendo Switch"
-        },
-        {
-          title: "Cloud Gaming: Xbox Game Pass Ultimate Adds 50 New Titles",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
-          description: "Microsoft expands Xbox Game Pass Ultimate with 50 new games including day-one releases and popular indie titles for cloud gaming.",
-          publishedAt: new Date(Date.now() - 777600000).toISOString(),
-          source: { name: "Xbox Wire" },
-          category: "Cloud Gaming",
-          platform: "Xbox/PC"
-        },
-        {
-          title: "Twitch Introduces New Creator Monetization Features",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
-          description: "Twitch announces enhanced monetization tools for streamers including improved subscription tiers and integrated merchandise sales.",
-          publishedAt: new Date(Date.now() - 864000000).toISOString(),
-          source: { name: "Twitch Blog" },
-          category: "Streaming",
-          platform: "Streaming"
-        },
-        {
-          title: "Gaming Laptops: ASUS ROG 2025 Lineup Features Liquid Cooling",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg",
-          description: "ASUS Republic of Gamers unveils their 2025 gaming laptop lineup featuring advanced liquid cooling systems and RTX 5000 series GPUs.",
-          publishedAt: new Date(Date.now() - 950400000).toISOString(),
-          source: { name: "ASUS ROG" },
-          category: "Hardware",
-          platform: "PC"
-        },
-        {
-          title: "Discord Gaming: Voice Channels Get Spatial Audio Update",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
-          description: "Discord rolls out spatial audio for voice channels, enhancing communication for gaming communities with 3D positional audio.",
-          publishedAt: new Date(Date.now() - 1036800000).toISOString(),
-          source: { name: "Discord" },
-          category: "Communication",
-          platform: "Multi-platform"
-        }
       ]);
     } catch (err) {
       setError('Failed to load gaming news');
@@ -304,14 +216,6 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
       'Updates': 'bg-blue-100 text-blue-700',
       'Hardware': 'bg-orange-100 text-orange-700',
       'Awards': 'bg-yellow-100 text-yellow-700',
-      'VR': 'bg-cyan-100 text-cyan-700',
-      'Industry': 'bg-pink-100 text-pink-700',
-      'Development': 'bg-indigo-100 text-indigo-700',
-      'Accessibility': 'bg-emerald-100 text-emerald-700',
-      'Retro': 'bg-red-100 text-red-700',
-      'Cloud Gaming': 'bg-sky-100 text-sky-700',
-      'Streaming': 'bg-violet-100 text-violet-700',
-      'Communication': 'bg-teal-100 text-teal-700',
     };
     return colors[category as keyof typeof colors] || 'bg-slate-100 text-slate-700';
   };
@@ -324,48 +228,38 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
       case 'Nintendo Switch': return <span className="text-xs font-bold">NS</span>;
       case 'Mobile': return <span className="text-xs font-bold">📱</span>;
       case 'Multi-platform': return <span className="text-xs font-bold">🎮</span>;
-      case 'Streaming': return <FaTwitch className="w-3 h-3" />;
+      case 'Streaming': return <Twitch className="w-3 h-3" />;
       case 'Development': return <span className="text-xs font-bold">🛠️</span>;
       default: return null;
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="absolute right-0 top-full mt-2 w-[900px] max-w-[95vw] bg-white rounded-2xl shadow-xl border border-slate-200 z-50 max-h-[700px] overflow-hidden">
+    <DropdownMenu open={isOpen} onOpenChange={onClose}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Gamepad2 className="w-5 h-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[900px] max-w-[95vw] max-h-[700px] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
+        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6 -m-2 mb-4 rounded-2xl">
           <h3 className="text-xl font-bold flex items-center gap-3 mb-4">
-            <FaGamepad className="w-6 h-6" />
+            <Gamepad2 className="w-6 h-6" />
             Gaming Hub
           </h3>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setActiveTab('steam')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                activeTab === 'steam' 
-                  ? 'bg-white text-primary-600' 
-                  : 'bg-white/20 text-white hover:bg-white/30'
-              }`}
-            >
-              <FaSteam className="w-4 h-4 inline mr-2" />
-              Steam Deals
-            </button>
-            <button
-              onClick={() => setActiveTab('news')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                activeTab === 'news' 
-                  ? 'bg-white text-primary-600' 
-                  : 'bg-white/20 text-white hover:bg-white/30'
-              }`}
-            >
-              <FaNewspaper className="w-4 h-4 inline mr-2" />
-              Gaming News
-            </button>
-          </div>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'steam' | 'news')}>
+            <TabsList className="bg-white/20 border-0">
+              <TabsTrigger value="steam" className="data-[state=active]:bg-white data-[state=active]:text-primary-600">
+                <FaSteam className="w-4 h-4 mr-2" />
+                Steam Deals
+              </TabsTrigger>
+              <TabsTrigger value="news" className="data-[state=active]:bg-white data-[state=active]:text-primary-600">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Gaming News
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Content */}
@@ -385,118 +279,128 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
             </div>
           )}
 
-          {activeTab === 'steam' && !loading && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {steamDeals.map((deal) => (
-                  <div 
-                    key={deal.dealID} 
-                    onClick={() => handleDealClick(deal.dealID)}
-                    className="card p-4 cursor-pointer hover:shadow-lg transition-all"
-                  >
-                    <div className="flex gap-4">
-                      <img 
-                        src={deal.thumb || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
-                        alt={deal.title}
-                        className="w-16 h-16 rounded-lg object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
-                        }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-slate-900 line-clamp-2 text-sm">
-                          {deal.title}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-lg font-bold text-green-600">
-                            {formatPrice(deal.salePrice)}
-                          </span>
-                          {parseFloat(deal.normalPrice) > parseFloat(deal.salePrice) && (
-                            <>
-                              <span className="text-sm text-slate-400 line-through">
-                                {formatPrice(deal.normalPrice)}
-                              </span>
-                              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                                -{Math.round(parseFloat(deal.savings))}%
-                              </span>
-                            </>
-                          )}
-                        </div>
-                        {deal.steamRatingText && (
-                          <div className="text-xs text-slate-500 mt-1">
-                            {deal.steamRatingText} ({deal.steamRatingPercent}%)
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="text-center text-xs text-slate-500 pt-4 border-t">
-                Powered by <a href="https://www.cheapshark.com/" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">CheapShark API</a>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'news' && !loading && (
-            <div className="space-y-4">
-              {news.map((article, index) => (
-                <div key={index} className="card p-4 hover:shadow-lg transition-all">
-                  <div className="flex gap-4">
-                    <img 
-                      src={article.urlToImage || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
-                      alt={article.title}
-                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
-                      }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2 flex-wrap">
-                        <span className="font-medium">{article.source.name}</span>
-                        <span>•</span>
-                        <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                        {article.category && (
-                          <>
-                            <span>•</span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
-                              {article.category}
-                            </span>
-                          </>
-                        )}
-                        {article.platform && (
-                          <>
-                            <span>•</span>
-                            <span className="flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
-                              {getPlatformIcon(article.platform)}
-                              {article.platform}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                      <h4 className="font-semibold text-slate-900 line-clamp-2 mb-2">
-                        {article.title}
-                      </h4>
-                      <p className="text-sm text-slate-600 line-clamp-2 mb-3">
-                        {article.description}
-                      </p>
-                      <a 
-                        href={article.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-medium"
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'steam' | 'news')}>
+            <TabsContent value="steam" className="mt-0">
+              {!loading && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {steamDeals.map((deal) => (
+                      <Card 
+                        key={deal.dealID} 
+                        className="cursor-pointer hover:shadow-lg transition-all"
+                        onClick={() => handleDealClick(deal.dealID)}
                       >
-                        Read More <FaExternalLinkAlt className="w-3 h-3" />
-                      </a>
-                    </div>
+                        <CardContent className="p-4">
+                          <div className="flex gap-4">
+                            <img 
+                              src={deal.thumb || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
+                              alt={deal.title}
+                              className="w-16 h-16 rounded-lg object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
+                              }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-slate-900 line-clamp-2 text-sm">
+                                {deal.title}
+                              </h4>
+                              <div className="flex items-center gap-2 mt-2">
+                                <span className="text-lg font-bold text-green-600">
+                                  {formatPrice(deal.salePrice)}
+                                </span>
+                                {parseFloat(deal.normalPrice) > parseFloat(deal.salePrice) && (
+                                  <>
+                                    <span className="text-sm text-slate-400 line-through">
+                                      {formatPrice(deal.normalPrice)}
+                                    </span>
+                                    <Badge variant="destructive" className="text-xs">
+                                      -{Math.round(parseFloat(deal.savings))}%
+                                    </Badge>
+                                  </>
+                                )}
+                              </div>
+                              {deal.steamRatingText && (
+                                <div className="text-xs text-slate-500 mt-1">
+                                  {deal.steamRatingText} ({deal.steamRatingPercent}%)
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  <div className="text-center text-xs text-slate-500 pt-4 border-t">
+                    Powered by <a href="https://www.cheapshark.com/" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">CheapShark API</a>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              )}
+            </TabsContent>
+
+            <TabsContent value="news" className="mt-0">
+              {!loading && (
+                <div className="space-y-4">
+                  {news.map((article, index) => (
+                    <Card key={index} className="hover:shadow-lg transition-all">
+                      <CardContent className="p-4">
+                        <div className="flex gap-4">
+                          <img 
+                            src={article.urlToImage || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
+                            alt={article.title}
+                            className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
+                            }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 text-xs text-slate-500 mb-2 flex-wrap">
+                              <span className="font-medium">{article.source.name}</span>
+                              <span>•</span>
+                              <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                              {article.category && (
+                                <>
+                                  <span>•</span>
+                                  <Badge variant="secondary" className={`text-xs ${getCategoryColor(article.category)}`}>
+                                    {article.category}
+                                  </Badge>
+                                </>
+                              )}
+                              {article.platform && (
+                                <>
+                                  <span>•</span>
+                                  <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                                    {getPlatformIcon(article.platform)}
+                                    {article.platform}
+                                  </Badge>
+                                </>
+                              )}
+                            </div>
+                            <h4 className="font-semibold text-slate-900 line-clamp-2 mb-2">
+                              {article.title}
+                            </h4>
+                            <p className="text-sm text-slate-600 line-clamp-2 mb-3">
+                              {article.description}
+                            </p>
+                            <a 
+                              href={article.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-medium"
+                            >
+                              Read More <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
-      </div>
-    </>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

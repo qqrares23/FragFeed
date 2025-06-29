@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { FaSearch, FaTimes, FaFire, FaClock, FaUsers } from "react-icons/fa";
+import { Search, X, Clock, Users, TrendingUp } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { useQuery } from "convex/react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface SearchResult {
   _id: string;
@@ -162,11 +167,10 @@ const SearchBar = () => {
       <div className={`relative flex items-center bg-white/50 backdrop-blur-sm border border-slate-300 rounded-xl transition-all duration-200 ${
         isFocused ? 'ring-2 ring-primary-500 border-primary-500' : 'hover:border-slate-400'
       }`}>
-        <FaSearch className="w-4 h-4 text-slate-400 ml-4" />
-        <input
+        <Search className="w-4 h-4 text-slate-400 ml-4" />
+        <Input
           ref={inputRef}
-          type="text"
-          className="w-full px-4 py-3 bg-transparent border-0 focus:ring-0 placeholder-slate-400"
+          className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
           placeholder={
             currentSubreddit
               ? `Search posts in r/${currentSubreddit}`
@@ -180,34 +184,38 @@ const SearchBar = () => {
         />
         
         {searchQuery && (
-          <button 
+          <Button 
+            variant="ghost"
+            size="sm"
             onClick={clearSearchQuery}
-            className="p-2 mr-2 text-slate-400 hover:text-slate-600 rounded-lg"
+            className="mr-2 p-2"
           >
-            <FaTimes className="w-4 h-4" />
-          </button>
+            <X className="w-4 h-4" />
+          </Button>
         )}
 
         {currentSubreddit && (
-          <div className="mr-3 px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-lg">
+          <Badge variant="secondary" className="mr-3">
             r/{currentSubreddit}
-          </div>
+          </Badge>
         )}
       </div>
 
       {isActive && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200 max-h-96 overflow-hidden z-50">
+        <Card className="absolute top-full left-0 right-0 mt-2 max-h-96 overflow-hidden z-50">
           <div className="flex items-center justify-between p-4 border-b border-slate-100">
             <h4 className="font-semibold text-slate-700">
               {searchQuery ? 'Search Results' : 'Recent & Suggestions'}
             </h4>
             {(searchHistory.length > 0 || recentSearches.length > 0) && (
-              <button 
+              <Button 
+                variant="ghost"
+                size="sm"
                 onClick={clearSearchHistory}
-                className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+                className="text-xs"
               >
                 Clear All
-              </button>
+              </Button>
             )}
           </div>
 
@@ -217,14 +225,15 @@ const SearchBar = () => {
                 {recentSearches.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <FaClock className="w-4 h-4 text-slate-400" />
+                      <Clock className="w-4 h-4 text-slate-400" />
                       <span className="text-sm font-medium text-slate-600">Recent Searches</span>
                     </div>
                     {recentSearches.map((recent, index) => (
-                      <button
+                      <Button
                         key={index}
+                        variant="ghost"
                         onClick={() => handleHistoryClick(recent.query)}
-                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 text-left"
+                        className="w-full justify-start p-2 h-auto"
                       >
                         <div className="text-sm">
                           <div className="font-medium text-slate-900">{recent.query}</div>
@@ -232,7 +241,7 @@ const SearchBar = () => {
                             {recent.type} • {formatTimeAgo(recent.timestamp)}
                           </div>
                         </div>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}
@@ -240,24 +249,25 @@ const SearchBar = () => {
                 {searchHistory.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <FaSearch className="w-4 h-4 text-slate-400" />
+                      <Search className="w-4 h-4 text-slate-400" />
                       <span className="text-sm font-medium text-slate-600">Search History</span>
                     </div>
                     {searchHistory.slice(0, 5).map((query, index) => (
-                      <button
+                      <Button
                         key={index}
+                        variant="ghost"
                         onClick={() => handleHistoryClick(query)}
-                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 text-left"
+                        className="w-full justify-start p-2 h-auto"
                       >
                         <span className="text-sm font-medium text-slate-900">{query}</span>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}
 
                 {recentSearches.length === 0 && searchHistory.length === 0 && (
                   <div className="text-center py-8">
-                    <FaSearch className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                    <Search className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                     <p className="text-slate-500 font-medium">Start typing to search</p>
                     <p className="text-sm text-slate-400 mt-1">
                       Search for communities and posts
@@ -268,31 +278,36 @@ const SearchBar = () => {
             ) : results && results.length > 0 ? (
               <div className="p-2">
                 {results.map((result) => (
-                  <button
+                  <Button
                     key={result._id}
+                    variant="ghost"
                     onClick={() => handleResultClick(result)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left"
+                    className="w-full justify-start p-3 h-auto"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-                      {result.type === 'community' ? (
-                        <FaUsers className="w-4 h-4 text-white" />
-                      ) : (
-                        <FaFire className="w-4 h-4 text-white" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-slate-900 truncate">{result.title}</div>
-                      <div className="text-sm text-slate-500">
-                        {result.type === 'community' ? 'Community' : 'Post'}
-                        {result.type === 'community' && ` • r/${result.name}`}
+                    <div className="flex items-center gap-3 w-full">
+                      <Avatar className="w-8 h-8">
+                        <AvatarFallback>
+                          {result.type === 'community' ? (
+                            <Users className="w-4 h-4" />
+                          ) : (
+                            <TrendingUp className="w-4 h-4" />
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="font-medium text-slate-900 truncate">{result.title}</div>
+                        <div className="text-sm text-slate-500">
+                          {result.type === 'community' ? 'Community' : 'Post'}
+                          {result.type === 'community' && ` • r/${result.name}`}
+                        </div>
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             ) : searchQuery.length >= 2 ? (
               <div className="text-center py-8">
-                <FaSearch className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <Search className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-medium">No results found</p>
                 <p className="text-sm text-slate-400 mt-1">
                   Try different keywords or check spelling
@@ -300,12 +315,12 @@ const SearchBar = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <FaSearch className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <Search className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-medium">Keep typing...</p>
               </div>
             )}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

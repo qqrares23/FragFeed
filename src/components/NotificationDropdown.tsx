@@ -1,7 +1,16 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { FaBell, FaCheck, FaEye, FaTimes } from "react-icons/fa";
+import { Bell, Check, Eye, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -12,8 +21,6 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
   const notifications = useQuery(api.notifications.getUserNotifications, { limit: 10 });
   const markAsRead = useMutation(api.notifications.markAsRead);
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
-
-  if (!isOpen) return null;
 
   const handleMarkAsRead = async (notificationId: string) => {
     await markAsRead({ notificationId: notificationId as any });
@@ -46,31 +53,30 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
   };
 
   return (
-    <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="absolute right-0 top-full mt-2 w-96 max-w-sm bg-white rounded-2xl shadow-xl border border-slate-200 z-50 max-h-96 overflow-hidden">
+    <DropdownMenu open={isOpen} onOpenChange={onClose}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Bell className="w-5 h-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-96 max-w-sm max-h-96 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <FaBell className="w-5 h-5 text-primary-600" />
+            <Bell className="w-5 h-5 text-primary-600" />
             <h3 className="font-semibold text-slate-900">Notifications</h3>
           </div>
           <div className="flex items-center gap-2">
             {notifications && notifications.some(n => !n.read) && (
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleMarkAllAsRead}
-                className="text-xs text-primary-600 hover:text-primary-700 font-medium"
-                title="Mark all as read"
+                className="text-xs"
               >
-                <FaCheck className="w-4 h-4" />
-              </button>
+                <Check className="w-4 h-4" />
+              </Button>
             )}
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-600"
-            >
-              <FaTimes className="w-4 h-4" />
-            </button>
           </div>
         </div>
 
@@ -78,7 +84,7 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
         <div className="max-h-80 overflow-y-auto">
           {!notifications || notifications.length === 0 ? (
             <div className="p-8 text-center">
-              <FaBell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <Bell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
               <p className="text-slate-500 font-medium">No notifications yet</p>
               <p className="text-sm text-slate-400 mt-1">
                 You'll see notifications here when someone posts in your communities
@@ -114,17 +120,18 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
                         </p>
                       </div>
                       {!notification.read && (
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             handleMarkAsRead(notification._id);
                           }}
-                          className="text-primary-600 hover:text-primary-700 p-1"
-                          title="Mark as read"
+                          className="p-1"
                         >
-                          <FaEye className="w-3 h-3" />
-                        </button>
+                          <Eye className="w-3 h-3" />
+                        </Button>
                       )}
                     </div>
                   </Link>
@@ -133,8 +140,8 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
             </div>
           )}
         </div>
-      </div>
-    </>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

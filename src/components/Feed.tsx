@@ -1,6 +1,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import PostCard from "./PostCard";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function Feed() {
   const topPosts = useQuery(api.leaderboard.getTopPosts, { limit: 10 });
