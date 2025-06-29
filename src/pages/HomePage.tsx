@@ -1,10 +1,11 @@
 import { Feed } from "../components/Feed";
+import TwitchSidebar from "../components/TwitchSidebar";
 
 const HomePage = () => {
   return (
     <div className="min-h-screen pt-20 pb-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12 px-4">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent mb-4 animate-fade-in-up">
             <span className="inline-block animate-wave-text" style={{ animationDelay: '0ms' }}>W</span>
             <span className="inline-block animate-wave-text" style={{ animationDelay: '100ms' }}>e</span>
@@ -31,8 +32,19 @@ const HomePage = () => {
             Your voice matters here.
           </p>
         </div>
-        <div className="animate-fade-in-up" style={{ animationDelay: '2500ms' }}>
-          <Feed />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Feed */}
+          <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '2500ms' }}>
+            <Feed />
+          </div>
+          
+          {/* Right Sidebar - Twitch */}
+          <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '3000ms' }}>
+            <div className="sticky top-24">
+              <TwitchSidebar />
+            </div>
+          </div>
         </div>
       </div>
     </div>

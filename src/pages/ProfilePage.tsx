@@ -29,9 +29,9 @@ const ProfilePage = () => {
   const stats = useQuery(api.users.getPublicUser, {username: username || ""});
   const memberships = useQuery(api.subreddit.getUserMemberships, {username: username || ""});
   
-  // Follow system queries
+  // Follow system queries - only if we have a valid user ID
   const isFollowing = useQuery(api.follows.isFollowing, 
-    stats?._id ? { targetUserId: stats._id } : "skip"
+    stats?._id && !isOwnProfile ? { targetUserId: stats._id } : "skip"
   );
   const followerCount = useQuery(api.follows.getFollowerCount, 
     stats?._id ? { userId: stats._id } : "skip"
@@ -97,12 +97,25 @@ const ProfilePage = () => {
     return 'Just now';
   };
 
-  if (posts === undefined) {
+  if (posts === undefined || stats === undefined) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600 dark:text-slate-400">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user doesn't exist, stats will have no _id
+  if (!stats._id) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">👤</div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">User not found</h1>
+          <p className="text-slate-600 dark:text-slate-400">The user u/{username} does not exist.</p>
         </div>
       </div>
     );
@@ -237,10 +250,10 @@ const ProfilePage = () => {
         </Card>
 
         {/* Followers/Following Section */}
-        {(followerCount || followingCount) && (followerCount! > 0 || followingCount! > 0) && (
+        {((followerCount ?? 0) > 0 || (followingCount ?? 0) > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Followers */}
-            {followerCount! > 0 && (
+            {(followerCount ?? 0) > 0 && (
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -294,7 +307,7 @@ const ProfilePage = () => {
             )}
 
             {/* Following */}
-            {followingCount! > 0 && (
+            {(followingCount ?? 0) > 0 && (
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
