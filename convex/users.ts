@@ -1,6 +1,8 @@
 import { internalMutation, query, QueryCtx, mutation } from "./_generated/server";
 import { v, Validator } from "convex/values";
 import { counts, postCountKey } from "./counter";
+// Import follows module to ensure it's included in the generated API
+import "./follows";
 
 export const current = query({
   args: {},
