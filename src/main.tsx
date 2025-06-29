@@ -5,6 +5,7 @@ import "./index.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
@@ -13,10 +14,12 @@ const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_te
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={clerkPublishableKey}>
-      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-        <App />
-      </ConvexProviderWithClerk>
-    </ClerkProvider>
+    <ThemeProvider>
+      <ClerkProvider publishableKey={clerkPublishableKey}>
+        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+          <App />
+        </ConvexProviderWithClerk>
+      </ClerkProvider>
+    </ThemeProvider>
   </React.StrictMode>,
 );

@@ -2,15 +2,15 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { User, Users, FileText, Sun, Moon, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTheme } from "../contexts/ThemeContext";
 
 const SettingsPage = () => {
   const { user } = useUser();
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const { theme, setTheme } = useTheme();
   
   const stats = useQuery(api.users.getPublicUser, {
     username: user?.username || ""
@@ -27,14 +27,13 @@ const SettingsPage = () => {
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
-    // Theme switching logic would go here
   };
 
   if (!user) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-slate-600">Please sign in to access settings.</p>
+          <p className="text-slate-600 dark:text-slate-400">Please sign in to access settings.</p>
         </div>
       </div>
     );
@@ -43,7 +42,7 @@ const SettingsPage = () => {
   return (
     <div className="min-h-screen pt-20 pb-8">
       <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-slate-900 mb-8">Settings</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-8">Settings</h1>
         
         <div className="space-y-6">
           {/* Account Summary */}
@@ -56,28 +55,28 @@ const SettingsPage = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-slate-600">Username</span>
-                <span className="font-semibold">u/{user.username}</span>
+                <span className="text-slate-600 dark:text-slate-400">Username</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">u/{user.username}</span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-slate-600">Account Created</span>
-                <span className="font-semibold">
+                <span className="text-slate-600 dark:text-slate-400">Account Created</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {new Date(user.createdAt || 0).toLocaleDateString()}
                 </span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-slate-600">Total Posts</span>
-                <span className="font-semibold flex items-center gap-1">
+                <span className="text-slate-600 dark:text-slate-400">Total Posts</span>
+                <span className="font-semibold flex items-center gap-1 text-slate-900 dark:text-slate-100">
                   <FileText className="w-4 h-4" />
                   {stats?.posts || 0}
                 </span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-slate-600">Communities Joined</span>
-                <span className="font-semibold flex items-center gap-1">
+                <span className="text-slate-600 dark:text-slate-400">Communities Joined</span>
+                <span className="font-semibold flex items-center gap-1 text-slate-900 dark:text-slate-100">
                   <Users className="w-4 h-4" />
                   {memberships?.length || 0}
                 </span>
@@ -108,7 +107,7 @@ const SettingsPage = () => {
                 <Button
                   variant={theme === 'light' ? 'default' : 'outline'}
                   onClick={() => handleThemeChange('light')}
-                  className="flex-1"
+                  className={`flex-1 ${theme === 'light' ? 'bg-slate-900 text-white hover:bg-slate-800' : 'border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white dark:border-slate-100 dark:text-slate-100 dark:hover:bg-slate-100 dark:hover:text-slate-900'}`}
                 >
                   <Sun className="w-4 h-4 mr-2" />
                   Light
@@ -116,7 +115,7 @@ const SettingsPage = () => {
                 <Button
                   variant={theme === 'dark' ? 'default' : 'outline'}
                   onClick={() => handleThemeChange('dark')}
-                  className="flex-1"
+                  className={`flex-1 ${theme === 'dark' ? 'bg-slate-900 text-white hover:bg-slate-800' : 'border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white dark:border-slate-100 dark:text-slate-100 dark:hover:bg-slate-100 dark:hover:text-slate-900'}`}
                 >
                   <Moon className="w-4 h-4 mr-2" />
                   Dark
