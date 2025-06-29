@@ -16,6 +16,15 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Dark theme improvements */
+  .dark {
+    color-scheme: dark;
+  }
+
+  .dark body {
+    @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900;
+  }
 }
 
 /* Custom scrollbar */
@@ -53,4 +62,47 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Dark theme button styles */
+.dark .btn {
+  @apply border-slate-600 text-slate-200;
+}
+
+.dark .btn:hover {
+  @apply bg-slate-700 border-slate-500;
+}
+
+.dark .btn-primary {
+  @apply bg-primary-600 border-primary-600 text-white;
+}
+
+.dark .btn-primary:hover {
+  @apply bg-primary-700 border-primary-700;
+}
+
+.dark .btn-secondary {
+  @apply bg-slate-700 border-slate-600 text-slate-200;
+}
+
+.dark .btn-secondary:hover {
+  @apply bg-slate-600 border-slate-500;
+}
+
+/* Dark theme input styles */
+.dark .input {
+  @apply bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-400;
+}
+
+.dark .input:focus {
+  @apply border-primary-500 ring-primary-500/20;
+}
+
+/* Dark theme card styles */
+.dark .card {
+  @apply bg-slate-800/80 border-slate-700/50 backdrop-blur-sm;
+}
+
+.dark .card:hover {
+  @apply bg-slate-800/90 shadow-xl shadow-slate-900/20;
 }
