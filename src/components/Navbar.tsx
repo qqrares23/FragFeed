@@ -79,7 +79,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-white/20 dark:border-slate-700/50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -104,7 +104,7 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={handleGamingClick}
-              className={showGamingDropdown ? "bg-slate-100" : ""}
+              className={showGamingDropdown ? "bg-slate-100 dark:bg-slate-800" : ""}
             >
               <Gamepad2 className="w-5 h-5" />
             </Button>
@@ -121,7 +121,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={handleCommunityQuickPostClick}
-                className={showCommunityQuickPost ? "bg-slate-100" : ""}
+                className={showCommunityQuickPost ? "bg-slate-100 dark:bg-slate-800" : ""}
               >
                 <Users className="w-5 h-5" />
               </Button>
@@ -132,7 +132,7 @@ const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   onClick={handleNotificationsClick}
-                  className={showNotifications ? "bg-slate-100" : ""}
+                  className={showNotifications ? "bg-slate-100 dark:bg-slate-800" : ""}
                 >
                   <Bell className="w-5 h-5" />
                 </Button>
@@ -151,7 +151,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={handleCreateClick}
-                className={showCreatePanel ? "bg-slate-100" : ""}
+                className={showCreatePanel ? "bg-slate-100 dark:bg-slate-800" : ""}
               >
                 <Plus className="w-5 h-5" />
               </Button>
@@ -195,7 +195,7 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-lg">
+          <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg">
             <div className="px-4 py-4 space-y-4">
               {/* Mobile Search */}
               <div className="w-full">
