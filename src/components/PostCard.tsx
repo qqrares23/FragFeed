@@ -1,4 +1,4 @@
-import { FaRegCommentAlt, FaTrash, FaArrowUp, FaArrowDown, FaUserShield } from "react-icons/fa";
+import { FaRegCommentAlt, FaTrash, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { PaginationStatus, useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -49,11 +49,6 @@ const PostCard = ({
   const hasUpvoted = useQuery(api.vote.hasUpvoted, { postId: post._id });
   const hasDownvoted = useQuery(api.vote.hasDownvoted, { postId: post._id });
 
-  // Get moderation info for the subreddit
-  const moderationInfo = useQuery(api.moderation.isUserModerator, 
-    post.subreddit ? { subredditId: post.subreddit._id } : "skip"
-  );
-
   const { results: comments, loadMore, status } = usePaginatedQuery(
     api.comments.getComments,
     { postId: post._id },
@@ -101,11 +96,6 @@ const PostCard = ({
     });
     setNewComment("");
   };
-
-  const canDeletePost = ownedByCurrentUser || 
-    (moderationInfo?.permissions.includes("delete_posts"));
-  
-  const canDeleteComments = moderationInfo?.permissions.includes("delete_comments");
 
   return (
     <div className={`card ${expandedView ? 'p-0' : 'p-4 lg:p-6'} ${expandedView ? '' : 'hover:-translate-y-1'}`}>
@@ -173,16 +163,6 @@ const PostCard = ({
             
             <span>•</span>
             <span>{new Date(post._creationTime).toLocaleDateString()}</span>
-            
-            {moderationInfo?.isModerator && (
-              <>
-                <span>•</span>
-                <span className="flex items-center gap-1 text-primary-600">
-                  <FaUserShield className="w-3 h-3" />
-                  <span className="text-xs">{moderationInfo.isOwner ? 'Owner' : 'Mod'}</span>
-                </span>
-              </>
-            )}
           </div>
 
           {/* Title and Content */}
@@ -238,7 +218,7 @@ const PostCard = ({
               <span className="text-xs lg:text-sm font-medium">{commentCount || 0} Comments</span>
             </button>
             
-            {canDeletePost && (
+            {ownedByCurrentUser && (
               <button
                 onClick={handleDelete}
                 className="flex items-center gap-2 text-red-500 hover:text-red-700 transition-colors"
@@ -276,7 +256,7 @@ const PostCard = ({
                   <Comment 
                     key={comment._id} 
                     comment={comment} 
-                    canDelete={comment.authorId === user?.id || canDeleteComments}
+                    canDelete={comment.authorId === user?.id}
                     onDelete={() => handleDeleteComment(comment._id)}
                   />
                 ))}

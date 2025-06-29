@@ -3,15 +3,13 @@ import { usePaginatedQuery, useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
-import ModerationModal from "../components/ModerationModal";
-import { FaUsers, FaPlus, FaMinus, FaCalendarAlt, FaEye, FaEyeSlash, FaUserShield, FaCog } from "react-icons/fa";
+import { FaUsers, FaPlus, FaMinus, FaCalendarAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 
 const SubredditPage = () => {
   const { subredditName } = useParams();
   const { user } = useUser();
   const [showMembers, setShowMembers] = useState(false);
-  const [showModerationModal, setShowModerationModal] = useState(false);
   
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.getSubredditPosts, {
@@ -26,9 +24,6 @@ const SubredditPage = () => {
   );
   const members = useQuery(api.subreddit.getMembers,
     subreddit && showMembers ? { subredditId: subreddit._id, limit: 20 } : "skip"
-  );
-  const moderationInfo = useQuery(api.moderation.isUserModerator,
-    subreddit ? { subredditId: subreddit._id } : "skip"
   );
   
   const joinSubreddit = useMutation(api.subreddit.join);
@@ -83,9 +78,6 @@ const SubredditPage = () => {
     return 'Just now';
   };
 
-  const isOwner = moderationInfo?.isOwner;
-  const isModerator = moderationInfo?.isModerator;
-
   return (
     <div className="min-h-screen pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,18 +98,6 @@ const SubredditPage = () => {
                 
                 {user && (
                   <div className="flex flex-col sm:flex-row gap-3">
-                    {/* Moderation Button - Only for owners */}
-                    {isOwner && (
-                      <button 
-                        onClick={() => setShowModerationModal(true)}
-                        className="btn btn-secondary order-3 sm:order-1"
-                        title="Manage moderators"
-                      >
-                        <FaUserShield className="w-4 h-4" />
-                        <span className="hidden sm:inline">Moderation</span>
-                      </button>
-                    )}
-                    
                     <button 
                       onClick={handleJoinLeave}
                       className={`btn ${isMember ? 'btn-secondary' : 'btn-primary'} order-1 sm:order-2`}
@@ -162,14 +142,6 @@ const SubredditPage = () => {
                   <span className="hidden sm:inline">posts</span>
                   <span className="sm:hidden">📝</span>
                 </div>
-                {isModerator && (
-                  <div className="flex items-center gap-2 text-primary-600">
-                    <FaUserShield className="w-4 h-4 lg:w-5 lg:h-5" />
-                    <span className="font-semibold text-sm">
-                      {isOwner ? 'Owner' : 'Moderator'}
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -291,16 +263,6 @@ const SubredditPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Moderation Modal */}
-      {showModerationModal && subreddit && (
-        <ModerationModal
-          isOpen={showModerationModal}
-          onClose={() => setShowModerationModal(false)}
-          subredditId={subreddit._id}
-          subredditName={subreddit.name}
-        />
-      )}
     </div>
   );
 };

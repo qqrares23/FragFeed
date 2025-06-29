@@ -3,7 +3,6 @@ import { v, ConvexError } from "convex/values";
 import { getCurrentUserOrThrow } from "./users";
 import {counts, commentCountKey} from "./counter"
 import { paginationOptsValidator } from "convex/server";
-import { checkModerationPermission } from "./moderation";
 
 export const create = mutation({
   args: {
@@ -58,25 +57,11 @@ export const deleteComment = mutation({
 
     const user = await getCurrentUserOrThrow(ctx);
     
-    // Check if user is the author
-    if (comment.authorId === user._id) {
-      await ctx.db.delete(args.id);
-      await counts.dec(ctx, commentCountKey(comment.postId));
-      return;
-    }
-    
-    // Check if user has moderation permissions
-    const post = await ctx.db.get(comment.postId);
-    if (!post) {
-      throw new ConvexError({ message: "Post not found" });
-    }
-    
-    const hasPermission = await checkModerationPermission(ctx, post.subreddit, "delete_comments");
-    if (!hasPermission) {
+    // Only allow the author to delete their own comments
+    if (comment.authorId !== user._id) {
       throw new ConvexError({ message: "You can't delete this comment" });
     }
     
-    // Moderator deleting comment
     await ctx.db.delete(args.id);
     await counts.dec(ctx, commentCountKey(comment.postId));
   },
