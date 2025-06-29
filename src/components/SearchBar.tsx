@@ -3,11 +3,6 @@ import { Search, X, Clock, Users, TrendingUp } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { useQuery } from "convex/react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface SearchResult {
   _id: string;
@@ -168,9 +163,9 @@ const SearchBar = () => {
         isFocused ? 'ring-2 ring-primary-500 border-primary-500' : 'hover:border-slate-400'
       }`}>
         <Search className="w-4 h-4 text-slate-400 ml-4" />
-        <Input
+        <input
           ref={inputRef}
-          className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="flex-1 px-4 py-3 bg-transparent border-0 focus:outline-none placeholder-slate-500"
           placeholder={
             currentSubreddit
               ? `Search posts in r/${currentSubreddit}`
@@ -184,38 +179,34 @@ const SearchBar = () => {
         />
         
         {searchQuery && (
-          <Button 
-            variant="ghost"
-            size="sm"
+          <button 
             onClick={clearSearchQuery}
-            className="mr-2 p-2"
+            className="p-2 mr-2 hover:bg-slate-100 rounded-lg transition-colors"
           >
-            <X className="w-4 h-4" />
-          </Button>
+            <X className="w-4 h-4 text-slate-400" />
+          </button>
         )}
 
         {currentSubreddit && (
-          <Badge variant="secondary" className="mr-3">
+          <div className="mr-3 px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-lg">
             r/{currentSubreddit}
-          </Badge>
+          </div>
         )}
       </div>
 
       {isActive && (
-        <Card className="absolute top-full left-0 right-0 mt-2 max-h-96 overflow-hidden z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 max-h-96 overflow-hidden z-50">
           <div className="flex items-center justify-between p-4 border-b border-slate-100">
             <h4 className="font-semibold text-slate-700">
               {searchQuery ? 'Search Results' : 'Recent & Suggestions'}
             </h4>
             {(searchHistory.length > 0 || recentSearches.length > 0) && (
-              <Button 
-                variant="ghost"
-                size="sm"
+              <button 
                 onClick={clearSearchHistory}
-                className="text-xs"
+                className="text-xs text-slate-500 hover:text-slate-700 transition-colors"
               >
                 Clear All
-              </Button>
+              </button>
             )}
           </div>
 
@@ -229,11 +220,10 @@ const SearchBar = () => {
                       <span className="text-sm font-medium text-slate-600">Recent Searches</span>
                     </div>
                     {recentSearches.map((recent, index) => (
-                      <Button
+                      <button
                         key={index}
-                        variant="ghost"
                         onClick={() => handleHistoryClick(recent.query)}
-                        className="w-full justify-start p-2 h-auto"
+                        className="w-full p-2 hover:bg-slate-50 rounded-lg text-left transition-colors"
                       >
                         <div className="text-sm">
                           <div className="font-medium text-slate-900">{recent.query}</div>
@@ -241,7 +231,7 @@ const SearchBar = () => {
                             {recent.type} • {formatTimeAgo(recent.timestamp)}
                           </div>
                         </div>
-                      </Button>
+                      </button>
                     ))}
                   </div>
                 )}
@@ -253,14 +243,13 @@ const SearchBar = () => {
                       <span className="text-sm font-medium text-slate-600">Search History</span>
                     </div>
                     {searchHistory.slice(0, 5).map((query, index) => (
-                      <Button
+                      <button
                         key={index}
-                        variant="ghost"
                         onClick={() => handleHistoryClick(query)}
-                        className="w-full justify-start p-2 h-auto"
+                        className="w-full p-2 hover:bg-slate-50 rounded-lg text-left transition-colors"
                       >
                         <span className="text-sm font-medium text-slate-900">{query}</span>
-                      </Button>
+                      </button>
                     ))}
                   </div>
                 )}
@@ -278,22 +267,19 @@ const SearchBar = () => {
             ) : results && results.length > 0 ? (
               <div className="p-2">
                 {results.map((result) => (
-                  <Button
+                  <button
                     key={result._id}
-                    variant="ghost"
                     onClick={() => handleResultClick(result)}
-                    className="w-full justify-start p-3 h-auto"
+                    className="w-full p-3 hover:bg-slate-50 rounded-lg text-left transition-colors"
                   >
                     <div className="flex items-center gap-3 w-full">
-                      <Avatar className="w-8 h-8">
-                        <AvatarFallback>
-                          {result.type === 'community' ? (
-                            <Users className="w-4 h-4" />
-                          ) : (
-                            <TrendingUp className="w-4 h-4" />
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center">
+                        {result.type === 'community' ? (
+                          <Users className="w-4 h-4 text-slate-600" />
+                        ) : (
+                          <TrendingUp className="w-4 h-4 text-slate-600" />
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0 text-left">
                         <div className="font-medium text-slate-900 truncate">{result.title}</div>
                         <div className="text-sm text-slate-500">
@@ -302,7 +288,7 @@ const SearchBar = () => {
                         </div>
                       </div>
                     </div>
-                  </Button>
+                  </button>
                 ))}
               </div>
             ) : searchQuery.length >= 2 ? (
@@ -320,7 +306,7 @@ const SearchBar = () => {
               </div>
             )}
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );

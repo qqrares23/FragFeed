@@ -9,8 +9,6 @@ import GamingDropdown from "./GamingDropdown";
 import NotificationDropdown from "./NotificationDropdown";
 import CommunityQuickPost from "./CommunityQuickPost";
 import SearchBar from "./SearchBar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 const Navbar = () => {
   const [showCreatePanel, setShowCreatePanel] = useState(false);
@@ -95,70 +93,66 @@ const Navbar = () => {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-2 relative">
             {/* Gaming Hub */}
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={handleGamingClick}
-              className={showGamingDropdown ? "bg-slate-100" : ""}
+              className={`p-2 rounded-lg transition-colors ${
+                showGamingDropdown ? "bg-slate-100" : "hover:bg-slate-100"
+              }`}
             >
-              <Gamepad2 className="w-5 h-5" />
-            </Button>
+              <Gamepad2 className="w-5 h-5 text-slate-600" />
+            </button>
 
             <Unauthenticated>
               <SignInButton mode="modal">
-                <Button>Sign In</Button>
+                <button className="btn btn-primary">Sign In</button>
               </SignInButton>
             </Unauthenticated>
             
             <Authenticated>
               {/* Community Quick Post */}
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={handleCommunityQuickPostClick}
-                className={showCommunityQuickPost ? "bg-slate-100" : ""}
+                className={`p-2 rounded-lg transition-colors ${
+                  showCommunityQuickPost ? "bg-slate-100" : "hover:bg-slate-100"
+                }`}
               >
-                <Users className="w-5 h-5" />
-              </Button>
+                <Users className="w-5 h-5 text-slate-600" />
+              </button>
 
               {/* Notifications */}
               <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
                   onClick={handleNotificationsClick}
-                  className={showNotifications ? "bg-slate-100" : ""}
+                  className={`p-2 rounded-lg transition-colors ${
+                    showNotifications ? "bg-slate-100" : "hover:bg-slate-100"
+                  }`}
                 >
-                  <Bell className="w-5 h-5" />
-                </Button>
+                  <Bell className="w-5 h-5 text-slate-600" />
+                </button>
                 {unreadCount && unreadCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                  >
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {unreadCount > 9 ? '9+' : unreadCount}
-                  </Badge>
+                  </span>
                 )}
               </div>
 
               {/* Create */}
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={handleCreateClick}
-                className={showCreatePanel ? "bg-slate-100" : ""}
+                className={`p-2 rounded-lg transition-colors ${
+                  showCreatePanel ? "bg-slate-100" : "hover:bg-slate-100"
+                }`}
               >
-                <Plus className="w-5 h-5" />
-              </Button>
+                <Plus className="w-5 h-5 text-slate-600" />
+              </button>
 
               {/* Profile */}
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={() => user?.username && navigate(`/u/${user.username}`)}
+                className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
               >
-                <User className="w-5 h-5" />
-              </Button>
+                <User className="w-5 h-5 text-slate-600" />
+              </button>
 
               <UserButton />
             </Authenticated>
@@ -169,13 +163,12 @@ const Navbar = () => {
             <Authenticated>
               <UserButton />
             </Authenticated>
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={toggleMobileMenu}
+              className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
               {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -190,73 +183,66 @@ const Navbar = () => {
 
               <Unauthenticated>
                 <SignInButton mode="modal">
-                  <Button className="w-full">Sign In</Button>
+                  <button className="btn btn-primary w-full">Sign In</button>
                 </SignInButton>
               </Unauthenticated>
 
               <Authenticated>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Gaming Hub */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
+                  <button 
                     onClick={handleGamingClick}
+                    className="btn btn-secondary flex items-center justify-center gap-2"
                   >
                     <Gamepad2 className="w-4 h-4" />
                     Gaming
-                  </Button>
+                  </button>
 
                   {/* Community Quick Post */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
+                  <button 
                     onClick={handleCommunityQuickPostClick}
+                    className="btn btn-secondary flex items-center justify-center gap-2"
                   >
                     <Users className="w-4 h-4" />
                     Quick Post
-                  </Button>
+                  </button>
 
                   {/* Notifications */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2 relative"
+                  <button 
                     onClick={handleNotificationsClick}
+                    className="btn btn-secondary flex items-center justify-center gap-2 relative"
                   >
                     <Bell className="w-4 h-4" />
                     Notifications
                     {unreadCount && unreadCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                      >
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
-                      </Badge>
+                      </span>
                     )}
-                  </Button>
+                  </button>
 
                   {/* Create */}
-                  <Button 
-                    className="flex items-center justify-center gap-2"
+                  <button 
                     onClick={handleCreateClick}
+                    className="btn btn-primary flex items-center justify-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
                     Create
-                  </Button>
+                  </button>
 
                   {/* Profile */}
-                  <Button
-                    variant="secondary"
-                    className="flex items-center justify-center gap-2 col-span-2"
+                  <button
                     onClick={() => {
                       if (user?.username) {
                         navigate(`/u/${user.username}`);
                         setShowMobileMenu(false);
                       }
                     }}
+                    className="btn btn-secondary flex items-center justify-center gap-2 col-span-2"
                   >
                     <User className="w-4 h-4" />
                     Profile
-                  </Button>
+                  </button>
                 </div>
               </Authenticated>
             </div>
