@@ -228,21 +228,27 @@ const ProfilePage = () => {
                 {/* Stats */}
                 <div className="flex gap-6 mt-4">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                    <span className="font-semibold">{stats?.posts ?? 0}</span>
+                    <span className="font-semibold">{stats?.posts || 0}</span>
                     <span>posts</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                    <span className="font-semibold">{followerCount ?? 0}</span>
-                    <span>followers</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                    <span className="font-semibold">{followingCount ?? 0}</span>
-                    <span>following</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                    <span className="font-semibold">{memberships?.length ?? 0}</span>
-                    <span>communities</span>
-                  </div>
+                  {(followerCount && followerCount > 0) && (
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                      <span className="font-semibold">{followerCount}</span>
+                      <span>followers</span>
+                    </div>
+                  )}
+                  {(followingCount && followingCount > 0) && (
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                      <span className="font-semibold">{followingCount}</span>
+                      <span>following</span>
+                    </div>
+                  )}
+                  {(memberships?.length && memberships.length > 0) && (
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                      <span className="font-semibold">{memberships.length}</span>
+                      <span>communities</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -250,10 +256,10 @@ const ProfilePage = () => {
         </Card>
 
         {/* Followers/Following Section */}
-        {((followerCount ?? 0) > 0 || (followingCount ?? 0) > 0) && (
+        {((followerCount && followerCount > 0) || (followingCount && followingCount > 0)) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Followers */}
-            {(followerCount ?? 0) > 0 && (
+            {(followerCount && followerCount > 0) && (
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -307,7 +313,7 @@ const ProfilePage = () => {
             )}
 
             {/* Following */}
-            {(followingCount ?? 0) > 0 && (
+            {(followingCount && followingCount > 0) && (
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">

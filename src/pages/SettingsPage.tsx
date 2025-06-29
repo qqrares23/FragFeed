@@ -66,21 +66,25 @@ const SettingsPage = () => {
                 </span>
               </div>
               
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600 dark:text-slate-400">Total Posts</span>
-                <span className="font-semibold flex items-center gap-1 text-slate-900 dark:text-slate-100">
-                  <FileText className="w-4 h-4" />
-                  {stats?.posts || 0}
-                </span>
-              </div>
+              {stats?.posts !== undefined && stats.posts > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600 dark:text-slate-400">Total Posts</span>
+                  <span className="font-semibold flex items-center gap-1 text-slate-900 dark:text-slate-100">
+                    <FileText className="w-4 h-4" />
+                    {stats.posts}
+                  </span>
+                </div>
+              )}
               
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600 dark:text-slate-400">Communities Joined</span>
-                <span className="font-semibold flex items-center gap-1 text-slate-900 dark:text-slate-100">
-                  <Users className="w-4 h-4" />
-                  {memberships?.length || 0}
-                </span>
-              </div>
+              {memberships && memberships.length > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600 dark:text-slate-400">Communities Joined</span>
+                  <span className="font-semibold flex items-center gap-1 text-slate-900 dark:text-slate-100">
+                    <Users className="w-4 h-4" />
+                    {memberships.length}
+                  </span>
+                </div>
+              )}
             </CardContent>
           </Card>
 
