@@ -1,4 +1,4 @@
-import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs, FaBars, FaTimes, FaCog } from "react-icons/fa";
+import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs, FaBars, FaTimes, FaCog, FaUsers } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,12 +7,14 @@ import { api } from "../../convex/_generated/api";
 import CreatePanel from "./CreatePanel";
 import GamingDropdown from "./GamingDropdown";
 import NotificationDropdown from "./NotificationDropdown";
+import CommunityQuickPost from "./CommunityQuickPost";
 import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const [showCreatePanel, setShowCreatePanel] = useState(false);
   const [showGamingDropdown, setShowGamingDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showCommunityQuickPost, setShowCommunityQuickPost] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { user } = useUser();
   const navigate = useNavigate();
@@ -25,6 +27,7 @@ const Navbar = () => {
       setShowCreatePanel(false);
       setShowGamingDropdown(false);
       setShowNotifications(false);
+      setShowCommunityQuickPost(false);
       setShowMobileMenu(false);
     };
 
@@ -36,6 +39,7 @@ const Navbar = () => {
     setShowCreatePanel(true);
     setShowGamingDropdown(false);
     setShowNotifications(false);
+    setShowCommunityQuickPost(false);
     setShowMobileMenu(false);
   };
 
@@ -43,6 +47,7 @@ const Navbar = () => {
     setShowGamingDropdown(true);
     setShowCreatePanel(false);
     setShowNotifications(false);
+    setShowCommunityQuickPost(false);
     setShowMobileMenu(false);
   };
 
@@ -50,6 +55,15 @@ const Navbar = () => {
     setShowNotifications(true);
     setShowCreatePanel(false);
     setShowGamingDropdown(false);
+    setShowCommunityQuickPost(false);
+    setShowMobileMenu(false);
+  };
+
+  const handleCommunityQuickPost = () => {
+    setShowCommunityQuickPost(true);
+    setShowCreatePanel(false);
+    setShowGamingDropdown(false);
+    setShowNotifications(false);
     setShowMobileMenu(false);
   };
 
@@ -57,6 +71,7 @@ const Navbar = () => {
     setShowCreatePanel(false);
     setShowGamingDropdown(false);
     setShowNotifications(false);
+    setShowCommunityQuickPost(false);
     setShowMobileMenu(false);
   };
 
@@ -65,6 +80,7 @@ const Navbar = () => {
     setShowCreatePanel(false);
     setShowGamingDropdown(false);
     setShowNotifications(false);
+    setShowCommunityQuickPost(false);
   };
 
   return (
@@ -112,6 +128,21 @@ const Navbar = () => {
             </Unauthenticated>
             
             <Authenticated>
+              {/* Community Quick Post */}
+              <div className="relative">
+                <button 
+                  onClick={handleCommunityQuickPost}
+                  className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
+                    showCommunityQuickPost 
+                      ? 'bg-primary-100 text-primary-700 shadow-md' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                  title="Quick Post to Communities"
+                >
+                  <FaUsers className="w-5 h-5" />
+                </button>
+              </div>
+
               {/* Notifications */}
               <div className="relative">
                 <button 
@@ -213,6 +244,15 @@ const Navbar = () => {
                     Gaming
                   </button>
 
+                  {/* Community Quick Post */}
+                  <button 
+                    onClick={handleCommunityQuickPost}
+                    className="btn btn-secondary flex items-center justify-center gap-2"
+                  >
+                    <FaUsers className="w-4 h-4" />
+                    Quick Post
+                  </button>
+
                   {/* Notifications */}
                   <button 
                     onClick={handleNotifications}
@@ -252,7 +292,7 @@ const Navbar = () => {
                         setShowMobileMenu(false);
                       }
                     }}
-                    className="btn btn-secondary flex items-center justify-center gap-2 col-span-2"
+                    className="btn btn-secondary flex items-center justify-center gap-2"
                   >
                     <FaUser className="w-4 h-4" />
                     Profile
@@ -280,6 +320,12 @@ const Navbar = () => {
       {showCreatePanel && (
         <CreatePanel
           isOpen={showCreatePanel}
+          onClose={closeAllDropdowns}
+        />
+      )}
+      {showCommunityQuickPost && (
+        <CommunityQuickPost
+          isOpen={showCommunityQuickPost}
           onClose={closeAllDropdowns}
         />
       )}
