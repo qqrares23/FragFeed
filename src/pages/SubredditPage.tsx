@@ -4,8 +4,8 @@ import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GuidelinesEditModal from "../components/GuidelinesEditModal";
-import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Camera, Upload, Image } from "lucide-react";
-import { useState, useRef } from "react";
+import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Image } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,13 +15,8 @@ const SubredditPage = () => {
   const { user } = useUser();
   const [showMembers, setShowMembers] = useState(false);
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
-  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  
-  // File input refs
-  const bannerInputRef = useRef<HTMLInputElement>(null);
-  const logoInputRef = useRef<HTMLInputElement>(null);
   
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.getSubredditPosts, {
@@ -43,7 +38,6 @@ const SubredditPage = () => {
   
   const joinSubreddit = useMutation(api.subreddit.join);
   const leaveSubreddit = useMutation(api.subreddit.leave);
-  const updateBanner = useMutation(api.subreddit.updateBanner);
   const updateLogo = useMutation(api.subreddit.updateLogo);
   const generateUploadUrl = useMutation(api.image.generateUploadUrl);
 
@@ -110,62 +104,8 @@ const SubredditPage = () => {
     }
   };
 
-  const handleBannerUpload = async () => {
-    if (!bannerInputRef.current || !subreddit) return;
-    
-    // Create and configure file input
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.style.display = 'none';
-    
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      // Validate file size (10MB limit)
-      if (file.size > 10 * 1024 * 1024) {
-        setUploadError("Banner image must be less than 10MB");
-        return;
-      }
-
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setUploadError("Please select a valid image file");
-        return;
-      }
-
-      setIsUploadingBanner(true);
-      setUploadError(null);
-
-      try {
-        // Upload file and get storage ID
-        const storageId = await uploadFileToStorage(file);
-        
-        // Update subreddit with new banner
-        await updateBanner({
-          subredditId: subreddit._id,
-          bannerImage: storageId,
-        });
-
-        console.log("Banner uploaded successfully");
-      } catch (error) {
-        console.error("Banner upload error:", error);
-        setUploadError("Failed to upload banner image. Please try again.");
-      } finally {
-        setIsUploadingBanner(false);
-        // Clean up
-        document.body.removeChild(input);
-      }
-    };
-
-    // Add to DOM and trigger click
-    document.body.appendChild(input);
-    input.click();
-  };
-
   const handleLogoUpload = async () => {
-    if (!logoInputRef.current || !subreddit) return;
+    if (!subreddit) return;
     
     // Create and configure file input
     const input = document.createElement('input');
@@ -236,59 +176,13 @@ const SubredditPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Community Header with Banner */}
+            {/* Community Header */}
             <Card className="overflow-hidden bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border-2 border-primary-100 dark:border-primary-900 shadow-xl">
-              {/* Banner Section */}
-              <div className="relative h-32 lg:h-48 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-600 overflow-hidden">
-                {subreddit.bannerImageUrl ? (
-                  <img 
-                    src={subreddit.bannerImageUrl} 
-                    alt={`r/${subreddit.name} banner`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-600 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Users className="w-12 h-12 lg:w-16 lg:h-16 mx-auto mb-2 opacity-50" />
-                      <p className="text-lg lg:text-xl font-bold opacity-75">r/{subreddit.name}</p>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Banner Upload Button for Owner */}
-                {isOwner && (
-                  <div className="absolute top-4 right-4">
-                    <Button
-                      onClick={handleBannerUpload}
-                      variant="secondary"
-                      size="sm"
-                      className="bg-white/90 hover:bg-white text-slate-700 shadow-lg backdrop-blur-sm"
-                      disabled={isUploadingBanner}
-                    >
-                      {isUploadingBanner ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin mr-2" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Camera className="w-4 h-4 mr-2" />
-                          Change Banner
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              </div>
-
-              <CardContent className="p-6 lg:p-8 -mt-8 relative z-10">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+              <CardContent className="p-6 lg:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
                   <div className="flex-1">
-                    {/* Community Avatar */}
-                    <div className="flex items-end gap-4 mb-4">
+                    {/* Community Avatar and Info */}
+                    <div className="flex items-center gap-4 mb-4">
                       <div className="relative">
                         <Avatar className="w-16 h-16 lg:w-20 lg:h-20 border-4 border-white dark:border-slate-800 shadow-xl">
                           <AvatarImage src={subreddit.logoImageUrl} />
@@ -315,7 +209,7 @@ const SubredditPage = () => {
                         )}
                       </div>
                       
-                      <div className="pb-2">
+                      <div>
                         <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
                           r/{subreddit.name}
                         </h1>
