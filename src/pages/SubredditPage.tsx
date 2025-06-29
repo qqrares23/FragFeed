@@ -17,6 +17,7 @@ const SubredditPage = () => {
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   
   // File input refs
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +38,7 @@ const SubredditPage = () => {
     subreddit && showMembers ? { subredditId: subreddit._id, limit: 20 } : "skip"
   );
   const isOwner = useQuery(api.subreddit.isOwner,
-    subreddit ? { subredditId: subreddit._id } : "skip"
+    subreddit ? { subredditId: subredditId: subreddit._id } : "skip"
   );
   
   const joinSubreddit = useMutation(api.subreddit.join);
@@ -83,90 +84,138 @@ const SubredditPage = () => {
     }
   };
 
-  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !subreddit) return;
-
-    if (file.size > 10 * 1024 * 1024) {
-      alert("Banner image size should be less than 10MB");
-      return;
-    }
-
-    setIsUploadingBanner(true);
+  const uploadFileToStorage = async (file: File): Promise<string> => {
     try {
+      // Generate upload URL
       const uploadUrl = await generateUploadUrl();
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file
-      });
-
-      if (!result.ok) throw new Error('Failed to upload banner');
-      const { storageId } = await result.json();
       
-      await updateBanner({
-        subredditId: subreddit._id,
-        bannerImage: storageId
-      });
-    } catch (error) {
-      console.error("Error uploading banner:", error);
-      alert("Failed to upload banner image");
-    } finally {
-      setIsUploadingBanner(false);
-      // Reset the input
-      if (bannerInputRef.current) {
-        bannerInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !subreddit) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Logo image size should be less than 5MB");
-      return;
-    }
-
-    setIsUploadingLogo(true);
-    try {
-      const uploadUrl = await generateUploadUrl();
-      const result = await fetch(uploadUrl, {
+      // Upload file to Convex storage
+      const uploadResponse = await fetch(uploadUrl, {
         method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
       });
 
-      if (!result.ok) throw new Error('Failed to upload logo');
-      const { storageId } = await result.json();
-      
-      await updateLogo({
-        subredditId: subreddit._id,
-        logoImage: storageId
-      });
-    } catch (error) {
-      console.error("Error uploading logo:", error);
-      alert("Failed to upload logo image");
-    } finally {
-      setIsUploadingLogo(false);
-      // Reset the input
-      if (logoInputRef.current) {
-        logoInputRef.current.value = '';
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed: ${uploadResponse.statusText}`);
       }
+
+      const { storageId } = await uploadResponse.json();
+      return storageId;
+    } catch (error) {
+      console.error("File upload error:", error);
+      throw new Error("Failed to upload file to storage");
     }
   };
 
-  const triggerBannerUpload = () => {
-    if (bannerInputRef.current) {
-      bannerInputRef.current.click();
-    }
+  const handleBannerUpload = async () => {
+    if (!bannerInputRef.current || !subreddit) return;
+    
+    // Create and configure file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.display = 'none';
+    
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        setUploadError("Banner image must be less than 10MB");
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setUploadError("Please select a valid image file");
+        return;
+      }
+
+      setIsUploadingBanner(true);
+      setUploadError(null);
+
+      try {
+        // Upload file and get storage ID
+        const storageId = await uploadFileToStorage(file);
+        
+        // Update subreddit with new banner
+        await updateBanner({
+          subredditId: subreddit._id,
+          bannerImage: storageId,
+        });
+
+        console.log("Banner uploaded successfully");
+      } catch (error) {
+        console.error("Banner upload error:", error);
+        setUploadError("Failed to upload banner image. Please try again.");
+      } finally {
+        setIsUploadingBanner(false);
+        // Clean up
+        document.body.removeChild(input);
+      }
+    };
+
+    // Add to DOM and trigger click
+    document.body.appendChild(input);
+    input.click();
   };
 
-  const triggerLogoUpload = () => {
-    if (logoInputRef.current) {
-      logoInputRef.current.click();
-    }
+  const handleLogoUpload = async () => {
+    if (!logoInputRef.current || !subreddit) return;
+    
+    // Create and configure file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.display = 'none';
+    
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadError("Logo image must be less than 5MB");
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setUploadError("Please select a valid image file");
+        return;
+      }
+
+      setIsUploadingLogo(true);
+      setUploadError(null);
+
+      try {
+        // Upload file and get storage ID
+        const storageId = await uploadFileToStorage(file);
+        
+        // Update subreddit with new logo
+        await updateLogo({
+          subredditId: subreddit._id,
+          logoImage: storageId,
+        });
+
+        console.log("Logo uploaded successfully");
+      } catch (error) {
+        console.error("Logo upload error:", error);
+        setUploadError("Failed to upload logo image. Please try again.");
+      } finally {
+        setIsUploadingLogo(false);
+        // Clean up
+        document.body.removeChild(input);
+      }
+    };
+
+    // Add to DOM and trigger click
+    document.body.appendChild(input);
+    input.click();
   };
 
   const formatTimeAgo = (timestamp: number) => {
@@ -210,7 +259,7 @@ const SubredditPage = () => {
                 {isOwner && (
                   <div className="absolute top-4 right-4">
                     <Button
-                      onClick={triggerBannerUpload}
+                      onClick={handleBannerUpload}
                       variant="secondary"
                       size="sm"
                       className="bg-white/90 hover:bg-white text-slate-700 shadow-lg backdrop-blur-sm"
@@ -228,15 +277,6 @@ const SubredditPage = () => {
                         </>
                       )}
                     </Button>
-                    {/* Hidden file input for banner */}
-                    <input
-                      ref={bannerInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleBannerUpload}
-                      className="hidden"
-                      disabled={isUploadingBanner}
-                    />
                   </div>
                 )}
                 
@@ -260,7 +300,7 @@ const SubredditPage = () => {
                         {/* Logo Upload Button for Owner */}
                         {isOwner && (
                           <Button
-                            onClick={triggerLogoUpload}
+                            onClick={handleLogoUpload}
                             variant="secondary"
                             size="sm"
                             className="absolute -bottom-1 -right-1 w-8 h-8 p-0 rounded-full bg-white/90 hover:bg-white text-slate-700 shadow-lg"
@@ -273,16 +313,6 @@ const SubredditPage = () => {
                             )}
                           </Button>
                         )}
-                        
-                        {/* Hidden file input for logo */}
-                        <input
-                          ref={logoInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleLogoUpload}
-                          className="hidden"
-                          disabled={isUploadingLogo}
-                        />
                       </div>
                       
                       <div className="pb-2">
@@ -330,6 +360,21 @@ const SubredditPage = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Error Display */}
+                {uploadError && (
+                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-red-700 dark:text-red-300 text-sm font-medium">{uploadError}</p>
+                    <Button
+                      onClick={() => setUploadError(null)}
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2 text-red-600 hover:text-red-700"
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                )}
 
                 {/* Enhanced Stats */}
                 <div className="flex flex-wrap gap-4 lg:gap-6">
