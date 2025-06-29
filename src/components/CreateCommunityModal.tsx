@@ -98,14 +98,14 @@ const CreateCommunityModal = ({
             </Label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-600 font-bold text-sm">
-                r/
+                fg/
               </div>
               <Input
                 id="community-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="awesome_community"
-                className="pl-8 h-11"
+                className="pl-10 h-11"
                 maxLength={21}
                 disabled={isLoading}
                 autoComplete="off"

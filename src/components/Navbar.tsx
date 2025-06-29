@@ -1,4 +1,5 @@
-import { Plus, User, Gamepad2, Bell, Target, Menu, X, Settings, Users } from "lucide-react";
+import { Plus, User, Gamepad2, Bell, Menu, X, Settings, Users } from "lucide-react";
+import { FaCrosshairs } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -113,7 +114,7 @@ const Navbar = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group" onClick={closeAllDropdowns}>
               <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
-                <Target className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                <FaCrosshairs className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </div>
               <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
                 FragFeed
