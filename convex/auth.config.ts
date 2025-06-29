@@ -1,7 +1,7 @@
 export default {
     providers: [
       {
-        domain: "https://unique-hound-72.clerk.accounts.dev",
+        domain: process.env.CLERK_JWKS_URL,
         applicationID: "convex",
       },
     ]
