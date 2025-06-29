@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaGamepad, FaSteam, FaNewspaper, FaExternalLinkAlt, FaTwitch, FaDiscord } from "react-icons/fa";
+import { FaGamepad, FaSteam, FaNewspaper, FaExternalLinkAlt, FaTwitch, FaDiscord, FaTimes } from "react-icons/fa";
 import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
 
 interface CheapSharkDeal {
@@ -333,82 +333,93 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
   if (!isOpen) return null;
 
   return (
-    <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="absolute right-0 top-full mt-2 w-[900px] max-w-[95vw] bg-white rounded-2xl shadow-xl border border-slate-200 z-50 max-h-[700px] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      {/* Backdrop - clicking this will close the modal */}
+      <div className="absolute inset-0" onClick={onClose} />
+      
+      {/* Modal Content */}
+      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden animate-slide-up">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
-          <h3 className="text-xl font-bold flex items-center gap-3 mb-4">
-            <FaGamepad className="w-6 h-6" />
-            Gaming Hub
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-2xl font-bold flex items-center gap-3">
+              <FaGamepad className="w-7 h-7" />
+              Gaming Hub
+            </h3>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-xl transition-colors"
+            >
+              <FaTimes className="w-6 h-6" />
+            </button>
+          </div>
           <div className="flex gap-3">
             <button
               onClick={() => setActiveTab('steam')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-6 py-3 rounded-xl font-medium transition-colors ${
                 activeTab === 'steam' 
                   ? 'bg-white text-primary-600' 
                   : 'bg-white/20 text-white hover:bg-white/30'
               }`}
             >
-              <FaSteam className="w-4 h-4 inline mr-2" />
+              <FaSteam className="w-5 h-5 inline mr-2" />
               Steam Deals
             </button>
             <button
               onClick={() => setActiveTab('news')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-6 py-3 rounded-xl font-medium transition-colors ${
                 activeTab === 'news' 
                   ? 'bg-white text-primary-600' 
                   : 'bg-white/20 text-white hover:bg-white/30'
               }`}
             >
-              <FaNewspaper className="w-4 h-4 inline mr-2" />
+              <FaNewspaper className="w-5 h-5 inline mr-2" />
               Gaming News
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 max-h-[500px] overflow-y-auto">
+        <div className="p-8 max-h-[calc(90vh-200px)] overflow-y-auto">
           {loading && (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-16">
               <div className="text-center">
-                <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-slate-600">Loading amazing content...</p>
+                <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-6"></div>
+                <p className="text-slate-600 text-lg">Loading amazing content...</p>
               </div>
             </div>
           )}
           
           {error && (
-            <div className="text-center py-8">
-              <p className="text-red-600">{error}</p>
+            <div className="text-center py-12">
+              <p className="text-red-600 text-lg">{error}</p>
             </div>
           )}
 
           {activeTab === 'steam' && !loading && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {steamDeals.map((deal) => (
                   <div 
                     key={deal.dealID} 
                     onClick={() => handleDealClick(deal.dealID)}
-                    className="card p-4 cursor-pointer hover:shadow-lg transition-all"
+                    className="card p-6 cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1"
                   >
                     <div className="flex gap-4">
                       <img 
                         src={deal.thumb || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
                         alt={deal.title}
-                        className="w-16 h-16 rounded-lg object-cover"
+                        className="w-20 h-20 rounded-xl object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                         }}
                       />
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-slate-900 line-clamp-2 text-sm">
+                        <h4 className="font-semibold text-slate-900 line-clamp-2 mb-3">
                           {deal.title}
                         </h4>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-lg font-bold text-green-600">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xl font-bold text-green-600">
                             {formatPrice(deal.salePrice)}
                           </span>
                           {parseFloat(deal.normalPrice) > parseFloat(deal.salePrice) && (
@@ -423,7 +434,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
                           )}
                         </div>
                         {deal.steamRatingText && (
-                          <div className="text-xs text-slate-500 mt-1">
+                          <div className="text-sm text-slate-500">
                             {deal.steamRatingText} ({deal.steamRatingPercent}%)
                           </div>
                         )}
@@ -432,71 +443,73 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
                   </div>
                 ))}
               </div>
-              <div className="text-center text-xs text-slate-500 pt-4 border-t">
+              <div className="text-center text-sm text-slate-500 pt-6 border-t">
                 Powered by <a href="https://www.cheapshark.com/" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">CheapShark API</a>
               </div>
             </div>
           )}
 
           {activeTab === 'news' && !loading && (
-            <div className="space-y-4">
-              {news.map((article, index) => (
-                <div key={index} className="card p-4 hover:shadow-lg transition-all">
-                  <div className="flex gap-4">
-                    <img 
-                      src={article.urlToImage || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
-                      alt={article.title}
-                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
-                      }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2 flex-wrap">
-                        <span className="font-medium">{article.source.name}</span>
-                        <span>•</span>
-                        <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                        {article.category && (
-                          <>
-                            <span>•</span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
-                              {article.category}
-                            </span>
-                          </>
-                        )}
-                        {article.platform && (
-                          <>
-                            <span>•</span>
-                            <span className="flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
-                              {getPlatformIcon(article.platform)}
-                              {article.platform}
-                            </span>
-                          </>
-                        )}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {news.map((article, index) => (
+                  <div key={index} className="card p-6 hover:shadow-xl transition-all hover:-translate-y-1">
+                    <div className="flex gap-4">
+                      <img 
+                        src={article.urlToImage || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
+                        alt={article.title}
+                        className="w-24 h-24 rounded-xl object-cover flex-shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-3 flex-wrap">
+                          <span className="font-medium">{article.source.name}</span>
+                          <span>•</span>
+                          <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                          {article.category && (
+                            <>
+                              <span>•</span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
+                                {article.category}
+                              </span>
+                            </>
+                          )}
+                          {article.platform && (
+                            <>
+                              <span>•</span>
+                              <span className="flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                                {getPlatformIcon(article.platform)}
+                                {article.platform}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        <h4 className="font-semibold text-slate-900 line-clamp-2 mb-3">
+                          {article.title}
+                        </h4>
+                        <p className="text-sm text-slate-600 line-clamp-2 mb-4">
+                          {article.description}
+                        </p>
+                        <a 
+                          href={article.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-medium"
+                        >
+                          Read More <FaExternalLinkAlt className="w-3 h-3" />
+                        </a>
                       </div>
-                      <h4 className="font-semibold text-slate-900 line-clamp-2 mb-2">
-                        {article.title}
-                      </h4>
-                      <p className="text-sm text-slate-600 line-clamp-2 mb-3">
-                        {article.description}
-                      </p>
-                      <a 
-                        href={article.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-medium"
-                      >
-                        Read More <FaExternalLinkAlt className="w-3 h-3" />
-                      </a>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
