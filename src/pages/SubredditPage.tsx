@@ -100,7 +100,7 @@ const SubredditPage = () => {
       return storageId;
     } catch (error) {
       console.error("File upload error:", error);
-      throw new Error("Failed to upload file to storage");
+      throw error;
     }
   };
 
@@ -145,7 +145,7 @@ const SubredditPage = () => {
         console.log("Logo uploaded successfully");
       } catch (error) {
         console.error("Logo upload error:", error);
-        setUploadError("Failed to upload logo image. Please try again.");
+        setUploadError(error instanceof Error ? error.message : "Failed to upload logo image. Please try again.");
       } finally {
         setIsUploadingLogo(false);
         // Clean up
