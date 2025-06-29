@@ -1,16 +1,16 @@
-import { FaPlus, FaUser, FaGamepad, FaBell } from "react-icons/fa";
+import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
-import CreateDropdown from "./CreateDowndown";
+import CreatePanel from "./CreatePanel";
 import GamingDropdown from "./GamingDropdown";
 import NotificationDropdown from "./NotificationDropdown";
 import SearchBar from "./SearchBar";
 
 const Navbar = () => {
-  const [showCreateDropdown, setShowCreateDropdown] = useState(false);
+  const [showCreatePanel, setShowCreatePanel] = useState(false);
   const [showGamingDropdown, setShowGamingDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { user } = useUser();
@@ -18,26 +18,26 @@ const Navbar = () => {
   
   const unreadCount = useQuery(api.notifications.getUnreadCount);
 
-  const handleCreateDropdown = () => {
-    setShowCreateDropdown(true);
+  const handleCreatePanel = () => {
+    setShowCreatePanel(true);
     setShowGamingDropdown(false);
     setShowNotifications(false);
   };
 
   const handleGamingDropdown = () => {
     setShowGamingDropdown(true);
-    setShowCreateDropdown(false);
+    setShowCreatePanel(false);
     setShowNotifications(false);
   };
 
   const handleNotifications = () => {
     setShowNotifications(true);
-    setShowCreateDropdown(false);
+    setShowCreatePanel(false);
     setShowGamingDropdown(false);
   };
 
   const closeAllDropdowns = () => {
-    setShowCreateDropdown(false);
+    setShowCreatePanel(false);
     setShowGamingDropdown(false);
     setShowNotifications(false);
   };
@@ -49,9 +49,9 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
-              <span className="text-white font-bold text-lg">F</span>
+              <FaCrosshairs className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent hidden sm:block">
+            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
               FragFeed
             </span>
           </Link>
@@ -114,15 +114,15 @@ const Navbar = () => {
               {/* Create */}
               <div className="relative">
                 <button 
-                  onClick={handleCreateDropdown}
+                  onClick={handleCreatePanel}
                   className="btn btn-ghost p-2"
                   title="Create"
                 >
                   <FaPlus className="w-5 h-5" />
                 </button>
-                {showCreateDropdown && (
-                  <CreateDropdown
-                    isOpen={showCreateDropdown}
+                {showCreatePanel && (
+                  <CreatePanel
+                    isOpen={showCreatePanel}
                     onClose={closeAllDropdowns}
                   />
                 )}
