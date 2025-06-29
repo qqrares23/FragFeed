@@ -1,4 +1,4 @@
-import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs } from "react-icons/fa";
+import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs, FaBars, FaTimes } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ const Navbar = () => {
   const [showCreatePanel, setShowCreatePanel] = useState(false);
   const [showGamingDropdown, setShowGamingDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { user } = useUser();
   const navigate = useNavigate();
   
@@ -22,21 +23,32 @@ const Navbar = () => {
     setShowCreatePanel(true);
     setShowGamingDropdown(false);
     setShowNotifications(false);
+    setShowMobileMenu(false);
   };
 
   const handleGamingDropdown = () => {
     setShowGamingDropdown(true);
     setShowCreatePanel(false);
     setShowNotifications(false);
+    setShowMobileMenu(false);
   };
 
   const handleNotifications = () => {
     setShowNotifications(true);
     setShowCreatePanel(false);
     setShowGamingDropdown(false);
+    setShowMobileMenu(false);
   };
 
   const closeAllDropdowns = () => {
+    setShowCreatePanel(false);
+    setShowGamingDropdown(false);
+    setShowNotifications(false);
+    setShowMobileMenu(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setShowMobileMenu(!showMobileMenu);
     setShowCreatePanel(false);
     setShowGamingDropdown(false);
     setShowNotifications(false);
@@ -48,21 +60,21 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
-              <FaCrosshairs className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
+              <FaCrosshairs className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
+            <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
               FragFeed
             </span>
           </Link>
 
-          {/* Search Bar */}
-          <div className="flex-1 max-w-2xl mx-4">
+          {/* Search Bar - Hidden on mobile, shown in mobile menu */}
+          <div className="hidden md:flex flex-1 max-w-2xl mx-4">
             <SearchBar />
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center gap-2">
             {/* Gaming Hub */}
             <div className="relative">
               <button 
@@ -140,8 +152,112 @@ const Navbar = () => {
               <UserButton />
             </Authenticated>
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-2">
+            <Authenticated>
+              <UserButton />
+            </Authenticated>
+            <button
+              onClick={toggleMobileMenu}
+              className="btn btn-ghost p-2"
+              title="Menu"
+            >
+              {showMobileMenu ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-lg">
+            <div className="px-4 py-4 space-y-4">
+              {/* Mobile Search */}
+              <div className="w-full">
+                <SearchBar />
+              </div>
+
+              <Unauthenticated>
+                <SignInButton mode="modal">
+                  <button className="btn btn-primary w-full">
+                    Sign In
+                  </button>
+                </SignInButton>
+              </Unauthenticated>
+
+              <Authenticated>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Gaming Hub */}
+                  <button 
+                    onClick={handleGamingDropdown}
+                    className="btn btn-secondary flex items-center justify-center gap-2"
+                  >
+                    <FaGamepad className="w-4 h-4" />
+                    Gaming
+                  </button>
+
+                  {/* Notifications */}
+                  <button 
+                    onClick={handleNotifications}
+                    className="btn btn-secondary flex items-center justify-center gap-2 relative"
+                  >
+                    <FaBell className="w-4 h-4" />
+                    Notifications
+                    {unreadCount && unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Create */}
+                  <button 
+                    onClick={handleCreatePanel}
+                    className="btn btn-primary flex items-center justify-center gap-2"
+                  >
+                    <FaPlus className="w-4 h-4" />
+                    Create
+                  </button>
+
+                  {/* Profile */}
+                  <button
+                    onClick={() => {
+                      if (user?.username) {
+                        navigate(`/u/${user.username}`);
+                        setShowMobileMenu(false);
+                      }
+                    }}
+                    className="btn btn-secondary flex items-center justify-center gap-2"
+                  >
+                    <FaUser className="w-4 h-4" />
+                    Profile
+                  </button>
+                </div>
+              </Authenticated>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Dropdowns for mobile */}
+      {showGamingDropdown && (
+        <GamingDropdown
+          isOpen={showGamingDropdown}
+          onClose={closeAllDropdowns}
+        />
+      )}
+      {showNotifications && (
+        <NotificationDropdown
+          isOpen={showNotifications}
+          onClose={closeAllDropdowns}
+        />
+      )}
+      {showCreatePanel && (
+        <CreatePanel
+          isOpen={showCreatePanel}
+          onClose={closeAllDropdowns}
+        />
+      )}
     </nav>
   );
 };

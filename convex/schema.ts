@@ -37,6 +37,7 @@ export default defineSchema({
     authorId: v.id("users"),
   })
     .index("byName", ["name"])
+    .index("byAuthor", ["authorId"])
     .searchIndex("search_body", { searchField: "name" }),
   subredditMembership: defineTable({
     userId: v.id("users"),
@@ -45,6 +46,16 @@ export default defineSchema({
   })
     .index("byUser", ["userId"])
     .index("bySubreddit", ["subredditId"])
+    .index("byUserAndSubreddit", ["userId", "subredditId"]),
+  subredditModerators: defineTable({
+    userId: v.id("users"),
+    subredditId: v.id("subreddit"),
+    addedBy: v.id("users"),
+    addedAt: v.number(),
+    permissions: v.array(v.string()), // ["delete_posts", "delete_comments", "manage_users"]
+  })
+    .index("bySubreddit", ["subredditId"])
+    .index("byUser", ["userId"])
     .index("byUserAndSubreddit", ["userId", "subredditId"]),
   post: defineTable({
     subject: v.string(),

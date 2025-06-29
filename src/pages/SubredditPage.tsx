@@ -3,13 +3,15 @@ import { usePaginatedQuery, useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
-import { FaUsers, FaPlus, FaMinus, FaCalendarAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import ModerationModal from "../components/ModerationModal";
+import { FaUsers, FaPlus, FaMinus, FaCalendarAlt, FaEye, FaEyeSlash, FaUserShield, FaCog } from "react-icons/fa";
 import { useState } from "react";
 
 const SubredditPage = () => {
   const { subredditName } = useParams();
   const { user } = useUser();
   const [showMembers, setShowMembers] = useState(false);
+  const [showModerationModal, setShowModerationModal] = useState(false);
   
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.getSubredditPosts, {
@@ -24,6 +26,9 @@ const SubredditPage = () => {
   );
   const members = useQuery(api.subreddit.getMembers,
     subreddit && showMembers ? { subredditId: subreddit._id, limit: 20 } : "skip"
+  );
+  const moderationInfo = useQuery(api.moderation.isUserModerator,
+    subreddit ? { subredditId: subreddit._id } : "skip"
   );
   
   const joinSubreddit = useMutation(api.subreddit.join);
@@ -78,48 +83,64 @@ const SubredditPage = () => {
     return 'Just now';
   };
 
+  const isOwner = moderationInfo?.isOwner;
+  const isModerator = moderationInfo?.isModerator;
+
   return (
     <div className="min-h-screen pt-20 pb-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-3 space-y-6">
             {/* Community Header */}
-            <div className="card p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <div className="card p-6 lg:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+                <div className="flex-1">
+                  <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
                     r/{subreddit.name}
                   </h1>
                   {subreddit.description && (
-                    <p className="text-slate-600 text-lg">{subreddit.description}</p>
+                    <p className="text-slate-600 text-base lg:text-lg">{subreddit.description}</p>
                   )}
                 </div>
                 
                 {user && (
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    {/* Moderation Button - Only for owners */}
+                    {isOwner && (
+                      <button 
+                        onClick={() => setShowModerationModal(true)}
+                        className="btn btn-secondary order-3 sm:order-1"
+                        title="Manage moderators"
+                      >
+                        <FaUserShield className="w-4 h-4" />
+                        <span className="hidden sm:inline">Moderation</span>
+                      </button>
+                    )}
+                    
                     <button 
                       onClick={handleJoinLeave}
-                      className={`btn ${isMember ? 'btn-secondary' : 'btn-primary'}`}
+                      className={`btn ${isMember ? 'btn-secondary' : 'btn-primary'} order-1 sm:order-2`}
                     >
                       {isMember ? (
                         <>
-                          <FaMinus />
+                          <FaMinus className="w-4 h-4" />
                           Leave
                         </>
                       ) : (
                         <>
-                          <FaPlus />
+                          <FaPlus className="w-4 h-4" />
                           Join
                         </>
                       )}
                     </button>
+                    
                     {isMember && (
                       <a 
                         href={`/r/${subredditName}/submit`}
-                        className="btn btn-primary"
+                        className="btn btn-primary order-2 sm:order-3"
                       >
-                        <FaPlus />
+                        <FaPlus className="w-4 h-4" />
                         Create Post
                       </a>
                     )}
@@ -128,32 +149,42 @@ const SubredditPage = () => {
               </div>
 
               {/* Stats */}
-              <div className="flex gap-6">
+              <div className="flex flex-wrap gap-4 lg:gap-6">
                 <div className="flex items-center gap-2 text-slate-600">
-                  <FaUsers className="w-5 h-5" />
+                  <FaUsers className="w-4 h-4 lg:w-5 lg:h-5" />
                   <span className="font-semibold">{memberCount || 0}</span>
-                  <span>members</span>
+                  <span className="hidden sm:inline">members</span>
+                  <span className="sm:hidden">👥</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-600">
-                  <FaCalendarAlt className="w-5 h-5" />
+                  <FaCalendarAlt className="w-4 h-4 lg:w-5 lg:h-5" />
                   <span className="font-semibold">{posts?.length || 0}</span>
-                  <span>posts</span>
+                  <span className="hidden sm:inline">posts</span>
+                  <span className="sm:hidden">📝</span>
                 </div>
+                {isModerator && (
+                  <div className="flex items-center gap-2 text-primary-600">
+                    <FaUserShield className="w-4 h-4 lg:w-5 lg:h-5" />
+                    <span className="font-semibold text-sm">
+                      {isOwner ? 'Owner' : 'Moderator'}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Posts */}
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
               {posts && posts.length === 0 ? (
-                <div className="card p-12 text-center">
-                  <div className="text-6xl mb-4">📝</div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">No posts yet</h3>
+                <div className="card p-8 lg:p-12 text-center">
+                  <div className="text-4xl lg:text-6xl mb-4">📝</div>
+                  <h3 className="text-lg lg:text-xl font-semibold text-slate-900 mb-2">No posts yet</h3>
                   <p className="text-slate-600 mb-6">
                     Be the first to post in r/{subredditName}
                   </p>
                   {user && isMember && (
                     <a href={`/r/${subredditName}/submit`} className="btn btn-primary">
-                      <FaPlus />
+                      <FaPlus className="w-4 h-4" />
                       Create First Post
                     </a>
                   )}
@@ -181,7 +212,7 @@ const SubredditPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Community Info */}
-            <div className="card p-6">
+            <div className="card p-4 lg:p-6">
               <h3 className="font-bold text-slate-900 mb-4">About Community</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -194,7 +225,7 @@ const SubredditPage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Created</span>
-                  <span className="font-semibold">
+                  <span className="font-semibold text-sm">
                     {new Date(subreddit._creationTime).toLocaleDateString()}
                   </span>
                 </div>
@@ -202,7 +233,7 @@ const SubredditPage = () => {
             </div>
 
             {/* Members Section */}
-            <div className="card p-6">
+            <div className="card p-4 lg:p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-slate-900">Members</h3>
                 <button
@@ -210,7 +241,7 @@ const SubredditPage = () => {
                   className="btn btn-ghost p-2"
                   title={showMembers ? "Hide members" : "Show members"}
                 >
-                  {showMembers ? <FaEyeSlash /> : <FaEye />}
+                  {showMembers ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
                 </button>
               </div>
               
@@ -220,13 +251,13 @@ const SubredditPage = () => {
                     members.map((member) => (
                       <div key={member._id} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-bold">
+                          <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs lg:text-sm font-bold">
                               {member.user?.username.charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div>
-                            <p className="font-medium text-slate-900">
+                            <p className="font-medium text-slate-900 text-sm lg:text-base">
                               u/{member.user?.username}
                             </p>
                             <p className="text-xs text-slate-500">
@@ -248,7 +279,7 @@ const SubredditPage = () => {
             </div>
 
             {/* Rules or Guidelines */}
-            <div className="card p-6">
+            <div className="card p-4 lg:p-6">
               <h3 className="font-bold text-slate-900 mb-4">Community Guidelines</h3>
               <div className="space-y-2 text-sm text-slate-600">
                 <p>• Be respectful to other members</p>
@@ -260,6 +291,16 @@ const SubredditPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Moderation Modal */}
+      {showModerationModal && subreddit && (
+        <ModerationModal
+          isOpen={showModerationModal}
+          onClose={() => setShowModerationModal(false)}
+          subredditId={subreddit._id}
+          subredditName={subreddit.name}
+        />
+      )}
     </div>
   );
 };

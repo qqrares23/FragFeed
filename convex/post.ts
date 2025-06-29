@@ -4,6 +4,7 @@ import { getCurrentUserOrThrow } from "./users";
 import { Doc, Id } from "./_generated/dataModel";
 import { counts, postCountKey } from "./counter";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
+import { checkModerationPermission } from "./moderation";
 
 type EnrichedPost = Omit<Doc<"post">, "subreddit"> & {
   author: { username: string } | undefined;
@@ -176,11 +177,21 @@ export const deletePost = mutation({
       throw new ConvexError({ message: ERROR_MESSAGES.POST_NOT_FOUND });
 
     const user = await getCurrentUserOrThrow(ctx);
-    if (post.authorId !== user._id) {
+    
+    // Check if user is the author
+    if (post.authorId === user._id) {
+      await counts.dec(ctx, postCountKey(user._id));
+      await ctx.db.delete(args.id);
+      return;
+    }
+    
+    // Check if user has moderation permissions
+    const hasPermission = await checkModerationPermission(ctx, post.subreddit, "delete_posts");
+    if (!hasPermission) {
       throw new ConvexError({ message: ERROR_MESSAGES.UNAUTHORIZED_DELETE });
     }
-
-    await counts.dec(ctx, postCountKey(user._id));
+    
+    // Moderator deleting post - don't decrement author's post count
     await ctx.db.delete(args.id);
   },
 });
