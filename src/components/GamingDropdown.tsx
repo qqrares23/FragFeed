@@ -64,13 +64,13 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
     setError(null);
     try {
       const response = await fetch(
-        'https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=60&pageSize=8&sortBy=Savings&desc=1&onSale=1'
+        'https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=60&pageSize=6&sortBy=Savings&desc=1&onSale=1'
       );
       
       if (!response.ok) throw new Error('Failed to fetch Steam deals');
       
       const deals: CheapSharkDeal[] = await response.json();
-      setSteamDeals(deals.slice(0, 6));
+      setSteamDeals(deals.slice(0, 4));
     } catch (err) {
       setError('Failed to load Steam deals');
       console.error('CheapShark API error:', err);
@@ -135,7 +135,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
           title: "Steam Winter Sale 2025: Best Deals and Discounts",
           url: "https://store.steampowered.com/",
           urlToImage: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          description: "Discover the best gaming deals during Steam's annual winter sale with discounts up to 90% off on popular titles including AAA games and indie favorites.",
+          description: "Discover the best gaming deals during Steam's annual winter sale with discounts up to 90% off.",
           publishedAt: new Date().toISOString(),
           source: { name: "Steam News" },
           category: "Sales",
@@ -155,31 +155,11 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
           title: "Fortnite Chapter 5 Season 2: New Map and Features",
           url: "#",
           urlToImage: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          description: "Epic Games unveils the latest Fortnite season with a completely redesigned map, new weapons, and exciting gameplay mechanics.",
+          description: "Epic Games unveils the latest Fortnite season with a completely redesigned map.",
           publishedAt: new Date(Date.now() - 7200000).toISOString(),
           source: { name: "Epic Games" },
           category: "Updates",
           platform: "Multi-platform"
-        },
-        {
-          title: "Rainbow Six Siege: Operation Crimson Heist Now Live",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg",
-          description: "Ubisoft launches the latest Rainbow Six Siege operation featuring new operator Flores, map rework, and weapon balancing changes.",
-          publishedAt: new Date(Date.now() - 86400000).toISOString(),
-          source: { name: "Ubisoft" },
-          category: "Updates",
-          platform: "PC/Console"
-        },
-        {
-          title: "Gaming Hardware: RTX 5000 Series Performance Review",
-          url: "#",
-          urlToImage: "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg",
-          description: "Comprehensive analysis of NVIDIA's latest RTX 5000 series graphics cards and their impact on 4K gaming performance across popular titles.",
-          publishedAt: new Date(Date.now() - 172800000).toISOString(),
-          source: { name: "Tech Gaming" },
-          category: "Hardware",
-          platform: "PC"
         },
       ]);
     } catch (err) {
@@ -226,26 +206,26 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-16 right-4 w-[900px] max-w-[95vw] bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 max-h-[700px] overflow-hidden">
+    <div className="absolute top-16 right-4 w-[600px] max-w-[90vw] bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 max-h-[500px] overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
+      <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold flex items-center gap-3">
-            <Gamepad2 className="w-6 h-6" />
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <Gamepad2 className="w-5 h-5" />
             Gaming Hub
           </h3>
           <button
             onClick={onClose}
-            className="text-white hover:bg-white/20 rounded-lg p-2 transition-colors"
+            className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
           >
             ×
           </button>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           <div className="flex bg-white/20 rounded-lg p-1">
             <button
               onClick={() => setActiveTab('steam')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md transition-colors text-sm ${
                 activeTab === 'steam' ? 'bg-white text-primary-600' : 'text-white hover:bg-white/10'
               }`}
             >
@@ -254,7 +234,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
             </button>
             <button
               onClick={() => setActiveTab('news')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md transition-colors text-sm ${
                 activeTab === 'news' ? 'bg-white text-primary-600' : 'text-white hover:bg-white/10'
               }`}
             >
@@ -266,54 +246,54 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
       </div>
 
       {/* Content */}
-      <div className="p-6 max-h-[500px] overflow-y-auto">
+      <div className="p-4 max-h-[350px] overflow-y-auto">
         {loading && (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-8">
             <div className="text-center">
-              <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-slate-600">Loading amazing content...</p>
+              <div className="w-6 h-6 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3"></div>
+              <p className="text-slate-600 text-sm">Loading content...</p>
             </div>
           </div>
         )}
         
         {error && (
-          <div className="text-center py-8">
-            <p className="text-red-600">{error}</p>
+          <div className="text-center py-6">
+            <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
 
         {activeTab === 'steam' && !loading && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-3">
               {steamDeals.map((deal) => (
                 <div 
                   key={deal.dealID} 
-                  className="bg-white border border-slate-200 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all"
+                  className="bg-white border border-slate-200 rounded-xl p-3 cursor-pointer hover:shadow-md transition-all"
                   onClick={() => handleDealClick(deal.dealID)}
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     <img 
                       src={deal.thumb || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
                       alt={deal.title}
-                      className="w-16 h-16 rounded-lg object-cover"
+                      className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                       }}
                     />
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-slate-900 line-clamp-2 text-sm">
+                      <h4 className="font-semibold text-slate-900 text-sm line-clamp-1">
                         {deal.title}
                       </h4>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-lg font-bold text-green-600">
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-base font-bold text-green-600">
                           {formatPrice(deal.salePrice)}
                         </span>
                         {parseFloat(deal.normalPrice) > parseFloat(deal.salePrice) && (
                           <>
-                            <span className="text-sm text-slate-400 line-through">
+                            <span className="text-xs text-slate-400 line-through">
                               {formatPrice(deal.normalPrice)}
                             </span>
-                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                            <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded">
                               -{Math.round(parseFloat(deal.savings))}%
                             </span>
                           </>
@@ -329,59 +309,50 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
                 </div>
               ))}
             </div>
-            <div className="text-center text-xs text-slate-500 pt-4 border-t">
+            <div className="text-center text-xs text-slate-500 pt-2 border-t">
               Powered by <a href="https://www.cheapshark.com/" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">CheapShark API</a>
             </div>
           </div>
         )}
 
         {activeTab === 'news' && !loading && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {news.map((article, index) => (
-              <div key={index} className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-lg transition-all">
-                <div className="flex gap-4">
+              <div key={index} className="bg-white border border-slate-200 rounded-xl p-3 hover:shadow-md transition-all">
+                <div className="flex gap-3">
                   <img 
                     src={article.urlToImage || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
                     alt={article.title}
-                    className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                    className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                     }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 mb-2 flex-wrap">
+                    <div className="flex items-center gap-2 text-xs text-slate-500 mb-1 flex-wrap">
                       <span className="font-medium">{article.source.name}</span>
                       <span>•</span>
                       <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
                       {article.category && (
                         <>
                           <span>•</span>
-                          <span className={`px-2 py-1 rounded text-xs ${getCategoryColor(article.category)}`}>
+                          <span className={`px-1.5 py-0.5 rounded text-xs ${getCategoryColor(article.category)}`}>
                             {article.category}
                           </span>
                         </>
                       )}
-                      {article.platform && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1 text-xs border border-slate-300 px-2 py-1 rounded">
-                            {getPlatformIcon(article.platform)}
-                            {article.platform}
-                          </span>
-                        </>
-                      )}
                     </div>
-                    <h4 className="font-semibold text-slate-900 line-clamp-2 mb-2">
+                    <h4 className="font-semibold text-slate-900 text-sm line-clamp-2 mb-1">
                       {article.title}
                     </h4>
-                    <p className="text-sm text-slate-600 line-clamp-2 mb-3">
+                    <p className="text-xs text-slate-600 line-clamp-2 mb-2">
                       {article.description}
                     </p>
                     <a 
                       href={article.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-medium"
+                      className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-xs font-medium"
                     >
                       Read More <ExternalLink className="w-3 h-3" />
                     </a>
