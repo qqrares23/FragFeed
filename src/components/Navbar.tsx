@@ -1,4 +1,5 @@
-import { Plus, User, Gamepad2, Bell, Target, Menu, X, Settings, Users } from "lucide-react";
+import { Plus, User, Gamepad2, Bell, Menu, X, Settings, Users } from "lucide-react";
+import { FaCrosshairs } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -79,13 +80,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
-              <Target className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+              <FaCrosshairs className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
             </div>
             <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
               FragFeed
@@ -104,7 +105,7 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={handleGamingClick}
-              className={showGamingDropdown ? "bg-slate-100" : ""}
+              className={showGamingDropdown ? "bg-slate-100 dark:bg-slate-800" : ""}
             >
               <Gamepad2 className="w-5 h-5" />
             </Button>
@@ -121,7 +122,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={handleCommunityQuickPostClick}
-                className={showCommunityQuickPost ? "bg-slate-100" : ""}
+                className={showCommunityQuickPost ? "bg-slate-100 dark:bg-slate-800" : ""}
               >
                 <Users className="w-5 h-5" />
               </Button>
@@ -132,7 +133,7 @@ const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   onClick={handleNotificationsClick}
-                  className={showNotifications ? "bg-slate-100" : ""}
+                  className={showNotifications ? "bg-slate-100 dark:bg-slate-800" : ""}
                 >
                   <Bell className="w-5 h-5" />
                 </Button>
@@ -151,7 +152,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={handleCreateClick}
-                className={showCreatePanel ? "bg-slate-100" : ""}
+                className={showCreatePanel ? "bg-slate-100 dark:bg-slate-800" : ""}
               >
                 <Plus className="w-5 h-5" />
               </Button>
@@ -195,7 +196,7 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-lg">
+          <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
             <div className="px-4 py-4 space-y-4">
               {/* Mobile Search */}
               <div className="w-full">
