@@ -41,7 +41,7 @@ export default {
         'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
         'slide-up': 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         'bounce-gentle': 'bounceGentle 2s infinite',
-        'gradient': 'gradient 3s ease-in-out infinite',
+        'gradient': 'gradient 4s ease-in-out infinite',
         'wave-text': 'waveText 2s ease-in-out infinite',
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
       },
@@ -70,9 +70,15 @@ export default {
           '60%': { transform: 'translateY(-5px)' },
         },
         gradient: {
-          '0%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-          '100%': { backgroundPosition: '0% 50%' },
+          '0%': { 
+            backgroundPosition: '0% 50%' 
+          },
+          '50%': { 
+            backgroundPosition: '100% 50%' 
+          },
+          '100%': { 
+            backgroundPosition: '0% 50%' 
+          },
         },
         waveText: {
           '0%, 40%, 100%': { 
