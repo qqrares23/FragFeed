@@ -2,6 +2,10 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { X, Users, Sparkles, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface CreateCommunityModalProps {
   isOpen: boolean;
@@ -89,19 +93,19 @@ const CreateCommunityModal = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Community Name */}
           <div className="space-y-2">
-            <label htmlFor="community-name" className="block text-sm font-semibold text-slate-700">
+            <Label htmlFor="community-name" className="text-sm font-semibold text-slate-700">
               Community Name
-            </label>
+            </Label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-600 font-bold text-sm">
                 fg/
               </div>
-              <input
+              <Input
                 id="community-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="awesome_community"
-                className="input pl-10"
+                className="pl-10 h-11"
                 maxLength={21}
                 disabled={isLoading}
                 autoComplete="off"
@@ -115,10 +119,10 @@ const CreateCommunityModal = ({
 
           {/* Description */}
           <div className="space-y-2">
-            <label htmlFor="community-description" className="block text-sm font-semibold text-slate-700">
+            <Label htmlFor="community-description" className="text-sm font-semibold text-slate-700">
               Description <span className="text-slate-400 font-normal">(optional)</span>
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               id="community-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -126,7 +130,7 @@ const CreateCommunityModal = ({
               maxLength={500}
               disabled={isLoading}
               rows={3}
-              className="input resize-none"
+              className="resize-none"
             />
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-400">
@@ -148,18 +152,19 @@ const CreateCommunityModal = ({
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={handleClose}
               disabled={isLoading}
-              className="btn btn-secondary flex-1"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isLoading || !name.trim()}
-              className="btn btn-primary flex-1"
+              className="flex-1"
             >
               {isLoading ? (
                 <>
@@ -172,7 +177,7 @@ const CreateCommunityModal = ({
                   Create
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
