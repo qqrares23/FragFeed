@@ -2,8 +2,6 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Bell, Check, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -48,99 +46,89 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              <h3 className="font-semibold">Notifications</h3>
-            </div>
-            <div className="flex items-center gap-2">
-              {notifications && notifications.some(n => !n.read) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleMarkAllAsRead}
-                  className="text-white hover:bg-white/20 text-xs"
-                >
-                  <Check className="w-4 h-4 mr-1" />
-                  Mark All Read
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="text-white hover:bg-white/20 text-xl"
-              >
-                ×
-              </Button>
-            </div>
-          </div>
+    <div className="absolute top-16 right-4 w-96 max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 max-h-96 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-t-2xl">
+        <div className="flex items-center gap-2">
+          <Bell className="w-5 h-5" />
+          <h3 className="font-semibold">Notifications</h3>
         </div>
-
-        {/* Notifications List */}
-        <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
-          {!notifications || notifications.length === 0 ? (
-            <div className="p-8 text-center">
-              <Bell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500 font-medium">No notifications yet</p>
-              <p className="text-sm text-slate-400 mt-1">
-                You'll see notifications here when someone posts in your communities
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {notifications.map((notification) => (
-                <div
-                  key={notification._id}
-                  className={`p-4 hover:bg-slate-50 transition-colors ${
-                    !notification.read ? 'bg-primary-50/50' : ''
-                  }`}
-                >
-                  <Link
-                    to={getNotificationLink(notification)}
-                    onClick={onClose}
-                    className="block"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                        !notification.read ? 'bg-primary-500' : 'bg-transparent'
-                      }`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900 text-sm">
-                          {notification.title}
-                        </p>
-                        <p className="text-sm text-slate-600 mt-1 line-clamp-2">
-                          {notification.message}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-2">
-                          {formatTimeAgo(notification.createdAt)}
-                        </p>
-                      </div>
-                      {!notification.read && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleMarkAsRead(notification._id);
-                          }}
-                          className="p-1"
-                        >
-                          <Eye className="w-3 h-3" />
-                        </Button>
-                      )}
-                    </div>
-                  </Link>
-                </div>
-              ))}
-            </div>
+        <div className="flex items-center gap-2">
+          {notifications && notifications.some(n => !n.read) && (
+            <button
+              onClick={handleMarkAllAsRead}
+              className="text-white hover:bg-white/20 rounded-lg px-2 py-1 text-xs transition-colors"
+            >
+              <Check className="w-4 h-4 inline mr-1" />
+              Mark All Read
+            </button>
           )}
+          <button
+            onClick={onClose}
+            className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
+          >
+            ×
+          </button>
         </div>
+      </div>
+
+      {/* Notifications List */}
+      <div className="max-h-80 overflow-y-auto">
+        {!notifications || notifications.length === 0 ? (
+          <div className="p-8 text-center">
+            <Bell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-500 font-medium">No notifications yet</p>
+            <p className="text-sm text-slate-400 mt-1">
+              You'll see notifications here when someone posts in your communities
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {notifications.map((notification) => (
+              <div
+                key={notification._id}
+                className={`p-4 hover:bg-slate-50 transition-colors ${
+                  !notification.read ? 'bg-primary-50/50' : ''
+                }`}
+              >
+                <Link
+                  to={getNotificationLink(notification)}
+                  onClick={onClose}
+                  className="block"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                      !notification.read ? 'bg-primary-500' : 'bg-transparent'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-slate-900 text-sm">
+                        {notification.title}
+                      </p>
+                      <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+                        {notification.message}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-2">
+                        {formatTimeAgo(notification.createdAt)}
+                      </p>
+                    </div>
+                    {!notification.read && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleMarkAsRead(notification._id);
+                        }}
+                        className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        <Eye className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

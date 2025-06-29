@@ -55,50 +55,21 @@
   overflow: hidden;
 }
 
-/* Modal backdrop blur */
-.modal-backdrop {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-/* Smooth transitions for modals */
-.modal-enter {
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-.modal-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 200ms ease-out, transform 200ms ease-out;
-}
-
-.modal-exit {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.modal-exit-active {
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 150ms ease-in, transform 150ms ease-in;
-}
-
 /* Enhanced button styles */
 .btn {
   @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20 disabled:pointer-events-none disabled:opacity-50;
 }
 
 .btn-primary {
-  @apply bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:from-primary-600 hover:to-primary-700 hover:shadow-xl hover:-translate-y-0.5;
+  @apply bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:from-primary-600 hover:to-primary-700 hover:shadow-xl hover:-translate-y-0.5 px-4 py-2;
 }
 
 .btn-secondary {
-  @apply bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 hover:shadow-md;
+  @apply bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 hover:shadow-md px-4 py-2;
 }
 
 .btn-ghost {
-  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100;
+  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-2 py-2;
 }
 
 /* Enhanced input styles */

@@ -9,8 +9,6 @@ import GamingDropdown from "./GamingDropdown";
 import NotificationDropdown from "./NotificationDropdown";
 import CommunityQuickPost from "./CommunityQuickPost";
 import SearchBar from "./SearchBar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 const Navbar = () => {
   const [showCreatePanel, setShowCreatePanel] = useState(false);
@@ -108,199 +106,185 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group" onClick={closeAllDropdowns}>
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
-              <Target className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 group" onClick={closeAllDropdowns}>
+              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
+                <Target className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+              </div>
+              <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
+                FragFeed
+              </span>
+            </Link>
+
+            {/* Search Bar - Hidden on mobile, shown in mobile menu */}
+            <div className="hidden md:flex flex-1 max-w-2xl mx-4">
+              <SearchBar />
             </div>
-            <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
-              FragFeed
-            </span>
-          </Link>
 
-          {/* Search Bar - Hidden on mobile, shown in mobile menu */}
-          <div className="hidden md:flex flex-1 max-w-2xl mx-4">
-            <SearchBar />
-          </div>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-2">
-            {/* Gaming Hub */}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleGamingClick}
-            >
-              <Gamepad2 className="w-5 h-5" />
-            </Button>
-
-            <Unauthenticated>
-              <SignInButton mode="modal">
-                <Button>Sign In</Button>
-              </SignInButton>
-            </Unauthenticated>
-            
-            <Authenticated>
-              {/* Community Quick Post */}
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleCommunityClick}
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center gap-2">
+              {/* Gaming Hub */}
+              <button 
+                className="btn btn-ghost p-2"
+                onClick={handleGamingClick}
               >
-                <Users className="w-5 h-5" />
-              </Button>
-
-              {/* Notifications */}
-              <div className="relative">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={handleNotificationClick}
-                >
-                  <Bell className="w-5 h-5" />
-                </Button>
-                {unreadCount && unreadCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Badge>
-                )}
-              </div>
-
-              {/* Create */}
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleCreateClick}
-              >
-                <Plus className="w-5 h-5" />
-              </Button>
-
-              {/* Settings */}
-              <Button variant="ghost" size="icon">
-                <Settings className="w-5 h-5" />
-              </Button>
-
-              {/* Profile */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleProfileClick}
-              >
-                <User className="w-5 h-5" />
-              </Button>
-
-              <UserButton />
-            </Authenticated>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
-            <Authenticated>
-              <UserButton />
-            </Authenticated>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleMobileMenu}
-            >
-              {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {showMobileMenu && (
-          <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-lg">
-            <div className="px-4 py-4 space-y-4">
-              {/* Mobile Search */}
-              <div className="w-full">
-                <SearchBar />
-              </div>
+                <Gamepad2 className="w-5 h-5" />
+              </button>
 
               <Unauthenticated>
                 <SignInButton mode="modal">
-                  <Button className="w-full">Sign In</Button>
+                  <button className="btn btn-primary">Sign In</button>
                 </SignInButton>
               </Unauthenticated>
-
+              
               <Authenticated>
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Gaming Hub */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleMobileGamingClick}
-                  >
-                    <Gamepad2 className="w-4 h-4" />
-                    Gaming
-                  </Button>
+                {/* Community Quick Post */}
+                <button 
+                  className="btn btn-ghost p-2"
+                  onClick={handleCommunityClick}
+                >
+                  <Users className="w-5 h-5" />
+                </button>
 
-                  {/* Community Quick Post */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleMobileCommunityClick}
+                {/* Notifications */}
+                <div className="relative">
+                  <button 
+                    className="btn btn-ghost p-2"
+                    onClick={handleNotificationClick}
                   >
-                    <Users className="w-4 h-4" />
-                    Quick Post
-                  </Button>
-
-                  {/* Notifications */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2 relative"
-                    onClick={handleMobileNotificationClick}
-                  >
-                    <Bell className="w-4 h-4" />
-                    Notifications
-                    {unreadCount && unreadCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                      >
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </Badge>
-                    )}
-                  </Button>
-
-                  {/* Create */}
-                  <Button 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleMobileCreateClick}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create
-                  </Button>
-
-                  {/* Settings */}
-                  <Button variant="secondary" className="flex items-center justify-center gap-2">
-                    <Settings className="w-4 h-4" />
-                    Settings
-                  </Button>
-
-                  {/* Profile */}
-                  <Button
-                    variant="secondary"
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleMobileProfileClick}
-                  >
-                    <User className="w-4 h-4" />
-                    Profile
-                  </Button>
+                    <Bell className="w-5 h-5" />
+                  </button>
+                  {unreadCount && unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </div>
+
+                {/* Create */}
+                <button 
+                  className="btn btn-ghost p-2"
+                  onClick={handleCreateClick}
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+
+                {/* Settings */}
+                <button className="btn btn-ghost p-2">
+                  <Settings className="w-5 h-5" />
+                </button>
+
+                {/* Profile */}
+                <button
+                  className="btn btn-ghost p-2"
+                  onClick={handleProfileClick}
+                >
+                  <User className="w-5 h-5" />
+                </button>
+
+                <UserButton />
               </Authenticated>
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* Dropdown Components */}
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center gap-2">
+              <Authenticated>
+                <UserButton />
+              </Authenticated>
+              <button
+                className="btn btn-ghost p-2"
+                onClick={toggleMobileMenu}
+              >
+                {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          {showMobileMenu && (
+            <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-lg">
+              <div className="px-4 py-4 space-y-4">
+                {/* Mobile Search */}
+                <div className="w-full">
+                  <SearchBar />
+                </div>
+
+                <Unauthenticated>
+                  <SignInButton mode="modal">
+                    <button className="btn btn-primary w-full">Sign In</button>
+                  </SignInButton>
+                </Unauthenticated>
+
+                <Authenticated>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Gaming Hub */}
+                    <button 
+                      className="btn btn-secondary flex items-center justify-center gap-2"
+                      onClick={handleMobileGamingClick}
+                    >
+                      <Gamepad2 className="w-4 h-4" />
+                      Gaming
+                    </button>
+
+                    {/* Community Quick Post */}
+                    <button 
+                      className="btn btn-secondary flex items-center justify-center gap-2"
+                      onClick={handleMobileCommunityClick}
+                    >
+                      <Users className="w-4 h-4" />
+                      Quick Post
+                    </button>
+
+                    {/* Notifications */}
+                    <button 
+                      className="btn btn-secondary flex items-center justify-center gap-2 relative"
+                      onClick={handleMobileNotificationClick}
+                    >
+                      <Bell className="w-4 h-4" />
+                      Notifications
+                      {unreadCount && unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Create */}
+                    <button 
+                      className="btn btn-primary flex items-center justify-center gap-2"
+                      onClick={handleMobileCreateClick}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Create
+                    </button>
+
+                    {/* Settings */}
+                    <button className="btn btn-secondary flex items-center justify-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      Settings
+                    </button>
+
+                    {/* Profile */}
+                    <button
+                      className="btn btn-secondary flex items-center justify-center gap-2"
+                      onClick={handleMobileProfileClick}
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </button>
+                  </div>
+                </Authenticated>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* Dropdown Components - Positioned absolutely */}
       <GamingDropdown
         isOpen={showGamingDropdown}
         onClose={closeAllDropdowns}
@@ -320,7 +304,7 @@ const Navbar = () => {
         isOpen={showCreatePanel}
         onClose={closeAllDropdowns}
       />
-    </nav>
+    </>
   );
 };
 
