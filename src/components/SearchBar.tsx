@@ -164,7 +164,7 @@ const SearchBar = () => {
 
   return (
     <div className="relative w-full max-w-2xl" ref={searchRef}>
-      <div className={`relative flex items-center bg-white/50 backdrop-blur-sm border border-slate-300 rounded-xl transition-all duration-200 ${
+      <div className={`relative flex items-center bg-white border border-slate-300 rounded-xl transition-all duration-200 ${
         isFocused ? 'ring-2 ring-primary-500 border-primary-500' : 'hover:border-slate-400'
       }`}>
         <Search className="w-4 h-4 text-slate-400 ml-4" />
