@@ -78,6 +78,12 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
       if (!response.ok) throw new Error('Failed to fetch Steam data');
       
       const data = await response.json();
+      
+      // Validate that data.contents exists and is a valid string before parsing
+      if (!data.contents || typeof data.contents !== 'string') {
+        throw new Error('Invalid or empty data from proxy');
+      }
+      
       const steamData = JSON.parse(data.contents);
       
       const games: SteamGame[] = [];
@@ -97,6 +103,22 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
     } catch (err) {
       setError('Failed to load Steam prices');
       console.error('Steam API error:', err);
+      
+      // Set fallback mock data when API fails
+      setSteamGames([
+        {
+          appid: 730,
+          name: "Counter-Strike 2",
+          header_image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+          short_description: "Popular competitive first-person shooter game",
+        },
+        {
+          appid: 570,
+          name: "Dota 2",
+          header_image: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+          short_description: "Multiplayer online battle arena game",
+        }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -116,6 +138,12 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
       if (!response.ok) throw new Error('Failed to fetch news');
       
       const data = await response.json();
+      
+      // Validate that data.contents exists and is a valid string before parsing
+      if (!data.contents || typeof data.contents !== 'string') {
+        throw new Error('Invalid or empty data from proxy');
+      }
+      
       const newsData = JSON.parse(data.contents);
       
       if (newsData.articles) {
