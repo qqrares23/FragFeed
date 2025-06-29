@@ -1,11 +1,13 @@
 .navbar {
-  background-color: white;
-  height: 49px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  height: 64px;
   position: fixed;
   width: 100%;
   top: 0;
-  border-bottom: 1px solid #edeff1;
+  border-bottom: 1px solid #e9ecef;
   z-index: 100;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
 }
 
 .navbar-content {
@@ -13,25 +15,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 24px;
   margin: 0 auto;
-  gap: 8px;
+  gap: 16px;
   width: 100%;
-  max-width: 1248px;
+  max-width: 1400px;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 2px 8px;
+  gap: 12px;
+  padding: 8px 16px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 16px;
   min-width: fit-content;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.05), rgba(255, 87, 34, 0.05));
 }
 
 .logo-container:hover {
-  background-color: rgba(26,26,27,0.1);
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 87, 34, 0.1));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 69, 0, 0.15);
 }
 
 .logo-link {
@@ -41,21 +47,27 @@
   align-items: center;
 }
 
-.logo-link:hover {
-  opacity: 0.8;
+.reddit-icon {
+  width: 36px;
+  height: 36px;
+  color: #FF4500;
+  filter: drop-shadow(0 2px 4px rgba(255, 69, 0, 0.3));
+  transition: all 0.3s ease;
 }
 
-.reddit-icon {
-  width: 32px;
-  height: 32px;
-  color: #FF4500;
+.logo-container:hover .reddit-icon {
+  transform: rotate(5deg) scale(1.1);
 }
 
 .site-name {
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: #1c1c1c;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
   white-space: nowrap;
+  background: linear-gradient(135deg, #FF4500, #FF5722);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 @media (max-width: 768px) {
@@ -67,7 +79,7 @@
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   min-width: fit-content;
 }
 
@@ -76,60 +88,251 @@
 }
 
 .icon-button {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 2px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border: 2px solid transparent;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.icon-button:hover::before {
+  left: 100%;
 }
 
 .icon-button:hover {
-  background-color: rgba(26,26,27,0.1);
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
 }
 
 .icon-button svg {
   width: 20px;
   height: 20px;
-  color: #1c1c1c;
+  color: #495057;
+  transition: all 0.3s ease;
+}
+
+.icon-button:hover svg {
+  color: #667eea;
+  transform: scale(1.1);
 }
 
 .gaming-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.gaming-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gaming-button:hover::after {
+  opacity: 1;
 }
 
 .gaming-button svg {
   color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .gaming-button:hover {
   background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.gaming-button:hover svg {
+  color: white;
+  transform: scale(1.2) rotate(5deg);
 }
 
 .sign-in-button {
-  height: 32px;
-  min-width: 80px;
-  padding: 4px 16px;
-  background-color: #FF4500;
+  height: 44px;
+  min-width: 100px;
+  padding: 8px 24px;
+  background: linear-gradient(135deg, #FF4500, #FF5722);
   color: white;
   font-size: 14px;
   font-weight: 700;
   border: none;
-  border-radius: 20px;
+  border-radius: 22px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(255, 69, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.sign-in-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.sign-in-button:hover::before {
+  left: 100%;
 }
 
 .sign-in-button:hover {
-  background-color: #FF5722;
+  background: linear-gradient(135deg, #FF5722, #FF6F00);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 69, 0, 0.4);
+}
+
+/* Enhanced responsive design */
+@media (max-width: 1024px) {
+  .navbar-content {
+    padding: 0 20px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: 56px;
+  }
+  
+  .navbar-content {
+    padding: 0 16px;
+    gap: 8px;
+  }
+  
+  .logo-container {
+    padding: 6px 12px;
+    gap: 8px;
+  }
+  
+  .reddit-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .icon-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+  
+  .sign-in-button {
+    height: 40px;
+    min-width: 80px;
+    padding: 6px 20px;
+    font-size: 13px;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-content {
+    padding: 0 12px;
+    gap: 6px;
+  }
+  
+  .logo-container {
+    padding: 4px 8px;
+  }
+  
+  .reddit-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .icon-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .icon-button svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .sign-in-button {
+    height: 36px;
+    min-width: 70px;
+    padding: 4px 16px;
+    font-size: 12px;
+  }
+}
+
+/* Animation keyframes */
+@keyframes glow {
+  0% {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+}
+
+.gaming-button {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Focus states for accessibility */
+.icon-button:focus,
+.sign-in-button:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .navbar {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-bottom-color: #404040;
+  }
+  
+  .site-name {
+    color: #ffffff;
+  }
+  
+  .icon-button {
+    background: linear-gradient(135deg, #2d2d2d, #404040);
+    color: #ffffff;
+  }
+  
+  .icon-button:hover {
+    background: linear-gradient(135deg, #404040, #2d2d2d);
+  }
 }
