@@ -2,13 +2,6 @@ import { useState, useEffect } from "react";
 import { Gamepad2, ExternalLink, Twitch, MessageSquare } from "lucide-react";
 import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
 import { FaSteam } from "react-icons/fa";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -234,21 +227,28 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <DropdownMenu open={isOpen} onOpenChange={onClose}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Gamepad2 className="w-5 h-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[900px] max-w-[95vw] max-h-[700px] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6 -m-2 mb-4 rounded-2xl">
-          <h3 className="text-xl font-bold flex items-center gap-3 mb-4">
-            <Gamepad2 className="w-6 h-6" />
-            Gaming Hub
-          </h3>
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'steam' | 'news')}>
+        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold flex items-center gap-3">
+              <Gamepad2 className="w-6 h-6" />
+              Gaming Hub
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-white hover:bg-white/20"
+            >
+              ×
+            </Button>
+          </div>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'steam' | 'news')} className="mt-4">
             <TabsList className="bg-white/20 border-0">
               <TabsTrigger value="steam" className="data-[state=active]:bg-white data-[state=active]:text-primary-600">
                 <FaSteam className="w-4 h-4 mr-2" />
@@ -399,8 +399,8 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
             </TabsContent>
           </Tabs>
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </div>
+    </div>
   );
 };
 

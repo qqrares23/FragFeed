@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { FaPlus, FaUsers, FaPen, FaTimes } from "react-icons/fa";
+import { Plus, Users, PenTool } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import CreateCommunityModal from "./CreateCommunityModal";
+import { Button } from "@/components/ui/button";
 
 interface CreatePanelProps {
   isOpen: boolean;
@@ -15,8 +16,6 @@ const CreatePanel = ({ isOpen, onClose }: CreatePanelProps) => {
   const subredditMatch = location.pathname.match(/^\/r\/([^/]+)/);
   const currentSubreddit = subredditMatch ? subredditMatch[1] : null;
 
-  if (!isOpen) return null;
-
   const handleCreatePost = () => {
     if (currentSubreddit) {
       navigate(`/r/${currentSubreddit}/submit`);
@@ -28,93 +27,97 @@ const CreatePanel = ({ isOpen, onClose }: CreatePanelProps) => {
     setIsCommunityModalOpen(true);
   };
 
+  const handleCommunityModalClose = () => {
+    setIsCommunityModalOpen(false);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
   return (
     <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      
-      {/* Panel positioned for both mobile and desktop */}
-      <div className="absolute right-4 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <FaPlus className="w-4 h-4" />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <Plus className="w-4 h-4" />
+                </div>
+                <h3 className="text-lg font-bold">Create Something</h3>
               </div>
-              <h3 className="text-lg font-bold">Create Something</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="text-white hover:bg-white/20"
+              >
+                ×
+              </Button>
             </div>
-            <button 
-              onClick={onClose}
-              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
-            >
-              <FaTimes className="w-4 h-4" />
-            </button>
+            <p className="text-white/80 text-sm mt-2">Share your thoughts with the world</p>
           </div>
-          <p className="text-white/80 text-sm mt-2">Share your thoughts with the world</p>
-        </div>
-        
-        {/* Options */}
-        <div className="p-4 space-y-3">
-          {currentSubreddit && (
-            <button 
-              onClick={handleCreatePost}
-              className="w-full group bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-xl p-4 transition-all duration-200 hover:shadow-md"
+          
+          {/* Options */}
+          <div className="space-y-2 p-6">
+            {currentSubreddit && (
+              <Button 
+                onClick={handleCreatePost} 
+                variant="outline"
+                className="w-full p-4 h-auto justify-start"
+              >
+                <div className="flex items-center gap-4 w-full">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                    <PenTool className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-semibold text-slate-900">
+                      Create Post
+                    </h4>
+                    <p className="text-sm text-slate-600">
+                      Share to r/{currentSubreddit}
+                    </p>
+                  </div>
+                </div>
+              </Button>
+            )}
+            
+            <Button 
+              onClick={handleCreateCommunity} 
+              variant="outline"
+              className="w-full p-4 h-auto justify-start"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <FaPen className="w-5 h-5 text-white" />
+              <div className="flex items-center gap-4 w-full">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">
-                    Create Post
+                  <h4 className="font-semibold text-slate-900">
+                    Create Community
                   </h4>
                   <p className="text-sm text-slate-600">
-                    Share to r/{currentSubreddit}
+                    Build your own space
                   </p>
                 </div>
               </div>
-            </button>
-          )}
-          
-          <button 
-            onClick={handleCreateCommunity}
-            className="w-full group bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 rounded-xl p-4 transition-all duration-200 hover:shadow-md"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                <FaUsers className="w-5 h-5 text-white" />
-              </div>
-              <div className="text-left">
-                <h4 className="font-semibold text-slate-900 group-hover:text-purple-700 transition-colors">
-                  Create Community
-                </h4>
-                <p className="text-sm text-slate-600">
-                  Build your own space
-                </p>
-              </div>
-            </div>
-          </button>
-        </div>
+            </Button>
+          </div>
 
-        {/* Footer */}
-        <div className="px-4 pb-4">
-          <div className="text-xs text-slate-500 text-center">
-            Express yourself and connect with others
+          {/* Footer */}
+          <div className="px-6 pb-6">
+            <div className="text-xs text-slate-500 text-center">
+              Express yourself and connect with others
+            </div>
           </div>
         </div>
       </div>
       
       {/* Community Modal */}
-      {isCommunityModalOpen && (
-        <CreateCommunityModal
-          isOpen={isCommunityModalOpen}
-          onClose={() => {
-            setIsCommunityModalOpen(false);
-            onClose();
-          }}
-        />
-      )}
+      <CreateCommunityModal
+        isOpen={isCommunityModalOpen}
+        onClose={handleCommunityModalClose}
+      />
     </>
   );
 };

@@ -1,14 +1,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Bell, Check, Eye, X } from "lucide-react";
+import { Bell, Check, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -52,14 +45,11 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
     return '#';
   };
 
+  if (!isOpen) return null;
+
   return (
-    <DropdownMenu open={isOpen} onOpenChange={onClose}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Bell className="w-5 h-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-96 max-w-sm max-h-96 overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -77,6 +67,13 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
                 <Check className="w-4 h-4" />
               </Button>
             )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+            >
+              ×
+            </Button>
           </div>
         </div>
 
@@ -140,8 +137,8 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
             </div>
           )}
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </div>
+    </div>
   );
 };
 
