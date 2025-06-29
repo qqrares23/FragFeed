@@ -10,6 +10,7 @@
 
 import type * as comments from "../comments.js";
 import type * as counter from "../counter.js";
+import type * as follows from "../follows.js";
 import type * as http from "../http.js";
 import type * as image from "../image.js";
 import type * as leaderboard from "../leaderboard.js";
@@ -36,6 +37,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   counter: typeof counter;
+  follows: typeof follows;
   http: typeof http;
   image: typeof image;
   leaderboard: typeof leaderboard;
