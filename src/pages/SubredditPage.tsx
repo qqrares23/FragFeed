@@ -4,8 +4,11 @@ import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GuidelinesEditModal from "../components/GuidelinesEditModal";
-import { FaUsers, FaPlus, FaMinus, FaCalendarAlt, FaEye, FaEyeSlash, FaEdit } from "react-icons/fa";
+import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const SubredditPage = () => {
   const { subredditName } = useParams();
@@ -90,82 +93,87 @@ const SubredditPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Community Header */}
-            <div className="card p-6 lg:p-8">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
-                <div className="flex-1">
-                  <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
-                    r/{subreddit.name}
-                  </h1>
-                  {subreddit.description && (
-                    <p className="text-slate-600 text-base lg:text-lg">{subreddit.description}</p>
-                  )}
-                </div>
-                
-                {user && (
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button 
-                      onClick={handleJoinLeave}
-                      className={`btn ${isMember ? 'btn-secondary' : 'btn-primary'} order-1 sm:order-2`}
-                    >
-                      {isMember ? (
-                        <>
-                          <FaMinus className="w-4 h-4" />
-                          Leave
-                        </>
-                      ) : (
-                        <>
-                          <FaPlus className="w-4 h-4" />
-                          Join
-                        </>
-                      )}
-                    </button>
-                    
-                    {isMember && (
-                      <a 
-                        href={`/r/${subredditName}/submit`}
-                        className="btn btn-primary order-2 sm:order-3"
-                      >
-                        <FaPlus className="w-4 h-4" />
-                        Create Post
-                      </a>
+            <Card>
+              <CardContent className="p-6 lg:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+                  <div className="flex-1">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
+                      r/{subreddit.name}
+                    </h1>
+                    {subreddit.description && (
+                      <p className="text-slate-600 text-base lg:text-lg">{subreddit.description}</p>
                     )}
                   </div>
-                )}
-              </div>
+                  
+                  {user && (
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button 
+                        onClick={handleJoinLeave}
+                        variant={isMember ? "outline" : "default"}
+                      >
+                        {isMember ? (
+                          <>
+                            <Minus className="w-4 h-4 mr-2" />
+                            Leave
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Join
+                          </>
+                        )}
+                      </Button>
+                      
+                      {isMember && (
+                        <Button asChild>
+                          <a href={`/r/${subredditName}/submit`}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Create Post
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
 
-              {/* Stats */}
-              <div className="flex flex-wrap gap-4 lg:gap-6">
-                <div className="flex items-center gap-2 text-slate-600">
-                  <FaUsers className="w-4 h-4 lg:w-5 lg:h-5" />
-                  <span className="font-semibold">{memberCount || 0}</span>
-                  <span className="hidden sm:inline">members</span>
-                  <span className="sm:hidden">👥</span>
+                {/* Stats */}
+                <div className="flex flex-wrap gap-4 lg:gap-6">
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Users className="w-4 h-4 lg:w-5 lg:h-5" />
+                    <span className="font-semibold">{memberCount || 0}</span>
+                    <span className="hidden sm:inline">members</span>
+                    <span className="sm:hidden">👥</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <CalendarDays className="w-4 h-4 lg:w-5 lg:h-5" />
+                    <span className="font-semibold">{posts?.length || 0}</span>
+                    <span className="hidden sm:inline">posts</span>
+                    <span className="sm:hidden">📝</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-slate-600">
-                  <FaCalendarAlt className="w-4 h-4 lg:w-5 lg:h-5" />
-                  <span className="font-semibold">{posts?.length || 0}</span>
-                  <span className="hidden sm:inline">posts</span>
-                  <span className="sm:hidden">📝</span>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Posts */}
             <div className="space-y-4 lg:space-y-6">
               {posts && posts.length === 0 ? (
-                <div className="card p-8 lg:p-12 text-center">
-                  <div className="text-4xl lg:text-6xl mb-4">📝</div>
-                  <h3 className="text-lg lg:text-xl font-semibold text-slate-900 mb-2">No posts yet</h3>
-                  <p className="text-slate-600 mb-6">
-                    Be the first to post in r/{subredditName}
-                  </p>
-                  {user && isMember && (
-                    <a href={`/r/${subredditName}/submit`} className="btn btn-primary">
-                      <FaPlus className="w-4 h-4" />
-                      Create First Post
-                    </a>
-                  )}
-                </div>
+                <Card>
+                  <CardContent className="p-8 lg:p-12 text-center">
+                    <div className="text-4xl lg:text-6xl mb-4">📝</div>
+                    <h3 className="text-lg lg:text-xl font-semibold text-slate-900 mb-2">No posts yet</h3>
+                    <p className="text-slate-600 mb-6">
+                      Be the first to post in r/{subredditName}
+                    </p>
+                    {user && isMember && (
+                      <Button asChild>
+                        <a href={`/r/${subredditName}/submit`}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create First Post
+                        </a>
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
               ) : (
                 <>
                   {posts?.map((post) => (
@@ -173,12 +181,12 @@ const SubredditPage = () => {
                   ))}
                   {status === "CanLoadMore" && (
                     <div className="text-center">
-                      <button 
+                      <Button 
                         onClick={() => loadMore(20)}
-                        className="btn btn-secondary"
+                        variant="outline"
                       >
                         Load More Posts
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </>
@@ -189,9 +197,11 @@ const SubredditPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Community Info */}
-            <div className="card p-4 lg:p-6">
-              <h3 className="font-bold text-slate-900 mb-4">About Community</h3>
-              <div className="space-y-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>About Community</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-slate-600">Members</span>
                   <span className="font-semibold">{memberCount || 0}</span>
@@ -206,85 +216,91 @@ const SubredditPage = () => {
                     {new Date(subreddit._creationTime).toLocaleDateString()}
                   </span>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Members Section */}
-            <div className="card p-4 lg:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-slate-900">Members</h3>
-                <button
-                  onClick={() => setShowMembers(!showMembers)}
-                  className="btn btn-ghost p-2"
-                  title={showMembers ? "Hide members" : "Show members"}
-                >
-                  {showMembers ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
-                </button>
-              </div>
-              
-              {showMembers ? (
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {members && members.length > 0 ? (
-                    members.map((member) => (
-                      <div key={member._id} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs lg:text-sm font-bold">
-                              {member.user?.username.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-900 text-sm lg:text-base">
-                              u/{member.user?.username}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              Joined {formatTimeAgo(member.joinedAt)}
-                            </p>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Members</CardTitle>
+                  <Button
+                    onClick={() => setShowMembers(!showMembers)}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    {showMembers ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {showMembers ? (
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {members && members.length > 0 ? (
+                      members.map((member) => (
+                        <div key={member._id} className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="w-6 h-6 lg:w-8 lg:h-8">
+                              <AvatarFallback className="text-xs lg:text-sm">
+                                {member.user?.username.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-slate-900 text-sm lg:text-base">
+                                u/{member.user?.username}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                Joined {formatTimeAgo(member.joinedAt)}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-slate-500 text-sm">No members to display</p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-slate-500 text-sm">
-                  Click the eye icon to view community members
-                </p>
-              )}
-            </div>
+                      ))
+                    ) : (
+                      <p className="text-slate-500 text-sm">No members to display</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-slate-500 text-sm">
+                    Click the eye icon to view community members
+                  </p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Community Guidelines */}
-            <div className="card p-4 lg:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-slate-900">Community Guidelines</h3>
-                {isOwner && (
-                  <button
-                    onClick={() => setShowGuidelinesModal(true)}
-                    className="btn btn-ghost p-2"
-                    title="Edit guidelines"
-                  >
-                    <FaEdit className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-              
-              <div className="space-y-2 text-sm text-slate-600">
-                {subreddit.guidelines && subreddit.guidelines.length > 0 ? (
-                  subreddit.guidelines.map((guideline, index) => (
-                    <p key={index}>• {guideline}</p>
-                  ))
-                ) : (
-                  <>
-                    <p>• Be respectful to other members</p>
-                    <p>• Stay on topic</p>
-                    <p>• No spam or self-promotion</p>
-                    <p>• Follow FragFeed's content policy</p>
-                  </>
-                )}
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Community Guidelines</CardTitle>
+                  {isOwner && (
+                    <Button
+                      onClick={() => setShowGuidelinesModal(true)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm text-slate-600">
+                  {subreddit.guidelines && subreddit.guidelines.length > 0 ? (
+                    subreddit.guidelines.map((guideline, index) => (
+                      <p key={index}>• {guideline}</p>
+                    ))
+                  ) : (
+                    <>
+                      <p>• Be respectful to other members</p>
+                      <p>• Stay on topic</p>
+                      <p>• No spam or self-promotion</p>
+                      <p>• Follow FragFeed's content policy</p>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

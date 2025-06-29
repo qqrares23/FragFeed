@@ -53,60 +53,6 @@ const Navbar = () => {
     setShowCommunityQuickPost(false);
   };
 
-  const handleGamingClick = () => {
-    closeAllDropdowns();
-    setShowGamingDropdown(true);
-  };
-
-  const handleNotificationsClick = () => {
-    closeAllDropdowns();
-    setShowNotifications(true);
-  };
-
-  const handleCommunityQuickPostClick = () => {
-    closeAllDropdowns();
-    setShowCommunityQuickPost(true);
-  };
-
-  const handleCreateClick = () => {
-    closeAllDropdowns();
-    setShowCreatePanel(true);
-  };
-
-  const handleProfileClick = () => {
-    if (user?.username) {
-      navigate(`/u/${user.username}`);
-      closeAllDropdowns();
-    }
-  };
-
-  const handleMobileGamingClick = () => {
-    setShowMobileMenu(false);
-    setShowGamingDropdown(true);
-  };
-
-  const handleMobileCommunityClick = () => {
-    setShowMobileMenu(false);
-    setShowCommunityQuickPost(true);
-  };
-
-  const handleMobileNotificationsClick = () => {
-    setShowMobileMenu(false);
-    setShowNotifications(true);
-  };
-
-  const handleMobileCreateClick = () => {
-    setShowMobileMenu(false);
-    setShowCreatePanel(true);
-  };
-
-  const handleMobileProfileClick = () => {
-    if (user?.username) {
-      navigate(`/u/${user.username}`);
-      setShowMobileMenu(false);
-    }
-  };
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,14 +75,10 @@ const Navbar = () => {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-2">
             {/* Gaming Hub */}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleGamingClick}
-              className="relative"
-            >
-              <Gamepad2 className="w-5 h-5" />
-            </Button>
+            <GamingDropdown
+              isOpen={showGamingDropdown}
+              onClose={closeAllDropdowns}
+            />
 
             <Unauthenticated>
               <SignInButton mode="modal">
@@ -146,25 +88,17 @@ const Navbar = () => {
             
             <Authenticated>
               {/* Community Quick Post */}
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleCommunityQuickPostClick}
-                className="relative"
-              >
-                <Users className="w-5 h-5" />
-              </Button>
+              <CommunityQuickPost
+                isOpen={showCommunityQuickPost}
+                onClose={closeAllDropdowns}
+              />
 
               {/* Notifications */}
               <div className="relative">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={handleNotificationsClick}
-                  className="relative"
-                >
-                  <Bell className="w-5 h-5" />
-                </Button>
+                <NotificationDropdown
+                  isOpen={showNotifications}
+                  onClose={closeAllDropdowns}
+                />
                 {unreadCount && unreadCount > 0 && (
                   <Badge 
                     variant="destructive" 
@@ -176,14 +110,10 @@ const Navbar = () => {
               </div>
 
               {/* Create */}
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleCreateClick}
-                className="relative"
-              >
-                <Plus className="w-5 h-5" />
-              </Button>
+              <CreatePanel
+                isOpen={showCreatePanel}
+                onClose={closeAllDropdowns}
+              />
 
               {/* Settings */}
               <Button variant="ghost" size="icon">
@@ -194,7 +124,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleProfileClick}
+                onClick={() => user?.username && navigate(`/u/${user.username}`)}
               >
                 <User className="w-5 h-5" />
               </Button>
@@ -236,31 +166,19 @@ const Navbar = () => {
               <Authenticated>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Gaming Hub */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleMobileGamingClick}
-                  >
+                  <Button variant="secondary" className="flex items-center justify-center gap-2">
                     <Gamepad2 className="w-4 h-4" />
                     Gaming
                   </Button>
 
                   {/* Community Quick Post */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleMobileCommunityClick}
-                  >
+                  <Button variant="secondary" className="flex items-center justify-center gap-2">
                     <Users className="w-4 h-4" />
                     Quick Post
                   </Button>
 
                   {/* Notifications */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2 relative"
-                    onClick={handleMobileNotificationsClick}
-                  >
+                  <Button variant="secondary" className="flex items-center justify-center gap-2 relative">
                     <Bell className="w-4 h-4" />
                     Notifications
                     {unreadCount && unreadCount > 0 && (
@@ -274,10 +192,7 @@ const Navbar = () => {
                   </Button>
 
                   {/* Create */}
-                  <Button 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleMobileCreateClick}
-                  >
+                  <Button className="flex items-center justify-center gap-2">
                     <Plus className="w-4 h-4" />
                     Create
                   </Button>
@@ -292,7 +207,12 @@ const Navbar = () => {
                   <Button
                     variant="secondary"
                     className="flex items-center justify-center gap-2"
-                    onClick={handleMobileProfileClick}
+                    onClick={() => {
+                      if (user?.username) {
+                        navigate(`/u/${user.username}`);
+                        setShowMobileMenu(false);
+                      }
+                    }}
                   >
                     <User className="w-4 h-4" />
                     Profile
@@ -303,27 +223,6 @@ const Navbar = () => {
           </div>
         )}
       </div>
-
-      {/* Dropdown Components */}
-      <GamingDropdown
-        isOpen={showGamingDropdown}
-        onClose={closeAllDropdowns}
-      />
-      
-      <NotificationDropdown
-        isOpen={showNotifications}
-        onClose={closeAllDropdowns}
-      />
-      
-      <CommunityQuickPost
-        isOpen={showCommunityQuickPost}
-        onClose={closeAllDropdowns}
-      />
-      
-      <CreatePanel
-        isOpen={showCreatePanel}
-        onClose={closeAllDropdowns}
-      />
     </nav>
   );
 };
