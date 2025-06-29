@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
@@ -22,6 +22,15 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
     api.subreddit.getUserMemberships, 
     user?.username ? { username: user.username } : "skip"
   );
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCommunity("");
+      setSearchQuery("");
+      setShowDropdown(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -77,7 +86,7 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
         
         {/* Content */}
         <div className="p-6 space-y-4">
-          {!memberships ? (
+          {memberships === undefined ? (
             <div className="text-center py-8">
               <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-slate-600">Loading your communities...</p>
@@ -100,7 +109,7 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
                 <div className="relative">
                   <button
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className="w-full flex items-center justify-between p-3 border border-slate-300 rounded-xl bg-white hover:border-primary-500 transition-colors"
+                    className="w-full flex items-center justify-between p-3 border border-slate-300 rounded-xl bg-white hover:border-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                   >
                     <span className={selectedCommunity ? "text-slate-900" : "text-slate-500"}>
                       {selectedCommunity ? `r/${selectedCommunity}` : "Choose a community..."}
@@ -109,35 +118,38 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
                   </button>
                   
                   {showDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-10 max-h-64 overflow-hidden">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-10 max-h-80 overflow-hidden">
                       {/* Search */}
-                      <div className="p-3 border-b border-slate-100">
-                        <div className="relative">
-                          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                          <input
-                            type="text"
-                            placeholder="Search communities..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
-                          />
+                      {memberships.length > 5 && (
+                        <div className="p-3 border-b border-slate-100">
+                          <div className="relative">
+                            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                            <input
+                              type="text"
+                              placeholder="Search communities..."
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+                              autoFocus
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
                       
                       {/* Communities List */}
-                      <div className="max-h-48 overflow-y-auto">
+                      <div className="max-h-64 overflow-y-auto">
                         {filteredCommunities.length === 0 ? (
                           <div className="p-4 text-center text-slate-500">
-                            No communities found
+                            {searchQuery ? "No communities found" : "No communities available"}
                           </div>
                         ) : (
                           filteredCommunities.map((community) => (
                             <button
                               key={community._id}
                               onClick={() => handleCommunitySelect(community.name)}
-                              className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors text-left"
+                              className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors text-left focus:outline-none focus:bg-slate-50"
                             >
-                              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
+                              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <span className="text-white text-xs font-bold">
                                   {community.name.charAt(0).toUpperCase()}
                                 </span>
@@ -158,6 +170,21 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
                   )}
                 </div>
               </div>
+
+              {/* Auto-show dropdown if no community selected and there are communities */}
+              {!selectedCommunity && !showDropdown && memberships.length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <div className="flex items-center gap-2 text-blue-700">
+                    <FaUsers className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      You have {memberships.length} communit{memberships.length === 1 ? 'y' : 'ies'} available
+                    </span>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Click the dropdown above to select where you want to post
+                  </p>
+                </div>
+              )}
 
               {/* Selected Community Info */}
               {selectedCommunity && (
