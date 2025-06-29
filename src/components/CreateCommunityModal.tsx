@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { FaTimes, FaUsers, FaPlus, FaRocket } from "react-icons/fa";
-import { IoSparkles } from "react-icons/io5";
+import { X, Users, Sparkles, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface CreateCommunityModalProps {
   isOpen: boolean;
@@ -18,8 +21,6 @@ const CreateCommunityModal = ({
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const createSubreddit = useMutation(api.subreddit.create);
-
-  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,133 +63,125 @@ const CreateCommunityModal = ({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-24 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[calc(100vh-8rem)] overflow-hidden animate-slide-up">
-          {/* Decorative Header */}
-          <div className="relative bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-600 text-white p-8 overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
-            
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                    <IoSparkles className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold">Create Community</h2>
-                    <p className="text-white/80 text-sm">Build your own space</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  className="p-2 hover:bg-white/20 rounded-xl transition-colors disabled:opacity-50"
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        {/* Header */}
+        <div className="relative bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-500 text-white p-6">
+          <button 
+            onClick={handleClose}
+            disabled={isLoading}
+            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-colors disabled:opacity-50"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Create Community</h2>
+              <p className="text-white/80 text-sm">Build your own space</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Community Name */}
+          <div className="space-y-2">
+            <Label htmlFor="community-name" className="text-sm font-semibold text-slate-700">
+              Community Name
+            </Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-600 font-bold text-sm">
+                r/
               </div>
+              <Input
+                id="community-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="awesome_community"
+                className="pl-8 h-11"
+                maxLength={21}
+                disabled={isLoading}
+                autoComplete="off"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <Users className="w-3 h-3" />
+              <span>Community names cannot be changed later</span>
             </div>
           </div>
 
-          {/* Form */}
-          <div className="max-h-[calc(100vh-16rem)] overflow-y-auto">
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="community-name" className="block text-sm font-semibold text-slate-700 mb-3">
-                    Community Name
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-600 font-bold text-lg">
-                      r/
-                    </div>
-                    <input
-                      type="text"
-                      id="community-name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="awesome_community"
-                      className="w-full pl-12 pr-4 py-4 border-2 border-slate-200 rounded-2xl focus:border-primary-500 focus:ring-0 transition-colors bg-slate-50 focus:bg-white"
-                      maxLength={21}
-                      disabled={isLoading}
-                      autoComplete="off"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-slate-500">
-                    <FaUsers className="w-3 h-3" />
-                    <span>Community names cannot be changed later</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="community-description" className="block text-sm font-semibold text-slate-700 mb-3">
-                    Description <span className="text-slate-400 font-normal">(optional)</span>
-                  </label>
-                  <textarea
-                    id="community-description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="What's your community about? Share your vision..."
-                    className="w-full px-4 py-4 border-2 border-slate-200 rounded-2xl focus:border-primary-500 focus:ring-0 transition-colors bg-slate-50 focus:bg-white resize-none"
-                    maxLength={500}
-                    disabled={isLoading}
-                    rows={4}
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="text-xs text-slate-400">
-                      Help others understand what your community is about
-                    </div>
-                    <div className="text-xs text-slate-400">
-                      {description.length}/500
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 flex items-center gap-3 text-red-700">
-                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-red-600 font-bold">!</span>
-                  </div>
-                  <span className="text-sm font-medium">{error}</span>
-                </div>
-              )}
-
-              <div className="flex gap-4 pt-6">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  className="flex-1 px-6 py-4 border-2 border-slate-200 text-slate-700 font-semibold rounded-2xl hover:bg-slate-50 transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading || !name.trim()}
-                  className="flex-1 px-6 py-4 bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-semibold rounded-2xl hover:from-primary-600 hover:to-secondary-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <FaRocket className="w-4 h-4" />
-                      Launch Community
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="community-description" className="text-sm font-semibold text-slate-700">
+              Description <span className="text-slate-400 font-normal">(optional)</span>
+            </Label>
+            <Textarea
+              id="community-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="What's your community about? Share your vision..."
+              maxLength={500}
+              disabled={isLoading}
+              rows={3}
+              className="resize-none"
+            />
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-slate-400">
+                Help others understand what your community is about
+              </span>
+              <span className="text-slate-400">
+                {description.length}/500
+              </span>
+            </div>
           </div>
-        </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-3 text-red-700">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <span className="text-sm font-medium">{error}</span>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isLoading}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading || !name.trim()}
+              className="flex-1"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Create
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 
