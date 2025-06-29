@@ -1,4 +1,4 @@
-import { Plus, User, Gamepad2, Bell, Target, Menu, X, Settings, Users } from "lucide-react";
+import { Plus, User, Gamepad2, Bell, Target, Menu, X, Users } from "lucide-react";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -71,11 +71,6 @@ const Navbar = () => {
   const handleCommunityQuickPostClick = () => {
     closeAllDropdowns();
     setShowCommunityQuickPost(true);
-  };
-
-  const handleSettingsClick = () => {
-    navigate('/settings');
-    closeAllDropdowns();
   };
 
   return (
@@ -154,15 +149,6 @@ const Navbar = () => {
                 className={showCreatePanel ? "bg-slate-100" : ""}
               >
                 <Plus className="w-5 h-5" />
-              </Button>
-
-              {/* Settings */}
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleSettingsClick}
-              >
-                <Settings className="w-5 h-5" />
               </Button>
 
               {/* Profile */}
@@ -257,20 +243,10 @@ const Navbar = () => {
                     Create
                   </Button>
 
-                  {/* Settings */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleSettingsClick}
-                  >
-                    <Settings className="w-4 h-4" />
-                    Settings
-                  </Button>
-
                   {/* Profile */}
                   <Button
                     variant="secondary"
-                    className="flex items-center justify-center gap-2"
+                    className="flex items-center justify-center gap-2 col-span-2"
                     onClick={() => {
                       if (user?.username) {
                         navigate(`/u/${user.username}`);
