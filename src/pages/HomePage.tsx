@@ -1,5 +1,6 @@
 import { Feed } from "../components/Feed";
 import TwitchSidebar from "../components/TwitchSidebar";
+import GamingSidebar from "../components/GamingSidebar";
 
 const HomePage = () => {
   return (
@@ -33,14 +34,21 @@ const HomePage = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
+          {/* Left Sidebar - Gaming */}
+          <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '2200ms' }}>
+            <div className="sticky top-24">
+              <GamingSidebar />
+            </div>
+          </div>
+          
           {/* Main Feed */}
           <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '2500ms' }}>
             <Feed />
           </div>
           
           {/* Right Sidebar - Twitch */}
-          <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '3000ms' }}>
+          <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '2800ms' }}>
             <div className="sticky top-24">
               <TwitchSidebar />
             </div>

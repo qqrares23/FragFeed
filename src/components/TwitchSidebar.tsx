@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Play, Users, Eye, ExternalLink, Gamepad2, TrendingUp } from "lucide-react";
+import { Play, Users, Eye, ExternalLink, TrendingUp, Zap, Star, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,12 +13,15 @@ interface TwitchStream {
   viewer_count: number;
   thumbnail_url: string;
   started_at: string;
+  is_mature: boolean;
+  language: string;
 }
 
 interface TwitchGame {
   id: string;
   name: string;
   box_art_url: string;
+  viewer_count?: number;
 }
 
 const TwitchSidebar = () => {
@@ -33,58 +36,67 @@ const TwitchSidebar = () => {
       setLoading(true);
       setError(null);
 
-      // Mock data since we can't access Twitch API directly from frontend
-      // In a real implementation, this would go through your backend
+      // Enhanced mock data with more realistic streaming content
       const mockStreams: TwitchStream[] = [
         {
           id: "1",
           user_name: "Ninja",
           user_login: "ninja",
           game_name: "Fortnite",
-          title: "Playing with viewers! !discord !youtube",
+          title: "🔥 INSANE BUILD BATTLES! Playing with viewers! !discord !youtube",
           viewer_count: 45230,
           thumbnail_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          started_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+          started_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          is_mature: false,
+          language: "en"
         },
         {
           id: "2",
           user_name: "shroud",
           user_login: "shroud",
           game_name: "Valorant",
-          title: "Ranked grind continues",
+          title: "🎯 RADIANT RANK GRIND - Insane Aim Training Session",
           viewer_count: 38420,
           thumbnail_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          started_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
+          started_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+          is_mature: false,
+          language: "en"
         },
         {
           id: "3",
           user_name: "pokimane",
           user_login: "pokimane",
           game_name: "League of Legends",
-          title: "Climbing to Challenger!",
+          title: "✨ Climbing to Challenger! Road to Rank 1 💪",
           viewer_count: 32100,
           thumbnail_url: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
-          started_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString()
+          started_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+          is_mature: false,
+          language: "en"
         },
         {
           id: "4",
           user_name: "xQcOW",
           user_login: "xqcow",
           game_name: "Grand Theft Auto V",
-          title: "NoPixel RP - New character!",
+          title: "🚗 NoPixel RP - New character arc begins! CHAOS MODE",
           viewer_count: 28750,
           thumbnail_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          started_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
+          started_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+          is_mature: true,
+          language: "en"
         },
         {
           id: "5",
           user_name: "TimTheTatman",
           user_login: "timthetatman",
           game_name: "Call of Duty: Warzone",
-          title: "Warzone with the boys",
+          title: "🎮 Warzone with the boys - Victory Royale hunting!",
           viewer_count: 25600,
           thumbnail_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          started_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+          started_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+          is_mature: false,
+          language: "en"
         }
       ];
 
@@ -92,27 +104,32 @@ const TwitchSidebar = () => {
         {
           id: "1",
           name: "League of Legends",
-          box_art_url: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg"
+          box_art_url: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
+          viewer_count: 234567
         },
         {
           id: "2",
           name: "Fortnite",
-          box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg"
+          box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+          viewer_count: 198432
         },
         {
           id: "3",
           name: "Valorant",
-          box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"
+          box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+          viewer_count: 156789
         },
         {
           id: "4",
           name: "Grand Theft Auto V",
-          box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg"
+          box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+          viewer_count: 134567
         },
         {
           id: "5",
           name: "Call of Duty: Warzone",
-          box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"
+          box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+          viewer_count: 98765
         }
       ];
 
@@ -165,25 +182,47 @@ const TwitchSidebar = () => {
     window.open(`https://twitch.tv/${userLogin}`, '_blank');
   };
 
+  const getStreamBadgeColor = (index: number) => {
+    switch (index) {
+      case 0: return "from-yellow-400 to-yellow-600"; // Gold
+      case 1: return "from-gray-300 to-gray-500"; // Silver
+      case 2: return "from-orange-400 to-orange-600"; // Bronze
+      default: return "from-purple-400 to-purple-600"; // Purple
+    }
+  };
+
+  const getGameBadgeColor = (index: number) => {
+    switch (index) {
+      case 0: return "from-green-400 to-green-600";
+      case 1: return "from-blue-400 to-blue-600";
+      case 2: return "from-red-400 to-red-600";
+      default: return "from-indigo-400 to-indigo-600";
+    }
+  };
+
   if (loading && !topStreams.length) {
     return (
-      <div className="space-y-4">
-        <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Play className="w-4 h-4 text-purple-600" />
-              Live Streams
+      <div className="space-y-6">
+        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800 shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                <Play className="w-4 h-4 text-white" />
+              </div>
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-bold">
+                Live Streams
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-2">
+            <div className="space-y-3">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="flex gap-2">
-                    <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                    <div className="flex-1 space-y-1">
-                      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
-                      <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+                  <div className="flex gap-3">
+                    <div className="w-16 h-10 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
                     </div>
                   </div>
                 </div>
@@ -196,82 +235,107 @@ const TwitchSidebar = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Top Live Streams */}
-      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
-        <CardHeader className="pb-3">
+      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800 shadow-lg hover:shadow-xl transition-all duration-300">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Play className="w-4 h-4 text-purple-600" />
-              Top Live Streams
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Play className="w-4 h-4 text-white" />
+              </div>
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-bold">
+                🔥 Top Live Streams
+              </span>
             </CardTitle>
-            <div className="flex items-center gap-1">
-              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-slate-500 dark:text-slate-400">LIVE</span>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-lg"></div>
+              <Badge variant="destructive" className="text-xs font-bold animate-pulse">
+                LIVE
+              </Badge>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
           {error ? (
-            <div className="text-center py-3">
-              <p className="text-red-500 text-xs">{error}</p>
+            <div className="text-center py-6">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Zap className="w-6 h-6 text-red-500" />
+              </div>
+              <p className="text-red-500 text-sm font-medium">{error}</p>
               <Button 
                 onClick={fetchTwitchData} 
                 variant="outline" 
                 size="sm" 
-                className="mt-2 text-xs h-7"
+                className="mt-3"
               >
+                <Zap className="w-3 h-3 mr-1" />
                 Retry
               </Button>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {topStreams.slice(0, 3).map((stream, index) => (
                 <div 
                   key={stream.id}
-                  className="group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg p-2 transition-colors"
+                  className="group cursor-pointer hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl p-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-transparent hover:border-purple-200 dark:hover:border-purple-700"
                   onClick={() => openTwitchStream(stream.user_login)}
                 >
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <div className="relative flex-shrink-0">
                       <img 
                         src={stream.thumbnail_url} 
                         alt={stream.title}
-                        className="w-12 h-8 rounded object-cover"
+                        className="w-16 h-10 rounded-lg object-cover shadow-md"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                         }}
                       />
-                      <div className="absolute top-0 left-0">
-                        <Badge variant="destructive" className="text-xs px-1 py-0 h-4 text-xs">
+                      <div className="absolute -top-1 -left-1">
+                        <div className={`w-6 h-6 bg-gradient-to-br ${getStreamBadgeColor(index)} rounded-full flex items-center justify-center shadow-lg`}>
+                          {index === 0 ? (
+                            <Crown className="w-3 h-3 text-white" />
+                          ) : (
+                            <span className="text-white font-bold text-xs">#{index + 1}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 right-0">
+                        <Badge variant="destructive" className="text-xs px-1.5 py-0.5 h-5 font-bold shadow-md">
                           LIVE
                         </Badge>
                       </div>
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 mb-1">
-                        <span className="text-xs font-bold text-purple-600">#{index + 1}</span>
-                        <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
                           {stream.user_name}
                         </h4>
+                        {stream.is_mature && (
+                          <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                            18+
+                          </Badge>
+                        )}
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 mb-1">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-2 leading-relaxed">
                         {stream.title}
                       </p>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500 dark:text-slate-400 truncate text-xs">
-                          {stream.game_name}
-                        </span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                            {stream.game_name}
+                          </Badge>
+                        </div>
                         <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
-                          <Eye className="w-2.5 h-2.5" />
-                          <span className="text-xs">{formatViewerCount(stream.viewer_count)}</span>
+                          <Eye className="w-3 h-3" />
+                          <span className="text-xs font-semibold">{formatViewerCount(stream.viewer_count)}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ExternalLink className="w-3 h-3 text-slate-400" />
+                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">
+                      <ExternalLink className="w-4 h-4 text-purple-500" />
                     </div>
                   </div>
                 </div>
@@ -282,45 +346,65 @@ const TwitchSidebar = () => {
       </Card>
 
       {/* Top Games */}
-      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <TrendingUp className="w-4 h-4 text-green-600" />
-            Top Games
+      <Card className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800 shadow-lg hover:shadow-xl transition-all duration-300">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+              <TrendingUp className="w-4 h-4 text-white" />
+            </div>
+            <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent font-bold">
+              🎮 Trending Games
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="space-y-2">
+          <div className="space-y-3">
             {topGames.slice(0, 3).map((game, index) => (
               <div 
                 key={game.id}
-                className="group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg p-2 transition-colors"
+                className="group cursor-pointer hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl p-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-transparent hover:border-green-200 dark:hover:border-green-700"
                 onClick={() => window.open(`https://twitch.tv/directory/game/${encodeURIComponent(game.name)}`, '_blank')}
               >
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className="text-xs font-bold text-green-600 w-4">#{index + 1}</span>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-shrink-0">
                     <img 
                       src={game.box_art_url} 
                       alt={game.name}
-                      className="w-6 h-8 rounded object-cover"
+                      className="w-10 h-12 rounded-lg object-cover shadow-md"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                       }}
                     />
+                    <div className="absolute -top-1 -left-1">
+                      <div className={`w-5 h-5 bg-gradient-to-br ${getGameBadgeColor(index)} rounded-full flex items-center justify-center shadow-lg`}>
+                        {index === 0 ? (
+                          <Star className="w-2.5 h-2.5 text-white" />
+                        ) : (
+                          <span className="text-white font-bold text-xs">#{index + 1}</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate mb-1">
                       {game.name}
                     </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Trending
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                        Trending
+                      </Badge>
+                      {game.viewer_count && (
+                        <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                          <Users className="w-3 h-3" />
+                          <span className="text-xs font-semibold">{formatViewerCount(game.viewer_count)}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ExternalLink className="w-3 h-3 text-slate-400" />
+                  <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">
+                    <ExternalLink className="w-4 h-4 text-green-500" />
                   </div>
                 </div>
               </div>
@@ -330,9 +414,12 @@ const TwitchSidebar = () => {
       </Card>
 
       {/* Footer */}
-      <div className="text-center">
-        <p className="text-xs text-slate-400 dark:text-slate-500">
-          {lastUpdate && `Updated: ${lastUpdate.toLocaleTimeString()}`}
+      <div className="text-center space-y-1">
+        <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+          {lastUpdate && `🔄 Updated: ${lastUpdate.toLocaleTimeString()}`}
+        </p>
+        <p className="text-xs text-slate-300 dark:text-slate-600">
+          Powered by <span className="text-purple-500 font-semibold">Twitch API</span>
         </p>
       </div>
     </div>
