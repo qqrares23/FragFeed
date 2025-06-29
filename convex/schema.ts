@@ -36,6 +36,14 @@ export default defineSchema({
   })
     .index("byExternalId", ["externalId"])
     .index("byUsername", ["username"]),
+  follows: defineTable({
+    followerId: v.id("users"),
+    followingId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("byFollower", ["followerId"])
+    .index("byFollowing", ["followingId"])
+    .index("byFollowerAndFollowing", ["followerId", "followingId"]),
   subreddit: defineTable({
     name: v.string(),
     description: v.optional(v.string()),
@@ -88,6 +96,7 @@ export default defineSchema({
     message: v.string(),
     postId: v.optional(v.id("post")),
     subredditId: v.optional(v.id("subreddit")),
+    fromUserId: v.optional(v.id("users")),
     read: v.boolean(),
     createdAt: v.number(),
   })

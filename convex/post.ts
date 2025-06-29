@@ -56,16 +56,17 @@ export const create = mutation({
     
     await counts.inc(ctx, postCountKey(user._id));
 
+    // Get subreddit info
+    const subreddit = await ctx.db.get(args.subreddit);
+    
     // Create notifications for all members of the subreddit (except the author)
     const subredditMembers = await ctx.db
       .query("subredditMembership")
       .withIndex("bySubreddit", (q) => q.eq("subredditId", args.subreddit))
       .collect();
 
-    const subreddit = await ctx.db.get(args.subreddit);
-    
     // Send notifications to all members except the post author
-    const notificationPromises = subredditMembers
+    const memberNotificationPromises = subredditMembers
       .filter(member => member.userId !== user._id)
       .map(member => 
         ctx.db.insert("notifications", {
@@ -75,12 +76,34 @@ export const create = mutation({
           message: `${user.username} posted "${args.subject}" in r/${subreddit?.name}`,
           postId: postId,
           subredditId: args.subreddit,
+          fromUserId: user._id,
           read: false,
           createdAt: Date.now(),
         })
       );
 
-    await Promise.all(notificationPromises);
+    // Get all followers of the post author
+    const followers = await ctx.db
+      .query("follows")
+      .withIndex("byFollowing", (q) => q.eq("followingId", user._id))
+      .collect();
+
+    // Send notifications to all followers
+    const followerNotificationPromises = followers.map(follow => 
+      ctx.db.insert("notifications", {
+        userId: follow.followerId,
+        type: "follower_post",
+        title: "New post from someone you follow",
+        message: `${user.username} posted "${args.subject}" in r/${subreddit?.name}`,
+        postId: postId,
+        subredditId: args.subreddit,
+        fromUserId: user._id,
+        read: false,
+        createdAt: Date.now(),
+      })
+    );
+
+    await Promise.all([...memberNotificationPromises, ...followerNotificationPromises]);
     
     return postId;
   },

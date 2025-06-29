@@ -5,7 +5,7 @@ import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GamingProfileModal from "../components/GamingProfileModal";
 import ProfileEditModal from "../components/ProfileEditModal";
-import { User, Users, Minus, CalendarDays, Plus, Unlink, Edit, MapPin, Globe, Camera, Gamepad2 } from "lucide-react";
+import { User, Users, Minus, CalendarDays, Plus, Unlink, Edit, MapPin, Globe, Camera, Gamepad2, UserPlus, UserMinus, Eye, EyeOff } from "lucide-react";
 import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
 import { FaSteam } from "react-icons/fa";
 import { useState } from "react";
@@ -19,6 +19,8 @@ const ProfilePage = () => {
   const isOwnProfile = user?.username === username;
   const [showGamingModal, setShowGamingModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
   
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.userPosts, {
     authorUsername: username || "",
@@ -27,8 +29,27 @@ const ProfilePage = () => {
   const stats = useQuery(api.users.getPublicUser, {username: username || ""});
   const memberships = useQuery(api.subreddit.getUserMemberships, {username: username || ""});
   
+  // Follow system queries
+  const isFollowing = useQuery(api.follows.isFollowing, 
+    stats?._id ? { targetUserId: stats._id } : "skip"
+  );
+  const followerCount = useQuery(api.follows.getFollowerCount, 
+    stats?._id ? { userId: stats._id } : "skip"
+  );
+  const followingCount = useQuery(api.follows.getFollowingCount, 
+    stats?._id ? { userId: stats._id } : "skip"
+  );
+  const followers = useQuery(api.follows.getFollowers,
+    stats?._id && showFollowers ? { userId: stats._id, limit: 20 } : "skip"
+  );
+  const following = useQuery(api.follows.getFollowing,
+    stats?._id && showFollowing ? { userId: stats._id, limit: 20 } : "skip"
+  );
+  
   const leaveSubreddit = useMutation(api.subreddit.leave);
   const disconnectProfile = useMutation(api.users.disconnectGamingProfile);
+  const followUser = useMutation(api.follows.followUser);
+  const unfollowUser = useMutation(api.follows.unfollowUser);
 
   const handleLeaveSubreddit = async (subredditId: string) => {
     if (!isOwnProfile) return;
@@ -48,6 +69,32 @@ const ProfilePage = () => {
     } catch (error) {
       console.error("Error disconnecting profile:", error);
     }
+  };
+
+  const handleFollowToggle = async () => {
+    if (!stats?._id || isOwnProfile) return;
+    
+    try {
+      if (isFollowing) {
+        await unfollowUser({ targetUserId: stats._id });
+      } else {
+        await followUser({ targetUserId: stats._id });
+      }
+    } catch (error) {
+      console.error("Error toggling follow:", error);
+    }
+  };
+
+  const formatTimeAgo = (timestamp: number) => {
+    const diff = Date.now() - timestamp;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor(diff / 60000);
+
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    if (minutes > 0) return `${minutes}m ago`;
+    return 'Just now';
   };
 
   if (posts === undefined) {
@@ -132,15 +179,37 @@ const ProfilePage = () => {
                     </div>
                   </div>
                   
-                  {isOwnProfile && (
-                    <Button
-                      onClick={() => setShowEditModal(true)}
-                      variant="outline"
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  )}
+                  <div className="flex gap-3">
+                    {!isOwnProfile && user && stats?._id && (
+                      <Button
+                        onClick={handleFollowToggle}
+                        variant={isFollowing ? "outline" : "default"}
+                        disabled={!stats._id}
+                      >
+                        {isFollowing ? (
+                          <>
+                            <UserMinus className="w-4 h-4 mr-2" />
+                            Unfollow
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            Follow
+                          </>
+                        )}
+                      </Button>
+                    )}
+                    
+                    {isOwnProfile && (
+                      <Button
+                        onClick={() => setShowEditModal(true)}
+                        variant="outline"
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Stats */}
@@ -148,6 +217,14 @@ const ProfilePage = () => {
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                     <span className="font-semibold">{stats?.posts ?? 0}</span>
                     <span>posts</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <span className="font-semibold">{followerCount ?? 0}</span>
+                    <span>followers</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <span className="font-semibold">{followingCount ?? 0}</span>
+                    <span>following</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                     <span className="font-semibold">{memberships?.length ?? 0}</span>
@@ -158,6 +235,119 @@ const ProfilePage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Followers/Following Section */}
+        {(followerCount || followingCount) && (followerCount! > 0 || followingCount! > 0) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Followers */}
+            {followerCount! > 0 && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="w-5 h-5 text-primary-600" />
+                      Followers ({followerCount})
+                    </CardTitle>
+                    <Button
+                      onClick={() => setShowFollowers(!showFollowers)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      {showFollowers ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {showFollowers ? (
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {followers && followers.length > 0 ? (
+                        followers.map((follower) => (
+                          <div key={follower._id} className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="w-6 h-6 lg:w-8 lg:h-8">
+                                <AvatarFallback className="text-xs lg:text-sm">
+                                  {follower.user?.username.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-slate-900 dark:text-slate-100 text-sm lg:text-base">
+                                  u/{follower.user?.username}
+                                </p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                  Followed {formatTimeAgo(follower.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">No followers to display</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">
+                      Click the eye icon to view followers
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Following */}
+            {followingCount! > 0 && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <UserPlus className="w-5 h-5 text-primary-600" />
+                      Following ({followingCount})
+                    </CardTitle>
+                    <Button
+                      onClick={() => setShowFollowing(!showFollowing)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      {showFollowing ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {showFollowing ? (
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {following && following.length > 0 ? (
+                        following.map((follow) => (
+                          <div key={follow._id} className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="w-6 h-6 lg:w-8 lg:h-8">
+                                <AvatarFallback className="text-xs lg:text-sm">
+                                  {follow.user?.username.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-slate-900 dark:text-slate-100 text-sm lg:text-base">
+                                  u/{follow.user?.username}
+                                </p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                  Following since {formatTimeAgo(follow.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">No following to display</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">
+                      Click the eye icon to view following
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
         {/* Gaming Profiles Section */}
         <Card className="mb-8">

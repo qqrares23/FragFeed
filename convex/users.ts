@@ -78,6 +78,7 @@ export const getPublicUser = query({
     const bannerImageUrl = user.bannerImage ? await ctx.storage.getUrl(user.bannerImage) : null;
     
     return {
+      _id: user._id,
       posts: postCount,
       bio: user.bio,
       location: user.location,
