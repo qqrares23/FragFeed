@@ -173,3 +173,30 @@ export const getMemberCount = query({
     return memberships.length;
   },
 });
+
+export const getMembers = query({
+  args: { subredditId: v.id("subreddit"), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const memberships = await ctx.db
+      .query("subredditMembership")
+      .withIndex("bySubreddit", (q) => q.eq("subredditId", args.subredditId))
+      .order("desc")
+      .take(args.limit || 50);
+
+    const members = await Promise.all(
+      memberships.map(async (membership) => {
+        const user = await ctx.db.get(membership.userId);
+        return {
+          _id: membership._id,
+          user: user ? {
+            _id: user._id,
+            username: user.username,
+          } : null,
+          joinedAt: membership.joinedAt,
+        };
+      })
+    );
+
+    return members.filter(member => member.user !== null);
+  },
+});

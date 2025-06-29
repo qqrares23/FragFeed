@@ -3,12 +3,16 @@ import { usePaginatedQuery, useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
-import { FaUser, FaUsers, FaMinus, FaCalendarAlt } from "react-icons/fa";
+import GamingProfileModal from "../components/GamingProfileModal";
+import { FaUser, FaUsers, FaMinus, FaCalendarAlt, FaSteam, FaGamepad, FaPlus, FaUnlink } from "react-icons/fa";
+import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
+import { useState } from "react";
 
 const ProfilePage = () => {
   const { username } = useParams();
   const { user } = useUser();
   const isOwnProfile = user?.username === username;
+  const [showGamingModal, setShowGamingModal] = useState(false);
   
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.userPosts, {
     authorUsername: username || "",
@@ -18,6 +22,7 @@ const ProfilePage = () => {
   const memberships = useQuery(api.subreddit.getUserMemberships, {username: username || ""});
   
   const leaveSubreddit = useMutation(api.subreddit.leave);
+  const disconnectProfile = useMutation(api.users.disconnectGamingProfile);
 
   const handleLeaveSubreddit = async (subredditId: string) => {
     if (!isOwnProfile) return;
@@ -26,6 +31,16 @@ const ProfilePage = () => {
       await leaveSubreddit({ subredditId: subredditId as any });
     } catch (error) {
       console.error("Error leaving subreddit:", error);
+    }
+  };
+
+  const handleDisconnectGamingProfile = async (platform: 'steam' | 'riot' | 'epic' | 'ubisoft') => {
+    if (!isOwnProfile) return;
+    
+    try {
+      await disconnectProfile({ platform });
+    } catch (error) {
+      console.error("Error disconnecting profile:", error);
     }
   };
 
@@ -61,6 +76,152 @@ const ProfilePage = () => {
                   <span>communities</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Gaming Profiles Section */}
+          <div className="border-t border-slate-200 pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <FaGamepad className="w-5 h-5 text-primary-600" />
+                Gaming Profiles
+              </h3>
+              {isOwnProfile && (
+                <button
+                  onClick={() => setShowGamingModal(true)}
+                  className="btn btn-secondary text-sm"
+                >
+                  <FaPlus />
+                  Connect Gaming Account
+                </button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Steam Profile */}
+              {stats?.steamProfile && (
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <FaSteam className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">{stats.steamProfile.username}</p>
+                        <p className="text-sm text-slate-600">Steam</p>
+                      </div>
+                    </div>
+                    {isOwnProfile && (
+                      <button
+                        onClick={() => handleDisconnectGamingProfile('steam')}
+                        className="text-red-500 hover:text-red-700 p-1"
+                        title="Disconnect Steam"
+                      >
+                        <FaUnlink className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  {stats.steamProfile.profileUrl && (
+                    <a
+                      href={stats.steamProfile.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline mt-2 block"
+                    >
+                      View Steam Profile
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* Riot Profile */}
+              {stats?.riotProfile && (
+                <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
+                        <SiRiotgames className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">{stats.riotProfile.gameName}#{stats.riotProfile.tagLine}</p>
+                        <p className="text-sm text-slate-600">Riot Games</p>
+                      </div>
+                    </div>
+                    {isOwnProfile && (
+                      <button
+                        onClick={() => handleDisconnectGamingProfile('riot')}
+                        className="text-red-500 hover:text-red-700 p-1"
+                        title="Disconnect Riot"
+                      >
+                        <FaUnlink className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Epic Profile */}
+              {stats?.epicProfile && (
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
+                        <SiEpicgames className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">{stats.epicProfile.displayName}</p>
+                        <p className="text-sm text-slate-600">Epic Games</p>
+                      </div>
+                    </div>
+                    {isOwnProfile && (
+                      <button
+                        onClick={() => handleDisconnectGamingProfile('epic')}
+                        className="text-red-500 hover:text-red-700 p-1"
+                        title="Disconnect Epic"
+                      >
+                        <FaUnlink className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Ubisoft Profile */}
+              {stats?.ubisoftProfile && (
+                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 border border-indigo-200 rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <SiUbisoft className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">{stats.ubisoftProfile.username}</p>
+                        <p className="text-sm text-slate-600">Ubisoft</p>
+                      </div>
+                    </div>
+                    {isOwnProfile && (
+                      <button
+                        onClick={() => handleDisconnectGamingProfile('ubisoft')}
+                        className="text-red-500 hover:text-red-700 p-1"
+                        title="Disconnect Ubisoft"
+                      >
+                        <FaUnlink className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* No gaming profiles */}
+              {!stats?.steamProfile && !stats?.riotProfile && !stats?.epicProfile && !stats?.ubisoftProfile && (
+                <div className="col-span-full text-center py-8 text-slate-500">
+                  <FaGamepad className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                  <p className="font-medium">No gaming profiles connected</p>
+                  {isOwnProfile && (
+                    <p className="text-sm mt-1">Connect your gaming accounts to show your gaming identity</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -138,6 +299,14 @@ const ProfilePage = () => {
           )}
         </div>
       </div>
+
+      {/* Gaming Profile Modal */}
+      {showGamingModal && (
+        <GamingProfileModal
+          isOpen={showGamingModal}
+          onClose={() => setShowGamingModal(false)}
+        />
+      )}
     </div>
   );
 };

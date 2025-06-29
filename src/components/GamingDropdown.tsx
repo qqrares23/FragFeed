@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { FaGamepad, FaSteam, FaNewspaper, FaExternalLinkAlt } from "react-icons/fa";
+import { FaGamepad, FaSteam, FaNewspaper, FaExternalLinkAlt, FaTwitch, FaDiscord } from "react-icons/fa";
+import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
 
 interface CheapSharkDeal {
   internalName: string;
@@ -32,6 +33,8 @@ interface NewsItem {
   source: {
     name: string;
   };
+  category?: string;
+  platform?: string;
 }
 
 interface GamingDropdownProps {
@@ -94,6 +97,27 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
           releaseDate: 0,
           lastChange: 0
         } as CheapSharkDeal,
+        {
+          title: "Cyberpunk 2077",
+          salePrice: "29.99",
+          normalPrice: "59.99",
+          savings: "50.00",
+          steamRatingText: "Very Positive",
+          steamRatingPercent: "78",
+          thumb: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+          dealID: "mock2",
+          storeID: "1",
+          gameID: "1091500",
+          steamAppID: "1091500",
+          isOnSale: "1",
+          metacriticScore: "86",
+          steamRatingCount: "500000",
+          dealRating: "8.9",
+          internalName: "CYBERPUNK2077",
+          metacriticLink: "",
+          releaseDate: 0,
+          lastChange: 0
+        } as CheapSharkDeal,
       ]);
     } finally {
       setLoading(false);
@@ -104,23 +128,158 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
     setLoading(true);
     setError(null);
     try {
+      // Enhanced gaming news with more variety and platforms
       setNews([
         {
           title: "Steam Winter Sale 2025: Best Deals and Discounts",
           url: "https://store.steampowered.com/",
           urlToImage: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          description: "Discover the best gaming deals during Steam's annual winter sale.",
+          description: "Discover the best gaming deals during Steam's annual winter sale with discounts up to 90% off on popular titles including AAA games and indie favorites.",
           publishedAt: new Date().toISOString(),
-          source: { name: "Steam News" }
+          source: { name: "Steam News" },
+          category: "Sales",
+          platform: "PC"
         },
         {
-          title: "Top 10 Most Anticipated Games of 2025",
+          title: "Valorant Champions 2025: Tournament Schedule Announced",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
+          description: "Riot Games reveals the complete schedule for Valorant Champions 2025, featuring 16 teams competing for the $2.5 million prize pool.",
+          publishedAt: new Date(Date.now() - 3600000).toISOString(),
+          source: { name: "Riot Games" },
+          category: "Esports",
+          platform: "PC"
+        },
+        {
+          title: "Fortnite Chapter 5 Season 2: New Map and Features",
           url: "#",
           urlToImage: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          description: "From AAA blockbusters to indie gems, here are the most anticipated releases.",
-          publishedAt: new Date(Date.now() - 86400000).toISOString(),
-          source: { name: "Gaming Weekly" }
+          description: "Epic Games unveils the latest Fortnite season with a completely redesigned map, new weapons, and exciting gameplay mechanics.",
+          publishedAt: new Date(Date.now() - 7200000).toISOString(),
+          source: { name: "Epic Games" },
+          category: "Updates",
+          platform: "Multi-platform"
         },
+        {
+          title: "Rainbow Six Siege: Operation Crimson Heist Now Live",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg",
+          description: "Ubisoft launches the latest Rainbow Six Siege operation featuring new operator Flores, map rework, and weapon balancing changes.",
+          publishedAt: new Date(Date.now() - 86400000).toISOString(),
+          source: { name: "Ubisoft" },
+          category: "Updates",
+          platform: "PC/Console"
+        },
+        {
+          title: "Gaming Hardware: RTX 5000 Series Performance Review",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg",
+          description: "Comprehensive analysis of NVIDIA's latest RTX 5000 series graphics cards and their impact on 4K gaming performance across popular titles.",
+          publishedAt: new Date(Date.now() - 172800000).toISOString(),
+          source: { name: "Tech Gaming" },
+          category: "Hardware",
+          platform: "PC"
+        },
+        {
+          title: "Indie Game Spotlight: Pizza Tower Wins Independent Game Award",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/1174746/pexels-photo-1174746.jpeg",
+          description: "The critically acclaimed indie platformer Pizza Tower takes home the prestigious Independent Game Festival award for excellence in design.",
+          publishedAt: new Date(Date.now() - 259200000).toISOString(),
+          source: { name: "Indie Focus" },
+          category: "Awards",
+          platform: "PC/Console"
+        },
+        {
+          title: "PlayStation VR2: Top 10 Must-Play Games",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/8728380/pexels-photo-8728380.jpeg",
+          description: "Explore the best virtual reality experiences available on PlayStation VR2, from immersive adventures to innovative puzzle games.",
+          publishedAt: new Date(Date.now() - 345600000).toISOString(),
+          source: { name: "PlayStation Blog" },
+          category: "VR",
+          platform: "PlayStation"
+        },
+        {
+          title: "Mobile Gaming Revenue Hits Record $120 Billion in 2024",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg",
+          description: "Mobile gaming continues to dominate the industry with innovative gameplay mechanics and successful free-to-play monetization strategies.",
+          publishedAt: new Date(Date.now() - 432000000).toISOString(),
+          source: { name: "Mobile Gaming Today" },
+          category: "Industry",
+          platform: "Mobile"
+        },
+        {
+          title: "Game Development: Unity 2025.1 Features AI-Powered Tools",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg",
+          description: "Unity Technologies announces revolutionary AI-powered development tools that streamline game creation and reduce development time by 40%.",
+          publishedAt: new Date(Date.now() - 518400000).toISOString(),
+          source: { name: "Unity Technologies" },
+          category: "Development",
+          platform: "Development"
+        },
+        {
+          title: "Accessibility in Gaming: Microsoft's Adaptive Controller 2.0",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/7915437/pexels-photo-7915437.jpeg",
+          description: "Microsoft unveils the next generation of their adaptive controller, making gaming more accessible for players with disabilities worldwide.",
+          publishedAt: new Date(Date.now() - 604800000).toISOString(),
+          source: { name: "Microsoft Gaming" },
+          category: "Accessibility",
+          platform: "Xbox/PC"
+        },
+        {
+          title: "Retro Gaming: Nintendo Direct Announces Classic Game Collection",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/371924/pexels-photo-371924.jpeg",
+          description: "Nintendo surprises fans with a comprehensive collection of classic NES, SNES, and N64 games coming to Nintendo Switch Online.",
+          publishedAt: new Date(Date.now() - 691200000).toISOString(),
+          source: { name: "Nintendo" },
+          category: "Retro",
+          platform: "Nintendo Switch"
+        },
+        {
+          title: "Cloud Gaming: Xbox Game Pass Ultimate Adds 50 New Titles",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
+          description: "Microsoft expands Xbox Game Pass Ultimate with 50 new games including day-one releases and popular indie titles for cloud gaming.",
+          publishedAt: new Date(Date.now() - 777600000).toISOString(),
+          source: { name: "Xbox Wire" },
+          category: "Cloud Gaming",
+          platform: "Xbox/PC"
+        },
+        {
+          title: "Twitch Introduces New Creator Monetization Features",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
+          description: "Twitch announces enhanced monetization tools for streamers including improved subscription tiers and integrated merchandise sales.",
+          publishedAt: new Date(Date.now() - 864000000).toISOString(),
+          source: { name: "Twitch Blog" },
+          category: "Streaming",
+          platform: "Streaming"
+        },
+        {
+          title: "Gaming Laptops: ASUS ROG 2025 Lineup Features Liquid Cooling",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg",
+          description: "ASUS Republic of Gamers unveils their 2025 gaming laptop lineup featuring advanced liquid cooling systems and RTX 5000 series GPUs.",
+          publishedAt: new Date(Date.now() - 950400000).toISOString(),
+          source: { name: "ASUS ROG" },
+          category: "Hardware",
+          platform: "PC"
+        },
+        {
+          title: "Discord Gaming: Voice Channels Get Spatial Audio Update",
+          url: "#",
+          urlToImage: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
+          description: "Discord rolls out spatial audio for voice channels, enhancing communication for gaming communities with 3D positional audio.",
+          publishedAt: new Date(Date.now() - 1036800000).toISOString(),
+          source: { name: "Discord" },
+          category: "Communication",
+          platform: "Multi-platform"
+        }
       ]);
     } catch (err) {
       setError('Failed to load gaming news');
@@ -138,12 +297,45 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
     return numPrice === 0 ? 'Free' : `$${numPrice.toFixed(2)}`;
   };
 
+  const getCategoryColor = (category?: string) => {
+    const colors = {
+      'Sales': 'bg-green-100 text-green-700',
+      'Esports': 'bg-purple-100 text-purple-700',
+      'Updates': 'bg-blue-100 text-blue-700',
+      'Hardware': 'bg-orange-100 text-orange-700',
+      'Awards': 'bg-yellow-100 text-yellow-700',
+      'VR': 'bg-cyan-100 text-cyan-700',
+      'Industry': 'bg-pink-100 text-pink-700',
+      'Development': 'bg-indigo-100 text-indigo-700',
+      'Accessibility': 'bg-emerald-100 text-emerald-700',
+      'Retro': 'bg-red-100 text-red-700',
+      'Cloud Gaming': 'bg-sky-100 text-sky-700',
+      'Streaming': 'bg-violet-100 text-violet-700',
+      'Communication': 'bg-teal-100 text-teal-700',
+    };
+    return colors[category as keyof typeof colors] || 'bg-slate-100 text-slate-700';
+  };
+
+  const getPlatformIcon = (platform?: string) => {
+    switch (platform) {
+      case 'PC': return <FaSteam className="w-3 h-3" />;
+      case 'PlayStation': return <span className="text-xs font-bold">PS</span>;
+      case 'Xbox/PC': return <span className="text-xs font-bold">XB</span>;
+      case 'Nintendo Switch': return <span className="text-xs font-bold">NS</span>;
+      case 'Mobile': return <span className="text-xs font-bold">📱</span>;
+      case 'Multi-platform': return <span className="text-xs font-bold">🎮</span>;
+      case 'Streaming': return <FaTwitch className="w-3 h-3" />;
+      case 'Development': return <span className="text-xs font-bold">🛠️</span>;
+      default: return null;
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="absolute right-0 top-full mt-2 w-[800px] max-w-[95vw] bg-white rounded-2xl shadow-xl border border-slate-200 z-50 max-h-[600px] overflow-hidden">
+      <div className="absolute right-0 top-full mt-2 w-[900px] max-w-[95vw] bg-white rounded-2xl shadow-xl border border-slate-200 z-50 max-h-[700px] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
           <h3 className="text-xl font-bold flex items-center gap-3 mb-4">
@@ -177,12 +369,12 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-6 max-h-96 overflow-y-auto">
+        <div className="p-6 max-h-[500px] overflow-y-auto">
           {loading && (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-slate-600">Loading amazing deals...</p>
+                <p className="text-slate-600">Loading amazing content...</p>
               </div>
             </div>
           )}
@@ -254,16 +446,33 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
                     <img 
                       src={article.urlToImage || "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg"} 
                       alt={article.title}
-                      className="w-20 h-20 rounded-lg object-cover"
+                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                       }}
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2 flex-wrap">
                         <span className="font-medium">{article.source.name}</span>
                         <span>•</span>
                         <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                        {article.category && (
+                          <>
+                            <span>•</span>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
+                              {article.category}
+                            </span>
+                          </>
+                        )}
+                        {article.platform && (
+                          <>
+                            <span>•</span>
+                            <span className="flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                              {getPlatformIcon(article.platform)}
+                              {article.platform}
+                            </span>
+                          </>
+                        )}
                       </div>
                       <h4 className="font-semibold text-slate-900 line-clamp-2 mb-2">
                         {article.title}

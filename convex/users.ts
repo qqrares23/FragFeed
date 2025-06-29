@@ -1,4 +1,4 @@
-import { internalMutation, query, QueryCtx } from "./_generated/server";
+import { internalMutation, query, QueryCtx, mutation } from "./_generated/server";
 import { UserJSON } from "@clerk/backend";
 import { v, Validator } from "convex/values";
 import { counts, postCountKey } from "./counter";
@@ -74,7 +74,101 @@ export const getPublicUser = query({
 
     const postCount = await counts.count(ctx, postCountKey(user._id))
     return {
-      posts: postCount
+      posts: postCount,
+      steamProfile: user.steamProfile,
+      riotProfile: user.riotProfile,
+      epicProfile: user.epicProfile,
+      ubisoftProfile: user.ubisoftProfile,
     }
+  },
+});
+
+export const connectSteamProfile = mutation({
+  args: {
+    steamId: v.string(),
+    username: v.string(),
+    profileUrl: v.string(),
+    avatarUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    
+    await ctx.db.patch(user._id, {
+      steamProfile: {
+        steamId: args.steamId,
+        username: args.username,
+        profileUrl: args.profileUrl,
+        avatarUrl: args.avatarUrl,
+        connectedAt: Date.now(),
+      },
+    });
+  },
+});
+
+export const connectRiotProfile = mutation({
+  args: {
+    riotId: v.string(),
+    gameName: v.string(),
+    tagLine: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    
+    await ctx.db.patch(user._id, {
+      riotProfile: {
+        riotId: args.riotId,
+        gameName: args.gameName,
+        tagLine: args.tagLine,
+        connectedAt: Date.now(),
+      },
+    });
+  },
+});
+
+export const connectEpicProfile = mutation({
+  args: {
+    epicId: v.string(),
+    displayName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    
+    await ctx.db.patch(user._id, {
+      epicProfile: {
+        epicId: args.epicId,
+        displayName: args.displayName,
+        connectedAt: Date.now(),
+      },
+    });
+  },
+});
+
+export const connectUbisoftProfile = mutation({
+  args: {
+    ubisoftId: v.string(),
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    
+    await ctx.db.patch(user._id, {
+      ubisoftProfile: {
+        ubisoftId: args.ubisoftId,
+        username: args.username,
+        connectedAt: Date.now(),
+      },
+    });
+  },
+});
+
+export const disconnectGamingProfile = mutation({
+  args: { platform: v.union(v.literal("steam"), v.literal("riot"), v.literal("epic"), v.literal("ubisoft")) },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    
+    const updateData: any = {};
+    updateData[`${args.platform}Profile`] = undefined;
+    
+    await ctx.db.patch(user._id, updateData);
   },
 });

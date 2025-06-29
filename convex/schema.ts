@@ -5,6 +5,29 @@ export default defineSchema({
   users: defineTable({
     username: v.string(),
     externalId: v.string(),
+    steamProfile: v.optional(v.object({
+      steamId: v.string(),
+      username: v.string(),
+      profileUrl: v.string(),
+      avatarUrl: v.optional(v.string()),
+      connectedAt: v.number(),
+    })),
+    riotProfile: v.optional(v.object({
+      riotId: v.string(),
+      gameName: v.string(),
+      tagLine: v.string(),
+      connectedAt: v.number(),
+    })),
+    epicProfile: v.optional(v.object({
+      epicId: v.string(),
+      displayName: v.string(),
+      connectedAt: v.number(),
+    })),
+    ubisoftProfile: v.optional(v.object({
+      ubisoftId: v.string(),
+      username: v.string(),
+      connectedAt: v.number(),
+    })),
   })
     .index("byExternalId", ["externalId"])
     .index("byUsername", ["username"]),
