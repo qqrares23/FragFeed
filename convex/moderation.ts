@@ -172,7 +172,6 @@ export const getModerators = query({
   },
 });
 
-// Make this function public by exporting it as a query
 export const isUserModerator = query({
   args: { subredditId: v.id("subreddit") },
   handler: async (ctx, args) => {
