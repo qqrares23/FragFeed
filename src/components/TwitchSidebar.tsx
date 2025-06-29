@@ -167,23 +167,23 @@ const TwitchSidebar = () => {
 
   if (loading && !topStreams.length) {
     return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Play className="w-5 h-5 text-purple-600" />
+      <div className="space-y-4">
+        <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Play className="w-4 h-4 text-purple-600" />
               Live Streams
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
+          <CardContent className="pt-0">
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="flex gap-3">
-                    <div className="w-16 h-12 bg-slate-200 rounded"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                      <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+                  <div className="flex gap-2">
+                    <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                    <div className="flex-1 space-y-1">
+                      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                      <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
                     </div>
                   </div>
                 </div>
@@ -196,87 +196,82 @@ const TwitchSidebar = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Live Streams */}
-      <Card>
-        <CardHeader>
+      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Play className="w-5 h-5 text-purple-600" />
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Play className="w-4 h-4 text-purple-600" />
               Top Live Streams
             </CardTitle>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-slate-500">LIVE</span>
+            <div className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-xs text-slate-500 dark:text-slate-400">LIVE</span>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           {error ? (
-            <div className="text-center py-4">
-              <p className="text-red-500 text-sm">{error}</p>
+            <div className="text-center py-3">
+              <p className="text-red-500 text-xs">{error}</p>
               <Button 
                 onClick={fetchTwitchData} 
                 variant="outline" 
                 size="sm" 
-                className="mt-2"
+                className="mt-2 text-xs h-7"
               >
                 Retry
               </Button>
             </div>
           ) : (
-            <div className="space-y-3">
-              {topStreams.slice(0, 5).map((stream, index) => (
+            <div className="space-y-2">
+              {topStreams.slice(0, 3).map((stream, index) => (
                 <div 
                   key={stream.id}
-                  className="group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg p-2 transition-colors"
+                  className="group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg p-2 transition-colors"
                   onClick={() => openTwitchStream(stream.user_login)}
                 >
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <div className="relative flex-shrink-0">
                       <img 
                         src={stream.thumbnail_url} 
                         alt={stream.title}
-                        className="w-16 h-12 rounded object-cover"
+                        className="w-12 h-8 rounded object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                         }}
                       />
-                      <div className="absolute top-1 left-1">
-                        <Badge variant="destructive" className="text-xs px-1 py-0">
+                      <div className="absolute top-0 left-0">
+                        <Badge variant="destructive" className="text-xs px-1 py-0 h-4 text-xs">
                           LIVE
-                        </Badge>
-                      </div>
-                      <div className="absolute bottom-1 right-1">
-                        <Badge variant="secondary" className="text-xs px-1 py-0 bg-black/70 text-white">
-                          {formatStreamDuration(stream.started_at)}
                         </Badge>
                       </div>
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-1 mb-1">
                         <span className="text-xs font-bold text-purple-600">#{index + 1}</span>
-                        <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate">
+                        <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">
                           {stream.user_name}
                         </h4>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-1">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 mb-1">
                         {stream.title}
                       </p>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500 dark:text-slate-400 truncate">
+                        <span className="text-slate-500 dark:text-slate-400 truncate text-xs">
                           {stream.game_name}
                         </span>
                         <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
-                          <Eye className="w-3 h-3" />
-                          <span>{formatViewerCount(stream.viewer_count)}</span>
+                          <Eye className="w-2.5 h-2.5" />
+                          <span className="text-xs">{formatViewerCount(stream.viewer_count)}</span>
                         </div>
                       </div>
                     </div>
                     
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ExternalLink className="w-4 h-4 text-slate-400" />
+                      <ExternalLink className="w-3 h-3 text-slate-400" />
                     </div>
                   </div>
                 </div>
@@ -287,28 +282,28 @@ const TwitchSidebar = () => {
       </Card>
 
       {/* Top Games */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
+      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <TrendingUp className="w-4 h-4 text-green-600" />
             Top Games
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {topGames.slice(0, 5).map((game, index) => (
+        <CardContent className="pt-0">
+          <div className="space-y-2">
+            {topGames.slice(0, 3).map((game, index) => (
               <div 
                 key={game.id}
-                className="group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg p-2 transition-colors"
+                className="group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg p-2 transition-colors"
                 onClick={() => window.open(`https://twitch.tv/directory/game/${encodeURIComponent(game.name)}`, '_blank')}
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs font-bold text-green-600 w-6">#{index + 1}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <span className="text-xs font-bold text-green-600 w-4">#{index + 1}</span>
                     <img 
                       src={game.box_art_url} 
                       alt={game.name}
-                      className="w-10 h-14 rounded object-cover"
+                      className="w-6 h-8 rounded object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
                       }}
@@ -316,16 +311,16 @@ const TwitchSidebar = () => {
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate">
+                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">
                       {game.name}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Trending game
+                      Trending
                     </p>
                   </div>
                   
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ExternalLink className="w-4 h-4 text-slate-400" />
+                    <ExternalLink className="w-3 h-3 text-slate-400" />
                   </div>
                 </div>
               </div>
@@ -337,10 +332,7 @@ const TwitchSidebar = () => {
       {/* Footer */}
       <div className="text-center">
         <p className="text-xs text-slate-400 dark:text-slate-500">
-          {lastUpdate && `Last updated: ${lastUpdate.toLocaleTimeString()}`}
-        </p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-          Data refreshes every 2 minutes
+          {lastUpdate && `Updated: ${lastUpdate.toLocaleTimeString()}`}
         </p>
       </div>
     </div>
