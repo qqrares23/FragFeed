@@ -21,6 +21,12 @@ export const create = mutation({
       name: args.name,
       description: args.description,
       authorId: user._id,
+      guidelines: [
+        "Be respectful to other members",
+        "Stay on topic",
+        "No spam or self-promotion",
+        "Follow FragFeed's content policy"
+      ],
     });
 
     // Automatically join the creator to the subreddit
@@ -44,6 +50,53 @@ export const get = query({
     if (!subreddit) return null;
 
     return subreddit;
+  },
+});
+
+export const updateGuidelines = mutation({
+  args: {
+    subredditId: v.id("subreddit"),
+    guidelines: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    const subreddit = await ctx.db.get(args.subredditId);
+    
+    if (!subreddit) {
+      throw new ConvexError({ message: "Subreddit not found" });
+    }
+    
+    // Only the owner can update guidelines
+    if (subreddit.authorId !== user._id) {
+      throw new ConvexError({ message: "Only the community owner can update guidelines" });
+    }
+    
+    // Filter out empty guidelines and limit to 10
+    const filteredGuidelines = args.guidelines
+      .filter(guideline => guideline.trim().length > 0)
+      .slice(0, 10);
+    
+    await ctx.db.patch(args.subredditId, {
+      guidelines: filteredGuidelines,
+    });
+  },
+});
+
+export const isOwner = query({
+  args: { subredditId: v.id("subreddit") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return false;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("byExternalId", (q) => q.eq("externalId", identity.subject))
+      .unique();
+
+    if (!user) return false;
+
+    const subreddit = await ctx.db.get(args.subredditId);
+    return subreddit?.authorId === user._id;
   },
 });
 

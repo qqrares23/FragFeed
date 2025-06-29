@@ -3,13 +3,15 @@ import { usePaginatedQuery, useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
-import { FaUsers, FaPlus, FaMinus, FaCalendarAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import GuidelinesEditModal from "../components/GuidelinesEditModal";
+import { FaUsers, FaPlus, FaMinus, FaCalendarAlt, FaEye, FaEyeSlash, FaEdit } from "react-icons/fa";
 import { useState } from "react";
 
 const SubredditPage = () => {
   const { subredditName } = useParams();
   const { user } = useUser();
   const [showMembers, setShowMembers] = useState(false);
+  const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
   
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.getSubredditPosts, {
@@ -24,6 +26,9 @@ const SubredditPage = () => {
   );
   const members = useQuery(api.subreddit.getMembers,
     subreddit && showMembers ? { subredditId: subreddit._id, limit: 20 } : "skip"
+  );
+  const isOwner = useQuery(api.subreddit.isOwner,
+    subreddit ? { subredditId: subreddit._id } : "skip"
   );
   
   const joinSubreddit = useMutation(api.subreddit.join);
@@ -250,19 +255,50 @@ const SubredditPage = () => {
               )}
             </div>
 
-            {/* Rules or Guidelines */}
+            {/* Community Guidelines */}
             <div className="card p-4 lg:p-6">
-              <h3 className="font-bold text-slate-900 mb-4">Community Guidelines</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-slate-900">Community Guidelines</h3>
+                {isOwner && (
+                  <button
+                    onClick={() => setShowGuidelinesModal(true)}
+                    className="btn btn-ghost p-2"
+                    title="Edit guidelines"
+                  >
+                    <FaEdit className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              
               <div className="space-y-2 text-sm text-slate-600">
-                <p>• Be respectful to other members</p>
-                <p>• Stay on topic</p>
-                <p>• No spam or self-promotion</p>
-                <p>• Follow FragFeed's content policy</p>
+                {subreddit.guidelines && subreddit.guidelines.length > 0 ? (
+                  subreddit.guidelines.map((guideline, index) => (
+                    <p key={index}>• {guideline}</p>
+                  ))
+                ) : (
+                  <>
+                    <p>• Be respectful to other members</p>
+                    <p>• Stay on topic</p>
+                    <p>• No spam or self-promotion</p>
+                    <p>• Follow FragFeed's content policy</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Guidelines Edit Modal */}
+      {showGuidelinesModal && subreddit && (
+        <GuidelinesEditModal
+          isOpen={showGuidelinesModal}
+          onClose={() => setShowGuidelinesModal(false)}
+          subredditId={subreddit._id}
+          subredditName={subreddit.name}
+          currentGuidelines={subreddit.guidelines || []}
+        />
+      )}
     </div>
   );
 };

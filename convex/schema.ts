@@ -40,6 +40,7 @@ export default defineSchema({
     name: v.string(),
     description: v.optional(v.string()),
     authorId: v.id("users"),
+    guidelines: v.optional(v.array(v.string())),
   })
     .index("byName", ["name"])
     .index("byAuthor", ["authorId"])
