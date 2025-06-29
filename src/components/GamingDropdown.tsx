@@ -231,7 +231,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
           <div className="flex items-center justify-between">
@@ -243,7 +243,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 text-xl"
             >
               ×
             </Button>
@@ -263,7 +263,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-6 max-h-[500px] overflow-y-auto">
+        <div className="p-6 max-h-[calc(90vh-200px)] overflow-y-auto">
           {loading && (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">

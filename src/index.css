@@ -18,46 +18,6 @@
   }
 }
 
-@layer components {
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 outline-none focus:outline-2 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-  
-  .btn-primary {
-    @apply bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:from-primary-600 hover:to-primary-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-primary-500;
-  }
-  
-  .btn-secondary {
-    @apply bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 hover:shadow-md focus:outline-slate-500;
-  }
-  
-  .btn-ghost {
-    @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-slate-500;
-  }
-  
-  .card {
-    @apply bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg transition-all duration-300 hover:shadow-xl;
-  }
-  
-  .input {
-    @apply w-full rounded-xl border border-slate-300 bg-white/50 backdrop-blur-sm px-4 py-3 transition-all duration-200 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20;
-  }
-  
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   @apply w-1.5;
@@ -78,4 +38,88 @@
 /* Selection styling */
 ::selection {
   @apply bg-primary-200 text-primary-900;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Modal backdrop blur */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Smooth transitions for modals */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+.modal-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 150ms ease-in, transform 150ms ease-in;
+}
+
+/* Enhanced button styles */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20 disabled:pointer-events-none disabled:opacity-50;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:from-primary-600 hover:to-primary-700 hover:shadow-xl hover:-translate-y-0.5;
+}
+
+.btn-secondary {
+  @apply bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 hover:shadow-md;
+}
+
+.btn-ghost {
+  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100;
+}
+
+/* Enhanced input styles */
+.input {
+  @apply flex h-10 w-full rounded-xl border border-slate-300 bg-white/50 backdrop-blur-sm px-4 py-3 text-sm transition-all duration-200 placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20 focus-visible:border-primary-500 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+/* Card hover effects */
+.card {
+  @apply bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg transition-all duration-300 hover:shadow-xl;
+}
+
+/* Gradient text animation */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background: linear-gradient(-45deg, #6366f1, #d946ef, #6366f1, #d946ef);
+  background-size: 400% 400%;
+  animation: gradient 3s ease infinite;
 }

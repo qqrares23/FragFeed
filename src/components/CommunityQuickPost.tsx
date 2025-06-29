@@ -4,13 +4,6 @@ import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { Users, Search, Edit, ChevronDown } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -25,6 +18,7 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
   const navigate = useNavigate();
   const [selectedCommunity, setSelectedCommunity] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
   
   // Get user's communities
   const memberships = useQuery(
@@ -37,6 +31,7 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
     if (isOpen) {
       setSelectedCommunity("");
       setSearchQuery("");
+      setShowDropdown(false);
     }
   }, [isOpen]);
 
@@ -47,6 +42,7 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
   const handleCommunitySelect = (communityName: string) => {
     setSelectedCommunity(communityName);
     setSearchQuery("");
+    setShowDropdown(false);
   };
 
   const handleCreatePost = () => {
@@ -84,7 +80,7 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 text-xl"
             >
               ×
             </Button>
@@ -113,20 +109,23 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
                 <label className="block text-sm font-semibold text-slate-700">
                   Select Community
                 </label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between">
-                      <span className={selectedCommunity ? "text-slate-900" : "text-slate-500"}>
-                        {selectedCommunity ? `r/${selectedCommunity}` : "Choose a community..."}
-                      </span>
-                      <ChevronDown className="w-4 h-4 text-slate-400" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-80">
-                    {/* Search */}
-                    {memberships.length > 5 && (
-                      <>
-                        <div className="p-3">
+                <div className="relative">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-between"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                  >
+                    <span className={selectedCommunity ? "text-slate-900" : "text-slate-500"}>
+                      {selectedCommunity ? `r/${selectedCommunity}` : "Choose a community..."}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                  </Button>
+                  
+                  {showDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-10 max-h-64 overflow-hidden">
+                      {/* Search */}
+                      {memberships.length > 5 && (
+                        <div className="p-3 border-b border-slate-100">
                           <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                             <Input
@@ -137,24 +136,21 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
                             />
                           </div>
                         </div>
-                        <DropdownMenuSeparator />
-                      </>
-                    )}
-                    
-                    {/* Communities List */}
-                    <div className="max-h-64 overflow-y-auto">
-                      {filteredCommunities.length === 0 ? (
-                        <div className="p-4 text-center text-slate-500">
-                          {searchQuery ? "No communities found" : "No communities available"}
-                        </div>
-                      ) : (
-                        filteredCommunities.map((community) => (
-                          <DropdownMenuItem
-                            key={community._id}
-                            onClick={() => handleCommunitySelect(community.name)}
-                            className="p-3 cursor-pointer"
-                          >
-                            <div className="flex items-center gap-3 w-full">
+                      )}
+                      
+                      {/* Communities List */}
+                      <div className="max-h-48 overflow-y-auto">
+                        {filteredCommunities.length === 0 ? (
+                          <div className="p-4 text-center text-slate-500">
+                            {searchQuery ? "No communities found" : "No communities available"}
+                          </div>
+                        ) : (
+                          filteredCommunities.map((community) => (
+                            <button
+                              key={community._id}
+                              onClick={() => handleCommunitySelect(community.name)}
+                              className="w-full p-3 hover:bg-slate-50 flex items-center gap-3 text-left"
+                            >
                               <Avatar className="w-8 h-8">
                                 <AvatarFallback className="text-xs">
                                   {community.name.charAt(0).toUpperCase()}
@@ -168,13 +164,13 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
                                   </div>
                                 )}
                               </div>
-                            </div>
-                          </DropdownMenuItem>
-                        ))
-                      )}
+                            </button>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  )}
+                </div>
               </div>
 
               {/* Auto-show hint if no community selected */}
@@ -233,9 +229,10 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
               </div>
 
               {/* Quick Stats */}
-              <DropdownMenuSeparator />
-              <div className="text-xs text-slate-500 text-center">
-                You're a member of {memberships.length} communit{memberships.length === 1 ? 'y' : 'ies'}
+              <div className="border-t border-slate-200 pt-4">
+                <div className="text-xs text-slate-500 text-center">
+                  You're a member of {memberships.length} communit{memberships.length === 1 ? 'y' : 'ies'}
+                </div>
               </div>
             </>
           )}

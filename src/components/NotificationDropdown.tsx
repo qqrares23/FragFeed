@@ -51,34 +51,38 @@ const NotificationDropdown = ({ isOpen, onClose }: NotificationDropdownProps) =>
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-primary-600" />
-            <h3 className="font-semibold text-slate-900">Notifications</h3>
-          </div>
-          <div className="flex items-center gap-2">
-            {notifications && notifications.some(n => !n.read) && (
+        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5" />
+              <h3 className="font-semibold">Notifications</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              {notifications && notifications.some(n => !n.read) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleMarkAllAsRead}
+                  className="text-white hover:bg-white/20 text-xs"
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  Mark All Read
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleMarkAllAsRead}
-                className="text-xs"
+                onClick={onClose}
+                className="text-white hover:bg-white/20 text-xl"
               >
-                <Check className="w-4 h-4" />
+                ×
               </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-            >
-              ×
-            </Button>
+            </div>
           </div>
         </div>
 
         {/* Notifications List */}
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
           {!notifications || notifications.length === 0 ? (
             <div className="p-8 text-center">
               <Bell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
