@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { FaImage } from "react-icons/fa";
+import { FaImage, FaExclamationTriangle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import "../styles/SubmitPage.css";
 
@@ -10,6 +10,9 @@ const SubmitPage = () => {
   const { subredditName } = useParams();
   const navigate = useNavigate();
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
+  const isMember = useQuery(api.subreddit.isMember, 
+    subreddit ? { subredditId: subreddit._id } : "skip"
+  );
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -20,7 +23,7 @@ const SubmitPage = () => {
   const createPost = useMutation(api.post.create);
   const generateUploadUrl = useMutation(api.image.generateUploadUrl);
 
-  if (subreddit === undefined) return <p>Loading...</p>;
+  if (subreddit === undefined) return <div className="loading">Loading...</div>;
 
   if (!subreddit) {
     return (
@@ -28,6 +31,24 @@ const SubmitPage = () => {
         <div className="not-found">
           <h1>Subreddit not found</h1>
           <p>The subreddit r/{subredditName} does not exist.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isMember === false) {
+    return (
+      <div className="content-container">
+        <div className="membership-required">
+          <FaExclamationTriangle className="warning-icon" />
+          <h1>Membership Required</h1>
+          <p>You must join r/{subredditName} before you can create posts.</p>
+          <button 
+            className="join-button"
+            onClick={() => navigate(`/r/${subredditName}`)}
+          >
+            Go to r/{subredditName}
+          </button>
         </div>
       </div>
     );
@@ -64,21 +85,22 @@ const SubmitPage = () => {
 
     try {
       setIsSubmitting(true);
-        let imageUrl = undefined;
+      let imageUrl = undefined;
 
-        if (selectedImage) {
-            const uploadUrl = await generateUploadUrl();
-            const result = await fetch(uploadUrl, {
-                method: "POST",
-                headers: {"Content-Type": selectedImage.type},
-                body: selectedImage
-            })
+      if (selectedImage) {
+        const uploadUrl = await generateUploadUrl();
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: {"Content-Type": selectedImage.type},
+          body: selectedImage
+        });
 
-            if (!result.ok) throw new Error('Failed to upload image.')
+        if (!result.ok) throw new Error('Failed to upload image.');
 
-            const {storageId} = await result.json()
-            imageUrl = storageId;
-        }
+        const {storageId} = await result.json();
+        imageUrl = storageId;
+      }
+      
       await createPost({
         subject: title.trim(),
         body: body.trim(),
@@ -86,9 +108,14 @@ const SubmitPage = () => {
         storageId: imageUrl
       });
       navigate(`/r/${subredditName}`);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      alert("Failed to create post. Please try again.");
+      if (error.data?.message === "You must join this subreddit before posting") {
+        alert("You must join this subreddit before posting. Redirecting...");
+        navigate(`/r/${subredditName}`);
+      } else {
+        alert("Failed to create post. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

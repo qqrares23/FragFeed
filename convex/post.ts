@@ -21,6 +21,7 @@ const ERROR_MESSAGES = {
   SUBREDDIT_NOT_FOUND: "Subreddit not found",
   UNAUTHORIZED_DELETE: "You can't delete this post",
   USER_NOT_FOUND: "User not found",
+  NOT_MEMBER: "You must join this subreddit before posting",
 } as const;
 
 export const create = mutation({
@@ -32,6 +33,19 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const user = await getCurrentUserOrThrow(ctx);
+    
+    // Check if user is a member of the subreddit
+    const membership = await ctx.db
+      .query("subredditMembership")
+      .withIndex("byUserAndSubreddit", (q) => 
+        q.eq("userId", user._id).eq("subredditId", args.subreddit)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new ConvexError({ message: ERROR_MESSAGES.NOT_MEMBER });
+    }
+
     const postId = await ctx.db.insert("post", {
       subject: args.subject,
       body: args.body,

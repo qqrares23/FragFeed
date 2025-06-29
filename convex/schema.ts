@@ -15,6 +15,14 @@ export default defineSchema({
   })
     .index("byName", ["name"])
     .searchIndex("search_body", { searchField: "name" }),
+  subredditMembership: defineTable({
+    userId: v.id("users"),
+    subredditId: v.id("subreddit"),
+    joinedAt: v.number(),
+  })
+    .index("byUser", ["userId"])
+    .index("bySubreddit", ["subredditId"])
+    .index("byUserAndSubreddit", ["userId", "subredditId"]),
   post: defineTable({
     subject: v.string(),
     body: v.string(),
