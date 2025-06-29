@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Users, Search, Edit, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface CommunityQuickPostProps {
   isOpen: boolean;
@@ -147,9 +148,12 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
                             onClick={() => handleCommunitySelect(community.name)}
                             className="w-full p-3 hover:bg-slate-50 dark:hover:bg-slate-600 flex items-center gap-3 text-left transition-colors"
                           >
-                            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
-                              {community.name.charAt(0).toUpperCase()}
-                            </div>
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage src={community.logoImageUrl} />
+                              <AvatarFallback className="bg-gradient-to-br from-primary-500 to-secondary-500 text-white font-bold text-xs">
+                                {community.name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
                             <div className="flex-1 min-w-0">
                               <div className="font-medium text-slate-900 dark:text-slate-100">r/{community.name}</div>
                               {community.description && (
@@ -186,9 +190,12 @@ const CommunityQuickPost = ({ isOpen, onClose }: CommunityQuickPostProps) => {
             {selectedCommunity && (
               <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {selectedCommunity.charAt(0).toUpperCase()}
-                  </div>
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={memberships?.find(m => m.name === selectedCommunity)?.logoImageUrl} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary-500 to-secondary-500 text-white font-bold">
+                      {selectedCommunity.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <div className="font-semibold text-slate-900 dark:text-slate-100">r/{selectedCommunity}</div>
                     <div className="text-sm text-slate-600 dark:text-slate-400">Ready to post!</div>

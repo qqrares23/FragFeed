@@ -95,6 +95,34 @@ export const getPublicUser = query({
   },
 });
 
+export const searchUsers = query({
+  args: { queryStr: v.string() },
+  handler: async (ctx, args) => {
+    if (!args.queryStr) return [];
+
+    const users = await ctx.db
+      .query("users")
+      .withSearchIndex("search_users", (q) => q.search("username", args.queryStr))
+      .take(10);
+
+    const enrichedUsers = await Promise.all(
+      users.map(async (user) => {
+        const profilePictureUrl = user.profilePicture ? await ctx.storage.getUrl(user.profilePicture) : null;
+        return {
+          _id: user._id,
+          username: user.username,
+          type: "user",
+          title: user.username,
+          profilePictureUrl,
+          bio: user.bio,
+        };
+      })
+    );
+
+    return enrichedUsers;
+  },
+});
+
 export const updateProfile = mutation({
   args: {
     bio: v.optional(v.string()),

@@ -4,19 +4,19 @@ import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GuidelinesEditModal from "../components/GuidelinesEditModal";
-import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Camera, Upload } from "lucide-react";
+import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Camera, Upload, Image } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const SubredditPage = () => {
   const { subredditName } = useParams();
   const { user } = useUser();
   const [showMembers, setShowMembers] = useState(false);
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.getSubredditPosts, {
@@ -39,6 +39,7 @@ const SubredditPage = () => {
   const joinSubreddit = useMutation(api.subreddit.join);
   const leaveSubreddit = useMutation(api.subreddit.leave);
   const updateBanner = useMutation(api.subreddit.updateBanner);
+  const updateLogo = useMutation(api.subreddit.updateLogo);
   const generateUploadUrl = useMutation(api.image.generateUploadUrl);
 
   if (subreddit === undefined) {
@@ -108,6 +109,39 @@ const SubredditPage = () => {
       alert("Failed to upload banner image");
     } finally {
       setIsUploadingBanner(false);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !subreddit) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Logo image size should be less than 5MB");
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file
+      });
+
+      if (!result.ok) throw new Error('Failed to upload logo');
+      const { storageId } = await result.json();
+      
+      await updateLogo({
+        subredditId: subreddit._id,
+        logoImage: storageId
+      });
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      alert("Failed to upload logo image");
+    } finally {
+      setIsUploadingLogo(false);
     }
   };
 
@@ -190,11 +224,40 @@ const SubredditPage = () => {
                   <div className="flex-1">
                     {/* Community Avatar */}
                     <div className="flex items-end gap-4 mb-4">
-                      <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center shadow-xl border-4 border-white dark:border-slate-800">
-                        <span className="text-2xl lg:text-3xl font-bold text-white">
-                          {subreddit.name.charAt(0).toUpperCase()}
-                        </span>
+                      <div className="relative">
+                        <Avatar className="w-16 h-16 lg:w-20 lg:h-20 border-4 border-white dark:border-slate-800 shadow-xl">
+                          <AvatarImage src={subreddit.logoImageUrl} />
+                          <AvatarFallback className="bg-gradient-to-br from-primary-500 to-secondary-500 text-white text-2xl lg:text-3xl font-bold">
+                            {subreddit.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        {/* Logo Upload Button for Owner */}
+                        {isOwner && (
+                          <label className="absolute -bottom-1 -right-1 cursor-pointer">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="w-8 h-8 p-0 rounded-full bg-white/90 hover:bg-white text-slate-700 shadow-lg"
+                              disabled={isUploadingLogo}
+                            >
+                              {isUploadingLogo ? (
+                                <div className="w-3 h-3 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin" />
+                              ) : (
+                                <Image className="w-3 h-3" />
+                              )}
+                            </Button>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleLogoUpload}
+                              className="hidden"
+                              disabled={isUploadingLogo}
+                            />
+                          </label>
+                        )}
                       </div>
+                      
                       <div className="pb-2">
                         <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
                           r/{subreddit.name}
@@ -377,6 +440,7 @@ const SubredditPage = () => {
                         <div key={member._id} className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg">
                           <div className="flex items-center gap-3">
                             <Avatar className="w-6 h-6 lg:w-8 lg:h-8">
+                              <AvatarImage src={member.user?.profilePictureUrl} />
                               <AvatarFallback className="text-xs lg:text-sm bg-gradient-to-br from-green-500 to-emerald-500 text-white">
                                 {member.user?.username.charAt(0).toUpperCase()}
                               </AvatarFallback>

@@ -49,12 +49,14 @@ export const get = query({
       .unique();
     if (!subreddit) return null;
 
-    // Get banner image URL if it exists
+    // Get banner and logo image URLs if they exist
     const bannerImageUrl = subreddit.bannerImage ? await ctx.storage.getUrl(subreddit.bannerImage) : null;
+    const logoImageUrl = subreddit.logoImage ? await ctx.storage.getUrl(subreddit.logoImage) : null;
 
     return {
       ...subreddit,
       bannerImageUrl,
+      logoImageUrl,
     };
   },
 });
@@ -79,6 +81,30 @@ export const updateBanner = mutation({
     
     await ctx.db.patch(args.subredditId, {
       bannerImage: args.bannerImage,
+    });
+  },
+});
+
+export const updateLogo = mutation({
+  args: {
+    subredditId: v.id("subreddit"),
+    logoImage: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    const subreddit = await ctx.db.get(args.subredditId);
+    
+    if (!subreddit) {
+      throw new ConvexError({ message: "Subreddit not found" });
+    }
+    
+    // Only the owner can update the logo
+    if (subreddit.authorId !== user._id) {
+      throw new ConvexError({ message: "Only the community owner can update the logo" });
+    }
+    
+    await ctx.db.patch(args.subredditId, {
+      logoImage: args.logoImage,
     });
   },
 });
@@ -140,9 +166,19 @@ export const search = query({
       .withSearchIndex("search_body", (q) => q.search("name", args.queryStr))
       .take(10);
 
-    return subreddits.map((sub) => {
-      return {...sub, type: "community", title: sub.name}
-    })
+    const enrichedSubreddits = await Promise.all(
+      subreddits.map(async (sub) => {
+        const logoImageUrl = sub.logoImage ? await ctx.storage.getUrl(sub.logoImage) : null;
+        return {
+          ...sub, 
+          type: "community", 
+          title: sub.name,
+          logoImageUrl
+        };
+      })
+    );
+
+    return enrichedSubreddits;
   },
 });
 
@@ -233,10 +269,12 @@ export const getUserMemberships = query({
     const subreddits = await Promise.all(
       memberships.map(async (membership) => {
         const subreddit = await ctx.db.get(membership.subredditId);
+        const logoImageUrl = subreddit?.logoImage ? await ctx.storage.getUrl(subreddit.logoImage) : null;
         return {
           ...subreddit,
           joinedAt: membership.joinedAt,
           membershipId: membership._id,
+          logoImageUrl,
         };
       })
     );
@@ -269,11 +307,13 @@ export const getMembers = query({
     const members = await Promise.all(
       memberships.map(async (membership) => {
         const user = await ctx.db.get(membership.userId);
+        const profilePictureUrl = user?.profilePicture ? await ctx.storage.getUrl(user.profilePicture) : null;
         return {
           _id: membership._id,
           user: user ? {
             _id: user._id,
             username: user.username,
+            profilePictureUrl,
           } : null,
           joinedAt: membership.joinedAt,
         };

@@ -35,7 +35,8 @@ export default defineSchema({
     })),
   })
     .index("byExternalId", ["externalId"])
-    .index("byUsername", ["username"]),
+    .index("byUsername", ["username"])
+    .searchIndex("search_users", { searchField: "username" }),
   follows: defineTable({
     followerId: v.id("users"),
     followingId: v.id("users"),
@@ -50,6 +51,7 @@ export default defineSchema({
     authorId: v.id("users"),
     guidelines: v.optional(v.array(v.string())),
     bannerImage: v.optional(v.id("_storage")),
+    logoImage: v.optional(v.id("_storage")),
   })
     .index("byName", ["name"])
     .index("byAuthor", ["authorId"])
