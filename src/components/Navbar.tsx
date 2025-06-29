@@ -2,7 +2,7 @@ import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs, FaBars, FaTimes } from
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../../convex/_generated/api";
 import CreatePanel from "./CreatePanel";
 import GamingDropdown from "./GamingDropdown";
@@ -18,6 +18,19 @@ const Navbar = () => {
   const navigate = useNavigate();
   
   const unreadCount = useQuery(api.notifications.getUnreadCount);
+
+  // Close all dropdowns when screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      setShowCreatePanel(false);
+      setShowGamingDropdown(false);
+      setShowNotifications(false);
+      setShowMobileMenu(false);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleCreatePanel = () => {
     setShowCreatePanel(true);
@@ -84,12 +97,6 @@ const Navbar = () => {
               >
                 <FaGamepad className="w-5 h-5 text-primary-600 group-hover:text-primary-700" />
               </button>
-              {showGamingDropdown && (
-                <GamingDropdown
-                  isOpen={showGamingDropdown}
-                  onClose={closeAllDropdowns}
-                />
-              )}
             </div>
 
             <Unauthenticated>
@@ -115,12 +122,6 @@ const Navbar = () => {
                     </span>
                   )}
                 </button>
-                {showNotifications && (
-                  <NotificationDropdown
-                    isOpen={showNotifications}
-                    onClose={closeAllDropdowns}
-                  />
-                )}
               </div>
 
               {/* Create */}
@@ -132,12 +133,6 @@ const Navbar = () => {
                 >
                   <FaPlus className="w-5 h-5" />
                 </button>
-                {showCreatePanel && (
-                  <CreatePanel
-                    isOpen={showCreatePanel}
-                    onClose={closeAllDropdowns}
-                  />
-                )}
               </div>
 
               {/* Profile */}
@@ -239,7 +234,7 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* Dropdowns for mobile */}
+      {/* Single set of dropdowns that work for both mobile and desktop */}
       {showGamingDropdown && (
         <GamingDropdown
           isOpen={showGamingDropdown}

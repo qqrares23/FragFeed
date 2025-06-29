@@ -30,8 +30,11 @@ const CreatePanel = ({ isOpen, onClose }: CreatePanelProps) => {
 
   return (
     <>
+      {/* Backdrop */}
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden">
+      
+      {/* Panel positioned for both mobile and desktop */}
+      <div className="absolute right-4 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
           <div className="flex items-center justify-between">
@@ -102,6 +105,7 @@ const CreatePanel = ({ isOpen, onClose }: CreatePanelProps) => {
         </div>
       </div>
       
+      {/* Community Modal */}
       {isCommunityModalOpen && (
         <CreateCommunityModal
           isOpen={isCommunityModalOpen}
