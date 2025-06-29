@@ -50,5 +50,17 @@ export default defineSchema({
     postId: v.id("post"),
     userId: v.id("users"),
   })
-    .index("byPost", ["postId", "userId"])
+    .index("byPost", ["postId", "userId"]),
+  notifications: defineTable({
+    userId: v.id("users"),
+    type: v.string(),
+    title: v.string(),
+    message: v.string(),
+    postId: v.optional(v.id("post")),
+    subredditId: v.optional(v.id("subreddit")),
+    read: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("byUser", ["userId"])
+    .index("byUserAndRead", ["userId", "read"]),
 });

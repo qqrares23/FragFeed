@@ -4,7 +4,6 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { FaImage, FaExclamationTriangle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-import "../styles/SubmitPage.css";
 
 const SubmitPage = () => {
   const { subredditName } = useParams();
@@ -23,14 +22,24 @@ const SubmitPage = () => {
   const createPost = useMutation(api.post.create);
   const generateUploadUrl = useMutation(api.image.generateUploadUrl);
 
-  if (subreddit === undefined) return <div className="loading">Loading...</div>;
+  if (subreddit === undefined) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!subreddit) {
     return (
-      <div className="content-container">
-        <div className="not-found">
-          <h1>Subreddit not found</h1>
-          <p>The subreddit r/{subredditName} does not exist.</p>
+      <div className="min-h-screen pt-20 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Community not found</h1>
+          <p className="text-slate-600">The community r/{subredditName} does not exist.</p>
         </div>
       </div>
     );
@@ -38,14 +47,16 @@ const SubmitPage = () => {
 
   if (isMember === false) {
     return (
-      <div className="content-container">
-        <div className="membership-required">
-          <FaExclamationTriangle className="warning-icon" />
-          <h1>Membership Required</h1>
-          <p>You must join r/{subredditName} before you can create posts.</p>
+      <div className="min-h-screen pt-20 flex items-center justify-center px-4">
+        <div className="card p-12 text-center max-w-md">
+          <FaExclamationTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Membership Required</h1>
+          <p className="text-slate-600 mb-6">
+            You must join r/{subredditName} before you can create posts.
+          </p>
           <button 
-            className="join-button"
             onClick={() => navigate(`/r/${subredditName}`)}
+            className="btn btn-primary"
           >
             Go to r/{subredditName}
           </button>
@@ -79,7 +90,7 @@ const SubmitPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !subreddit) {
-      alert("Please enter a title and select a subreddit");
+      alert("Please enter a title");
       return;
     }
 
@@ -122,72 +133,108 @@ const SubmitPage = () => {
   };
 
   return (
-    <div className="content-container">
-      <div className="submit-container">
-        <h1>Create a post in r/{subredditName}</h1>
-        <form className="submit-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
-            className="submit-title"
-            maxLength={100}
-          />
-          <div className="media-input-container">
-            <label className="image-upload-label">
-              <FaImage className="image-icon" />
-              Upload Image
+    <div className="min-h-screen pt-20 pb-8">
+      <div className="max-w-2xl mx-auto px-4">
+        <div className="card p-8">
+          <h1 className="text-2xl font-bold text-slate-900 mb-6">
+            Create a post in r/{subredditName}
+          </h1>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-2">
+                Title
+              </label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                style={{ display: "none" }}
+                type="text"
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="An interesting title"
+                className="input"
+                maxLength={100}
+                disabled={isSubmitting}
               />
-            </label>
-            {imagePreview && (
-              <div className="image-preview-container">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="image-preview"
-                />
-                <button
-                  type="button"
-                  className="remove-image-button"
-                  onClick={handleRemoveImage}
-                >
-                  <IoMdClose />
-                </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Image (optional)
+              </label>
+              <div className="border-2 border-dashed border-slate-300 rounded-xl p-6">
+                <label className="btn btn-secondary cursor-pointer">
+                  <FaImage />
+                  Upload Image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                    disabled={isSubmitting}
+                  />
+                </label>
+                
+                {imagePreview && (
+                  <div className="mt-4 relative inline-block">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="max-w-full max-h-64 rounded-xl"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                      disabled={isSubmitting}
+                    >
+                      <IoMdClose />
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <textarea
-            placeholder="Text (optional)"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            className="submit-body"
-          />
-          <div className="submit-actions">
-            <button
-              type="button"
-              onClick={() => navigate(`/r/${subredditName}`)}
-              className="back-button"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isSubmitting || !title.trim()}
-            >
-              {isSubmitting ? "Posting..." : "Post"}
-            </button>
-          </div>
-        </form>
+            </div>
+
+            <div>
+              <label htmlFor="body" className="block text-sm font-semibold text-slate-700 mb-2">
+                Text (optional)
+              </label>
+              <textarea
+                id="body"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="What's on your mind?"
+                className="input resize-none"
+                rows={6}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <button
+                type="button"
+                onClick={() => navigate(`/r/${subredditName}`)}
+                className="btn btn-secondary flex-1"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary flex-1"
+                disabled={isSubmitting || !title.trim()}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Posting...
+                  </>
+                ) : (
+                  "Post"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

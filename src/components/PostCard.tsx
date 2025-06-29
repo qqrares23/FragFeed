@@ -1,13 +1,11 @@
-import { FaRegCommentAlt, FaTrash } from "react-icons/fa";
-import { TbArrowBigUp, TbArrowBigDown } from "react-icons/tb";
+import { FaRegCommentAlt, FaTrash, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { PaginationStatus, useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Doc, Id } from "../../convex/_generated/dataModel";
 import { useUser } from "@clerk/clerk-react";
-import Comment from "./Comment";
-import "../styles/PostCard.css";
 import { useState } from "react";
+import Comment from "./Comment";
 
 interface Post {
   _id: Id<"post">;
@@ -30,184 +28,6 @@ interface PostCardProps {
   expandedView?: boolean;
 }
 
-interface PostHeaderProps {
-  author?: { username: string };
-  subreddit: { name: string };
-  showSubreddit: boolean;
-  creationTime: number;
-}
-
-interface PostContentProps {
-  subject: string;
-  body?: string;
-  image?: string;
-  expandedView: boolean;
-}
-
-interface CommentSectionProps {
-  postId: Id<"post">;
-  comments: Doc<"comments">[];
-  onSubmit: (content: string) => void;
-  signedIn: boolean;
-  loadMore: (numItems: number) => void;
-  status: PaginationStatus;
-}
-
-interface VoteButtonsProps {
-  voteCounts: { total: number; upvotes: number; downvotes: number } | undefined;
-  hasUpvoted: boolean | undefined;
-  hasDownvoted: boolean | undefined;
-  onUpvote: () => void;
-  onDownvote: () => void;
-}
-
-const VoteButtons = ({
-  voteCounts,
-  hasUpvoted,
-  hasDownvoted,
-  onUpvote,
-  onDownvote,
-}: VoteButtonsProps) => {
-  return (
-    <div className="post-votes">
-      <span className="vote-count upvote-count">
-        {voteCounts?.upvotes ?? 0}
-      </span>
-      <button
-        className={`vote-button ${hasUpvoted ? "voted" : ""}`}
-        onClick={onUpvote}
-      >
-        <TbArrowBigUp size={24} />
-      </button>
-      <span className="vote-count total-count">{voteCounts?.total ?? 0}</span>
-      <span className="vote-count downvote-count">
-        {voteCounts?.downvotes ?? 0}
-      </span>
-      <button
-        className={`vote-button ${hasDownvoted ? "voted" : ""}`}
-        onClick={onDownvote}
-      >
-        <TbArrowBigDown size={24} />
-      </button>
-    </div>
-  );
-};
-
-const PostHeader = ({
-  author,
-  subreddit,
-  showSubreddit,
-  creationTime,
-}: PostHeaderProps) => {
-  return (
-    <div className="post-header">
-      {author ? (
-        <Link to={`/u/${author.username}`}>u/{author.username}</Link>
-      ) : (
-        <span className="post-author">u/deleted</span>
-      )}
-
-      {showSubreddit && subreddit && (
-        <>
-          <span className="post-dot">-</span>
-          <Link to={`/r/${subreddit.name}`} className="post-subreddit">
-            r/{subreddit.name}
-          </Link>
-        </>
-      )}
-      <span className="post-dot">-</span>
-      <span className="post-timestamp">
-        {new Date(creationTime).toLocaleString()}
-      </span>
-    </div>
-  );
-};
-
-const PostContent = ({
-  subject,
-  body,
-  image,
-  expandedView,
-}: PostContentProps) => {
-  return (
-    <>
-      {expandedView ? (
-        <>
-          <h1 className="post-title">{subject}</h1>
-          {image && (
-            <div className="post-image-container">
-              <img src={image} alt="Post content" className="post-image" />
-            </div>
-          )}
-          {body && <p className="post-body">{body}</p>}
-        </>
-      ) : (
-        <div className="preview-post">
-          <div>
-            <h2 className="post-title">{subject}</h2>
-            {body && <p className="post-body">{body}</p>}
-          </div>
-          {image && (
-            <div className="post-image-container small-img">
-              <img src={image} alt="Post content" className="post-image" />
-            </div>
-          )}
-        </div>
-      )}
-    </>
-  );
-};
-
-const CommentSection = ({
-  comments,
-  onSubmit,
-  signedIn,
-  loadMore,
-  status,
-}: CommentSectionProps) => {
-  const [newComment, setNewComment] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-    onSubmit(newComment.trim());
-    setNewComment("");
-  };
-
-  return (
-    <div className="comments-section">
-      {signedIn && (
-        <form className="comment-form">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="What are your thoughts?"
-            className="comment-input"
-          />
-          <button
-            type="submit"
-            className="comment-submit"
-            onClick={handleSubmit}
-            disabled={!newComment}
-          >
-            Comment
-          </button>
-        </form>
-      )}
-      <div className="comments-list">
-        {comments?.map((comment) => (
-          <Comment key={comment._id} comment={comment} />
-        ))}
-      </div>
-      {status === "CanLoadMore" && (
-        <button className="load-more" onClick={() => loadMore(20)}>
-          Load More
-        </button>
-      )}
-    </div>
-  );
-};
-
 const PostCard = ({
   post,
   showSubreddit = false,
@@ -220,20 +40,26 @@ const PostCard = ({
 
   const deletePost = useMutation(api.post.deletePost);
   const createComment = useMutation(api.comments.create);
-  const toggleUpvote = useMutation(api.vote.toggleUpvote)
-  const toggleDownvote = useMutation(api.vote.toggleDownvote)
+  const toggleUpvote = useMutation(api.vote.toggleUpvote);
+  const toggleDownvote = useMutation(api.vote.toggleDownvote);
 
-  const voteCounts = useQuery(api.vote.getVoteCounts, {postId: post._id})
-  const hasUpvoted = useQuery(api.vote.hasUpvoted, {postId: post._id})
-  const hasDownvoted = useQuery(api.vote.hasDownvoted, {postId: post._id})
+  const voteCounts = useQuery(api.vote.getVoteCounts, { postId: post._id });
+  const hasUpvoted = useQuery(api.vote.hasUpvoted, { postId: post._id });
+  const hasDownvoted = useQuery(api.vote.hasDownvoted, { postId: post._id });
 
-  const {results: comments, loadMore, status} = usePaginatedQuery(api.comments.getComments, { postId: post._id }, {initialNumItems: 20});
+  const { results: comments, loadMore, status } = usePaginatedQuery(
+    api.comments.getComments,
+    { postId: post._id },
+    { initialNumItems: 20 }
+  );
   const commentCount = useQuery(api.comments.getCommentCount, {
     postId: post._id,
   });
 
-  const onUpvote = () => toggleUpvote({postId: post._id})
-  const onDownvote = () => toggleDownvote({postId: post._id})
+  const [newComment, setNewComment] = useState("");
+
+  const onUpvote = () => toggleUpvote({ postId: post._id });
+  const onDownvote = () => toggleDownvote({ postId: post._id });
 
   const handleComment = () => {
     if (!expandedView) {
@@ -252,60 +78,188 @@ const PostCard = ({
     }
   };
 
-  const handleSubmitComment = (content: string) => {
-    createComment({
-      content,
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    
+    await createComment({
+      content: newComment.trim(),
       postId: post._id,
     });
+    setNewComment("");
   };
 
   return (
-    <div className={`post-card ${expandedView ? "expanded" : ""}`}>
-        <VoteButtons 
-            voteCounts={voteCounts}
-            hasUpvoted={hasUpvoted}
-            hasDownvoted={hasDownvoted}
-            onUpvote={user ? onUpvote : () => {}}
-            onDownvote={user ? onDownvote : () => {}}
-        />
-      <div className="post-content">
-        <PostHeader
-          author={post.author}
-          subreddit={post.subreddit ?? { name: "deleted" }}
-          showSubreddit={showSubreddit}
-          creationTime={post._creationTime}
-        />
-        <PostContent
-          subject={post.subject}
-          body={post.body}
-          image={post.imageUrl}
-          expandedView={expandedView}
-        />
-        <div className="post-actions">
-          <button className="action-button" onClick={handleComment}>
-            <FaRegCommentAlt />
-            <span>{commentCount ?? 0} Comments</span>
+    <div className={`card ${expandedView ? 'p-0' : 'p-6'} ${expandedView ? '' : 'hover:-translate-y-1'}`}>
+      <div className="flex gap-4">
+        {/* Vote Section */}
+        <div className="flex flex-col items-center gap-1 pt-1">
+          <button
+            onClick={user ? onUpvote : () => {}}
+            disabled={!user}
+            className={`p-2 rounded-lg transition-colors ${
+              hasUpvoted
+                ? 'bg-orange-100 text-orange-600'
+                : 'text-slate-400 hover:bg-slate-100 hover:text-orange-500'
+            } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <FaArrowUp className="w-4 h-4" />
           </button>
-          {ownedByCurrentUser && (
-            <button
-              className="action-button delete-button"
-              onClick={handleDelete}
+          
+          <span className={`text-sm font-semibold ${
+            (voteCounts?.total || 0) > 0 ? 'text-orange-600' : 
+            (voteCounts?.total || 0) < 0 ? 'text-blue-600' : 'text-slate-500'
+          }`}>
+            {voteCounts?.total || 0}
+          </span>
+          
+          <button
+            onClick={user ? onDownvote : () => {}}
+            disabled={!user}
+            className={`p-2 rounded-lg transition-colors ${
+              hasDownvoted
+                ? 'bg-blue-100 text-blue-600'
+                : 'text-slate-400 hover:bg-slate-100 hover:text-blue-500'
+            } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <FaArrowDown className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Header */}
+          <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
+            {post.author ? (
+              <Link 
+                to={`/u/${post.author.username}`}
+                className="font-medium text-slate-700 hover:text-primary-600"
+              >
+                u/{post.author.username}
+              </Link>
+            ) : (
+              <span className="text-slate-400">u/deleted</span>
+            )}
+
+            {showSubreddit && post.subreddit && (
+              <>
+                <span>•</span>
+                <Link 
+                  to={`/r/${post.subreddit.name}`}
+                  className="font-medium text-primary-600 hover:text-primary-700"
+                >
+                  r/{post.subreddit.name}
+                </Link>
+              </>
+            )}
+            
+            <span>•</span>
+            <span>{new Date(post._creationTime).toLocaleDateString()}</span>
+          </div>
+
+          {/* Title and Content */}
+          {expandedView ? (
+            <div className="space-y-4">
+              <h1 className="text-2xl font-bold text-slate-900">{post.subject}</h1>
+              {post.imageUrl && (
+                <div className="rounded-xl overflow-hidden">
+                  <img 
+                    src={post.imageUrl} 
+                    alt="Post content" 
+                    className="w-full max-h-96 object-contain bg-slate-50"
+                  />
+                </div>
+              )}
+              {post.body && (
+                <div className="prose prose-slate max-w-none">
+                  <p className="whitespace-pre-wrap">{post.body}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-slate-900 line-clamp-2">
+                {post.subject}
+              </h2>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  {post.body && (
+                    <p className="text-slate-600 line-clamp-3">{post.body}</p>
+                  )}
+                </div>
+                {post.imageUrl && (
+                  <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={post.imageUrl} 
+                      alt="Post content" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-4 mt-4 pt-3 border-t border-slate-100">
+            <button 
+              onClick={handleComment}
+              className="flex items-center gap-2 text-slate-500 hover:text-slate-700 transition-colors"
             >
-              <FaTrash />
-              <span>Delete</span>
+              <FaRegCommentAlt className="w-4 h-4" />
+              <span className="text-sm font-medium">{commentCount || 0} Comments</span>
             </button>
+            
+            {ownedByCurrentUser && (
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 text-red-500 hover:text-red-700 transition-colors"
+              >
+                <FaTrash className="w-4 h-4" />
+                <span className="text-sm font-medium">Delete</span>
+              </button>
+            )}
+          </div>
+
+          {/* Comments Section */}
+          {(showComments || expandedView) && (
+            <div className="mt-6 space-y-4">
+              {user && (
+                <form onSubmit={handleSubmitComment} className="space-y-3">
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="What are your thoughts?"
+                    className="input resize-none"
+                    rows={3}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newComment.trim()}
+                    className="btn btn-primary"
+                  >
+                    Comment
+                  </button>
+                </form>
+              )}
+              
+              <div className="space-y-3">
+                {comments?.map((comment) => (
+                  <Comment key={comment._id} comment={comment} />
+                ))}
+              </div>
+              
+              {status === "CanLoadMore" && (
+                <button 
+                  onClick={() => loadMore(20)}
+                  className="btn btn-secondary w-full"
+                >
+                  Load More Comments
+                </button>
+              )}
+            </div>
           )}
         </div>
-        {(showComments || expandedView) && (
-          <CommentSection
-            postId={post._id}
-            comments={comments ?? []}
-            onSubmit={handleSubmitComment}
-            signedIn={!!user}
-            loadMore={loadMore}
-            status={status}
-          />
-        )}
       </div>
     </div>
   );

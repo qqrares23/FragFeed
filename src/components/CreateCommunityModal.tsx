@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { FaTimes, FaUsers, FaPlus } from "react-icons/fa";
-import "../styles/CreateCommunityModal.css";
 
 interface CreateCommunityModalProps {
   isOpen: boolean;
@@ -64,103 +63,107 @@ const CreateCommunityModal = ({
 
   return (
     <>
-      <div className="modal-overlay" onClick={handleClose} />
-      <div className="modal-container">
-        <div className="modal-header">
-          <div className="modal-title">
-            <FaUsers className="title-icon" />
-            <h2>Create Community</h2>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden animate-slide-up">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FaUsers className="w-6 h-6" />
+                <h2 className="text-xl font-bold">Create Community</h2>
+              </div>
+              <button 
+                onClick={handleClose}
+                disabled={isLoading}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
           </div>
-          <button 
-            className="close-button" 
-            onClick={handleClose}
-            disabled={isLoading}
-            aria-label="Close modal"
-          >
-            <FaTimes />
-          </button>
-        </div>
 
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-section">
-            <div className="form-group">
-              <label htmlFor="community-name" className="form-label">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <div>
+              <label htmlFor="community-name" className="block text-sm font-semibold text-slate-700 mb-2">
                 Community Name
               </label>
-              <div className="input-wrapper">
-                <span className="input-prefix">r/</span>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-600 font-semibold">
+                  r/
+                </span>
                 <input
                   type="text"
                   id="community-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="community_name"
-                  className="form-input"
+                  className="input pl-8"
                   maxLength={21}
                   disabled={isLoading}
                   autoComplete="off"
                 />
               </div>
-              <p className="input-help">
+              <p className="text-xs text-slate-500 mt-1">
                 Community names including capitalization cannot be changed
               </p>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="community-description" className="form-label">
-                Description <span className="optional">(optional)</span>
+            <div>
+              <label htmlFor="community-description" className="block text-sm font-semibold text-slate-700 mb-2">
+                Description <span className="text-slate-400 font-normal">(optional)</span>
               </label>
               <textarea
                 id="community-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Tell us about your community"
-                className="form-textarea"
+                className="input resize-none"
                 maxLength={500}
                 disabled={isLoading}
                 rows={4}
               />
-              <div className="character-count">
+              <div className="text-xs text-slate-400 text-right mt-1">
                 {description.length}/500
               </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="error-message">
-              <span className="error-icon">⚠️</span>
-              {error}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-2 text-red-700">
+                <span>⚠️</span>
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={handleClose}
+                disabled={isLoading}
+                className="btn btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading || !name.trim()}
+                className="btn btn-primary flex-1"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <FaPlus />
+                    Create Community
+                  </>
+                )}
+              </button>
             </div>
-          )}
-
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={handleClose}
-              disabled={isLoading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="create-button"
-              disabled={isLoading || !name.trim()}
-            >
-              {isLoading ? (
-                <>
-                  <div className="loading-spinner" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <FaPlus />
-                  Create Community
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </>
   );

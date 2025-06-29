@@ -3,7 +3,6 @@ import { FaSearch, FaTimes, FaFire, FaClock, FaUsers } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { useQuery } from "convex/react";
-import "../styles/SearchBar.css";
 
 interface SearchResult {
   _id: string;
@@ -11,8 +10,6 @@ interface SearchResult {
   title: string;
   name: string;
   description?: string;
-  memberCount?: number;
-  createdAt?: string;
 }
 
 interface RecentSearch {
@@ -36,7 +33,6 @@ const SearchBar = () => {
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
-  // Enhanced search queries with debouncing
   const subredditSearch = useQuery(
     api.subreddit.search, 
     searchQuery.length >= 2 && !currentSubreddit ? { queryStr: searchQuery } : "skip"
@@ -52,10 +48,9 @@ const SearchBar = () => {
 
   const results = currentSubreddit ? postSearch : subredditSearch;
 
-  // Load search history from localStorage
   useEffect(() => {
-    const savedHistory = localStorage.getItem('reddit-search-history');
-    const savedRecent = localStorage.getItem('reddit-recent-searches');
+    const savedHistory = localStorage.getItem('fragfeed-search-history');
+    const savedRecent = localStorage.getItem('fragfeed-recent-searches');
     
     if (savedHistory) {
       setSearchHistory(JSON.parse(savedHistory));
@@ -65,7 +60,6 @@ const SearchBar = () => {
     }
   }, []);
 
-  // Handle clicks outside search
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -85,7 +79,6 @@ const SearchBar = () => {
 
   const handleBlur = () => {
     setIsFocused(false);
-    // Keep active for a moment to allow clicks
     setTimeout(() => {
       if (!searchRef.current?.contains(document.activeElement)) {
         setIsActive(false);
@@ -109,12 +102,10 @@ const SearchBar = () => {
   };
 
   const performSearch = (query: string) => {
-    // Add to search history
     const newHistory = [query, ...searchHistory.filter(h => h !== query)].slice(0, 10);
     setSearchHistory(newHistory);
-    localStorage.setItem('reddit-search-history', JSON.stringify(newHistory));
+    localStorage.setItem('fragfeed-search-history', JSON.stringify(newHistory));
 
-    // Add to recent searches
     const newRecent: RecentSearch = {
       query,
       timestamp: Date.now(),
@@ -122,7 +113,7 @@ const SearchBar = () => {
     };
     const updatedRecent = [newRecent, ...recentSearches.filter(r => r.query !== query)].slice(0, 5);
     setRecentSearches(updatedRecent);
-    localStorage.setItem('reddit-recent-searches', JSON.stringify(updatedRecent));
+    localStorage.setItem('fragfeed-recent-searches', JSON.stringify(updatedRecent));
 
     setIsActive(false);
     setSearchQuery("");
@@ -145,24 +136,13 @@ const SearchBar = () => {
   const clearSearchHistory = () => {
     setSearchHistory([]);
     setRecentSearches([]);
-    localStorage.removeItem('reddit-search-history');
-    localStorage.removeItem('reddit-recent-searches');
+    localStorage.removeItem('fragfeed-search-history');
+    localStorage.removeItem('fragfeed-recent-searches');
   };
 
   const clearSearchQuery = () => {
     setSearchQuery("");
     inputRef.current?.focus();
-  };
-
-  const getIconForType = (type: string) => {
-    switch (type) {
-      case "community":
-        return <FaUsers className="result-type-icon community" />;
-      case "post":
-        return <FaFire className="result-type-icon post" />;
-      default:
-        return <FaSearch className="result-type-icon" />;
-    }
   };
 
   const formatTimeAgo = (timestamp: number) => {
@@ -178,13 +158,15 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="search-wrapper" ref={searchRef}>
-      <div className={`search-container ${isFocused ? 'focused' : ''} ${isActive ? 'active' : ''}`}>
-        <FaSearch className="search-icon" />
+    <div className="relative w-full max-w-2xl" ref={searchRef}>
+      <div className={`relative flex items-center bg-white/50 backdrop-blur-sm border border-slate-300 rounded-xl transition-all duration-200 ${
+        isFocused ? 'ring-2 ring-primary-500 border-primary-500' : 'hover:border-slate-400'
+      }`}>
+        <FaSearch className="w-4 h-4 text-slate-400 ml-4" />
         <input
           ref={inputRef}
           type="text"
-          className="search-input"
+          className="w-full px-4 py-3 bg-transparent border-0 focus:ring-0 placeholder-slate-400"
           placeholder={
             currentSubreddit
               ? `Search posts in r/${currentSubreddit}`
@@ -198,152 +180,128 @@ const SearchBar = () => {
         />
         
         {searchQuery && (
-          <button className="clear-search" onClick={clearSearchQuery}>
-            <FaTimes />
+          <button 
+            onClick={clearSearchQuery}
+            className="p-2 mr-2 text-slate-400 hover:text-slate-600 rounded-lg"
+          >
+            <FaTimes className="w-4 h-4" />
           </button>
         )}
 
         {currentSubreddit && (
-          <div className="search-scope">
-            <span>r/{currentSubreddit}</span>
+          <div className="mr-3 px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-lg">
+            r/{currentSubreddit}
           </div>
         )}
       </div>
 
       {isActive && (
-        <div className="search-results">
-          <div className="search-results-header">
-            <h4>
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200 max-h-96 overflow-hidden z-50">
+          <div className="flex items-center justify-between p-4 border-b border-slate-100">
+            <h4 className="font-semibold text-slate-700">
               {searchQuery ? 'Search Results' : 'Recent & Suggestions'}
             </h4>
             {(searchHistory.length > 0 || recentSearches.length > 0) && (
-              <button className="clear-history" onClick={clearSearchHistory}>
+              <button 
+                onClick={clearSearchHistory}
+                className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+              >
                 Clear All
               </button>
             )}
           </div>
 
-          <div className="search-results-content">
+          <div className="max-h-80 overflow-y-auto">
             {searchQuery === "" ? (
-              // Show recent searches and history when no query
-              <div className="search-suggestions">
+              <div className="p-4">
                 {recentSearches.length > 0 && (
-                  <div className="suggestion-section">
-                    <div className="suggestion-header">
-                      <FaClock className="section-icon" />
-                      <span>Recent Searches</span>
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <FaClock className="w-4 h-4 text-slate-400" />
+                      <span className="text-sm font-medium text-slate-600">Recent Searches</span>
                     </div>
                     {recentSearches.map((recent, index) => (
-                      <div
+                      <button
                         key={index}
-                        className="suggestion-item recent"
                         onClick={() => handleHistoryClick(recent.query)}
+                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 text-left"
                       >
-                        <div className="suggestion-content">
-                          <span className="suggestion-text">{recent.query}</span>
-                          <span className="suggestion-meta">
+                        <div className="text-sm">
+                          <div className="font-medium text-slate-900">{recent.query}</div>
+                          <div className="text-slate-500">
                             {recent.type} • {formatTimeAgo(recent.timestamp)}
-                          </span>
+                          </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )}
 
                 {searchHistory.length > 0 && (
-                  <div className="suggestion-section">
-                    <div className="suggestion-header">
-                      <FaSearch className="section-icon" />
-                      <span>Search History</span>
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <FaSearch className="w-4 h-4 text-slate-400" />
+                      <span className="text-sm font-medium text-slate-600">Search History</span>
                     </div>
                     {searchHistory.slice(0, 5).map((query, index) => (
-                      <div
+                      <button
                         key={index}
-                        className="suggestion-item history"
                         onClick={() => handleHistoryClick(query)}
+                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 text-left"
                       >
-                        <div className="suggestion-content">
-                          <span className="suggestion-text">{query}</span>
-                        </div>
-                      </div>
+                        <span className="text-sm font-medium text-slate-900">{query}</span>
+                      </button>
                     ))}
                   </div>
                 )}
 
                 {recentSearches.length === 0 && searchHistory.length === 0 && (
-                  <div className="empty-state">
-                    <FaSearch className="empty-icon" />
-                    <p>Start typing to search for communities and posts</p>
-                    <div className="search-tips">
-                      <span>💡 Tips:</span>
-                      <ul>
-                        <li>Use specific keywords for better results</li>
-                        <li>Search works across titles and content</li>
-                        <li>Recent searches are saved for quick access</li>
-                      </ul>
-                    </div>
+                  <div className="text-center py-8">
+                    <FaSearch className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                    <p className="text-slate-500 font-medium">Start typing to search</p>
+                    <p className="text-sm text-slate-400 mt-1">
+                      Search for communities and posts
+                    </p>
                   </div>
                 )}
               </div>
             ) : results && results.length > 0 ? (
-              // Show search results
-              <div className="results-list">
+              <div className="p-2">
                 {results.map((result) => (
-                  <div
+                  <button
                     key={result._id}
-                    className="result-item"
                     onClick={() => handleResultClick(result)}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left"
                   >
-                    <div className="result-icon">
-                      {getIconForType(result.type)}
+                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
+                      {result.type === 'community' ? (
+                        <FaUsers className="w-4 h-4 text-white" />
+                      ) : (
+                        <FaFire className="w-4 h-4 text-white" />
+                      )}
                     </div>
-                    <div className="result-content">
-                      <div className="result-title">{result.title}</div>
-                      <div className="result-meta">
-                        <span className="result-type">
-                          {result.type === 'community' ? 'Community' : 'Post'}
-                        </span>
-                        {result.type === 'community' && (
-                          <>
-                            <span className="result-separator">•</span>
-                            <span className="result-info">r/{result.name}</span>
-                          </>
-                        )}
-                        {result.description && (
-                          <>
-                            <span className="result-separator">•</span>
-                            <span className="result-description">
-                              {result.description.substring(0, 60)}...
-                            </span>
-                          </>
-                        )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-slate-900 truncate">{result.title}</div>
+                      <div className="text-sm text-slate-500">
+                        {result.type === 'community' ? 'Community' : 'Post'}
+                        {result.type === 'community' && ` • r/${result.name}`}
                       </div>
                     </div>
-                    <div className="result-action">
-                      <span>View</span>
-                    </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             ) : searchQuery.length >= 2 ? (
-              // No results found
-              <div className="empty-state">
-                <FaSearch className="empty-icon" />
-                <p>No results found for "{searchQuery}"</p>
-                <div className="search-suggestions-alt">
-                  <span>Try:</span>
-                  <ul>
-                    <li>Different keywords or phrases</li>
-                    <li>Checking spelling</li>
-                    <li>Using more general terms</li>
-                  </ul>
-                </div>
+              <div className="text-center py-8">
+                <FaSearch className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 font-medium">No results found</p>
+                <p className="text-sm text-slate-400 mt-1">
+                  Try different keywords or check spelling
+                </p>
               </div>
             ) : (
-              // Typing but not enough characters
-              <div className="empty-state">
-                <FaSearch className="empty-icon" />
-                <p>Keep typing to see results...</p>
+              <div className="text-center py-8">
+                <FaSearch className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 font-medium">Keep typing...</p>
               </div>
             )}
           </div>

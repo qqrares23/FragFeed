@@ -53,7 +53,35 @@ export const create = mutation({
       authorId: user._id,
       image: args.storageId || undefined,
     });
+    
     await counts.inc(ctx, postCountKey(user._id));
+
+    // Create notifications for all members of the subreddit (except the author)
+    const subredditMembers = await ctx.db
+      .query("subredditMembership")
+      .withIndex("bySubreddit", (q) => q.eq("subredditId", args.subreddit))
+      .collect();
+
+    const subreddit = await ctx.db.get(args.subreddit);
+    
+    // Send notifications to all members except the post author
+    const notificationPromises = subredditMembers
+      .filter(member => member.userId !== user._id)
+      .map(member => 
+        ctx.db.insert("notifications", {
+          userId: member.userId,
+          type: "new_post",
+          title: "New post in community",
+          message: `${user.username} posted "${args.subject}" in r/${subreddit?.name}`,
+          postId: postId,
+          subredditId: args.subreddit,
+          read: false,
+          createdAt: Date.now(),
+        })
+      );
+
+    await Promise.all(notificationPromises);
+    
     return postId;
   },
 });

@@ -4,7 +4,6 @@ import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import { FaUsers, FaPlus, FaMinus, FaCalendarAlt } from "react-icons/fa";
-import "../styles/SubredditPage.css";
 
 const SubredditPage = () => {
   const { subredditName } = useParams();
@@ -24,15 +23,24 @@ const SubredditPage = () => {
   const joinSubreddit = useMutation(api.subreddit.join);
   const leaveSubreddit = useMutation(api.subreddit.leave);
 
-  if (subreddit === undefined) return <div className="loading">Loading...</div>;
+  if (subreddit === undefined) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading community...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!subreddit) {
     return (
-      <div className="content-container">
-        <div className="not-found">
-          <div className="not-found-icon">🔍</div>
-          <h1>Subreddit not found</h1>
-          <p>The subreddit r/{subredditName} does not exist.</p>
+      <div className="min-h-screen pt-20 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Community not found</h1>
+          <p className="text-slate-600">The community r/{subredditName} does not exist.</p>
         </div>
       </div>
     );
@@ -53,94 +61,100 @@ const SubredditPage = () => {
   };
 
   return (
-    <div className="content-container">
-      <div className="subreddit-banner">
-        <div className="banner-content">
-          <h1>r/{subreddit.name}</h1>
-          {subreddit.description && (
-            <p className="subreddit-description">{subreddit.description}</p>
-          )}
-          
-          <div className="subreddit-meta">
-            <div className="meta-item">
-              <FaUsers className="meta-icon" />
-              <div className="meta-content">
-                <span className="meta-number">{memberCount || 0}</span>
-                <span className="meta-label">Members</span>
-              </div>
+    <div className="min-h-screen pt-20 pb-8">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Community Header */}
+        <div className="card p-8 mb-8">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                r/{subreddit.name}
+              </h1>
+              {subreddit.description && (
+                <p className="text-slate-600 text-lg">{subreddit.description}</p>
+              )}
             </div>
-            <div className="meta-item">
-              <FaCalendarAlt className="meta-icon" />
-              <div className="meta-content">
-                <span className="meta-number">{posts?.length || 0}</span>
-                <span className="meta-label">Posts</span>
+            
+            {user && (
+              <div className="flex gap-3">
+                <button 
+                  onClick={handleJoinLeave}
+                  className={`btn ${isMember ? 'btn-secondary' : 'btn-primary'}`}
+                >
+                  {isMember ? (
+                    <>
+                      <FaMinus />
+                      Leave
+                    </>
+                  ) : (
+                    <>
+                      <FaPlus />
+                      Join
+                    </>
+                  )}
+                </button>
+                {isMember && (
+                  <a 
+                    href={`/r/${subredditName}/submit`}
+                    className="btn btn-primary"
+                  >
+                    <FaPlus />
+                    Create Post
+                  </a>
+                )}
               </div>
-            </div>
+            )}
           </div>
 
-          {user && (
-            <div className="action-buttons">
-              <button 
-                className={`action-btn ${isMember ? 'secondary' : 'primary'}`}
-                onClick={handleJoinLeave}
-              >
-                {isMember ? (
-                  <>
-                    <FaMinus />
-                    Leave Community
-                  </>
-                ) : (
-                  <>
-                    <FaPlus />
-                    Join Community
-                  </>
-                )}
-              </button>
-              {isMember && (
-                <a 
-                  href={`/r/${subredditName}/submit`}
-                  className="action-btn primary"
-                >
+          {/* Stats */}
+          <div className="flex gap-6">
+            <div className="flex items-center gap-2 text-slate-600">
+              <FaUsers className="w-5 h-5" />
+              <span className="font-semibold">{memberCount || 0}</span>
+              <span>members</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-600">
+              <FaCalendarAlt className="w-5 h-5" />
+              <span className="font-semibold">{posts?.length || 0}</span>
+              <span>posts</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Posts */}
+        <div className="space-y-6">
+          {posts && posts.length === 0 ? (
+            <div className="card p-12 text-center">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">No posts yet</h3>
+              <p className="text-slate-600 mb-6">
+                Be the first to post in r/{subredditName}
+              </p>
+              {user && isMember && (
+                <a href={`/r/${subredditName}/submit`} className="btn btn-primary">
                   <FaPlus />
-                  Create Post
+                  Create First Post
                 </a>
               )}
             </div>
+          ) : (
+            <>
+              {posts?.map((post) => (
+                <PostCard key={post._id} post={post} />
+              ))}
+              {status === "CanLoadMore" && (
+                <div className="text-center">
+                  <button 
+                    onClick={() => loadMore(20)}
+                    className="btn btn-secondary"
+                  >
+                    Load More Posts
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
-      </div>
-
-      <div className="posts-container">
-        <div className="posts-section-header">
-          <h2>Posts</h2>
-        </div>
-        
-        {posts && posts.length === 0 ? (
-          <div className="no-posts">
-            <div className="no-posts-icon">📝</div>
-            <div className="no-posts-title">No posts yet</div>
-            <div className="no-posts-description">
-              Be the first to post in r/{subredditName}
-            </div>
-            {user && isMember && (
-              <a href={`/r/${subredditName}/submit`} className="action-btn primary">
-                <FaPlus />
-                Create First Post
-              </a>
-            )}
-          </div>
-        ) : (
-          <>
-            {posts?.map((post) => (
-              <PostCard key={post._id} post={post} />
-            ))}
-            {status === "CanLoadMore" && (
-              <button className="load-more" onClick={() => loadMore(20)}>
-                Load More Posts
-              </button>
-            )}
-          </>
-        )}
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import { Id } from "../../convex/_generated/dataModel";
 import { Link } from "react-router-dom";
-import "../styles/Comment.css";
 
 interface CommentProps {
   comment: {
@@ -15,23 +14,26 @@ interface CommentProps {
 
 const Comment = ({ comment }: CommentProps) => {
   return (
-    <div className="comment">
-      <div className="comment-header">
+    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+      <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
         {comment.author?.username ? (
-          <Link to={`/u/${comment.author.username}`} className="comment-author">
+          <Link 
+            to={`/u/${comment.author.username}`} 
+            className="font-medium text-slate-700 hover:text-primary-600"
+          >
             u/{comment.author.username}
           </Link>
         ) : (
-          <span className="comment-author">deleted</span>
+          <span className="text-slate-400">deleted</span>
         )}
-        <span className="comment-dot">-</span>
-        <span className="comment-timestamp">
-            {new Date(comment._creationTime).toLocaleString()}
-        </span>
+        <span>•</span>
+        <span>{new Date(comment._creationTime).toLocaleDateString()}</span>
       </div>
-      <div className="comment-content">{comment.content}</div>
+      <div className="text-slate-900 whitespace-pre-wrap">
+        {comment.content}
+      </div>
     </div>
   );
 };
 
-export default Comment
+export default Comment;

@@ -5,7 +5,6 @@ import ProfilePage from "./pages/ProfilePage";
 import SubredditPage from "./pages/SubredditPage";
 import SubmitPage from "./pages/SubmitPage";
 import PostPage from "./pages/PostPage";
-import "./styles/App.css";
 
 function App() {
   return (
