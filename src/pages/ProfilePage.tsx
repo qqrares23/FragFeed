@@ -5,7 +5,6 @@ import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GamingProfileModal from "../components/GamingProfileModal";
 import ProfileEditModal from "../components/ProfileEditModal";
-import OnlineStatusIndicator from "../components/OnlineStatusIndicator";
 import { User, Users, Minus, CalendarDays, Plus, Unlink, Edit, MapPin, Globe, Camera, Gamepad2 } from "lucide-react";
 import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
 import { FaSteam } from "react-icons/fa";
@@ -102,8 +101,6 @@ const ProfilePage = () => {
                     <User className="w-8 h-8 sm:w-12 sm:h-12" />
                   </AvatarFallback>
                 </Avatar>
-                {/* Online Status Indicator */}
-                {username && <OnlineStatusIndicator username={username} />}
               </div>
 
               {/* User Info */}
