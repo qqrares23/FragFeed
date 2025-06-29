@@ -333,12 +333,31 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+    <div 
+      className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4"
+      style={{ 
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(4px)',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 2147483647 // Maximum z-index value
+      }}
+    >
       {/* Backdrop - clicking this will close the modal */}
-      <div className="absolute inset-0" onClick={onClose} />
+      <div 
+        className="absolute inset-0" 
+        onClick={onClose}
+        style={{ zIndex: 1 }}
+      />
       
       {/* Modal Content */}
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden animate-slide-up">
+      <div 
+        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[85vh] overflow-hidden animate-slide-up"
+        style={{ zIndex: 2 }}
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-6">
           <div className="flex items-center justify-between mb-4">
@@ -380,7 +399,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-8 max-h-[calc(90vh-200px)] overflow-y-auto">
+        <div className="p-8 max-h-[calc(85vh-200px)] overflow-y-auto">
           {loading && (
             <div className="flex items-center justify-center py-16">
               <div className="text-center">
@@ -486,7 +505,7 @@ const GamingDropdown = ({ isOpen, onClose }: GamingDropdownProps) => {
                             </>
                           )}
                         </div>
-                        <h4 className="font-semibold text-slate-900 line-clamp-2 mb-3">
+                        <h4 className="font-semibold text-slate-slate-900 line-clamp-2 mb-3">
                           {article.title}
                         </h4>
                         <p className="text-sm text-slate-600 line-clamp-2 mb-4">
