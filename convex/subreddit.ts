@@ -49,7 +49,37 @@ export const get = query({
       .unique();
     if (!subreddit) return null;
 
-    return subreddit;
+    // Get banner image URL if it exists
+    const bannerImageUrl = subreddit.bannerImage ? await ctx.storage.getUrl(subreddit.bannerImage) : null;
+
+    return {
+      ...subreddit,
+      bannerImageUrl,
+    };
+  },
+});
+
+export const updateBanner = mutation({
+  args: {
+    subredditId: v.id("subreddit"),
+    bannerImage: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    const subreddit = await ctx.db.get(args.subredditId);
+    
+    if (!subreddit) {
+      throw new ConvexError({ message: "Subreddit not found" });
+    }
+    
+    // Only the owner can update the banner
+    if (subreddit.authorId !== user._id) {
+      throw new ConvexError({ message: "Only the community owner can update the banner" });
+    }
+    
+    await ctx.db.patch(args.subredditId, {
+      bannerImage: args.bannerImage,
+    });
   },
 });
 

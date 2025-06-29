@@ -94,6 +94,40 @@
   }
 }
 
+/* Community page post glow effects */
+.post-glow {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.post-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, 
+    rgba(99, 102, 241, 0.1), 
+    rgba(217, 70, 239, 0.1), 
+    rgba(99, 102, 241, 0.1)
+  );
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  filter: blur(10px);
+}
+
+.post-glow:hover::before {
+  opacity: 1;
+}
+
+.post-glow:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 30px rgba(99, 102, 241, 0.2);
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   .animate-wave-text,
@@ -104,8 +138,19 @@
   .animate-pulse-glow,
   .animate-mobile-bounce,
   .animate-mobile-slide,
-  .animate-mobile-scale {
+  .animate-mobile-scale,
+  .post-glow {
     animation: none;
+    transition: none;
+  }
+  
+  .post-glow:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .post-glow::before {
+    display: none;
   }
   
   * {

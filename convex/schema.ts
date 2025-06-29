@@ -49,6 +49,7 @@ export default defineSchema({
     description: v.optional(v.string()),
     authorId: v.id("users"),
     guidelines: v.optional(v.array(v.string())),
+    bannerImage: v.optional(v.id("_storage")),
   })
     .index("byName", ["name"])
     .index("byAuthor", ["authorId"])

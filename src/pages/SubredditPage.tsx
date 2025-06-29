@@ -4,7 +4,7 @@ import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GuidelinesEditModal from "../components/GuidelinesEditModal";
-import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit } from "lucide-react";
+import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Camera, Upload } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,8 @@ const SubredditPage = () => {
   const { user } = useUser();
   const [showMembers, setShowMembers] = useState(false);
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.getSubredditPosts, {
@@ -36,6 +38,8 @@ const SubredditPage = () => {
   
   const joinSubreddit = useMutation(api.subreddit.join);
   const leaveSubreddit = useMutation(api.subreddit.leave);
+  const updateBanner = useMutation(api.subreddit.updateBanner);
+  const generateUploadUrl = useMutation(api.image.generateUploadUrl);
 
   if (subreddit === undefined) {
     return (
@@ -74,6 +78,39 @@ const SubredditPage = () => {
     }
   };
 
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !subreddit) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Banner image size should be less than 10MB");
+      return;
+    }
+
+    setIsUploadingBanner(true);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file
+      });
+
+      if (!result.ok) throw new Error('Failed to upload banner');
+      const { storageId } = await result.json();
+      
+      await updateBanner({
+        subredditId: subreddit._id,
+        bannerImage: storageId
+      });
+    } catch (error) {
+      console.error("Error uploading banner:", error);
+      alert("Failed to upload banner image");
+    } finally {
+      setIsUploadingBanner(false);
+    }
+  };
+
   const formatTimeAgo = (timestamp: number) => {
     const diff = Date.now() - timestamp;
     const days = Math.floor(diff / 86400000);
@@ -92,17 +129,81 @@ const SubredditPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Community Header */}
-            <Card>
-              <CardContent className="p-6 lg:p-8">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+            {/* Community Header with Banner */}
+            <Card className="overflow-hidden bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border-2 border-primary-100 dark:border-primary-900 shadow-xl">
+              {/* Banner Section */}
+              <div className="relative h-32 lg:h-48 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-600 overflow-hidden">
+                {subreddit.bannerImageUrl ? (
+                  <img 
+                    src={subreddit.bannerImageUrl} 
+                    alt={`r/${subreddit.name} banner`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-600 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <Users className="w-12 h-12 lg:w-16 lg:h-16 mx-auto mb-2 opacity-50" />
+                      <p className="text-lg lg:text-xl font-bold opacity-75">r/{subreddit.name}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Banner Upload Button for Owner */}
+                {isOwner && (
+                  <div className="absolute top-4 right-4">
+                    <label className="cursor-pointer">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="bg-white/90 hover:bg-white text-slate-700 shadow-lg backdrop-blur-sm"
+                        disabled={isUploadingBanner}
+                      >
+                        {isUploadingBanner ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin mr-2" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Camera className="w-4 h-4 mr-2" />
+                            Change Banner
+                          </>
+                        )}
+                      </Button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleBannerUpload}
+                        className="hidden"
+                        disabled={isUploadingBanner}
+                      />
+                    </label>
+                  </div>
+                )}
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              </div>
+
+              <CardContent className="p-6 lg:p-8 -mt-8 relative z-10">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
                   <div className="flex-1">
-                    <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
-                      r/{subreddit.name}
-                    </h1>
-                    {subreddit.description && (
-                      <p className="text-slate-600 text-base lg:text-lg">{subreddit.description}</p>
-                    )}
+                    {/* Community Avatar */}
+                    <div className="flex items-end gap-4 mb-4">
+                      <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center shadow-xl border-4 border-white dark:border-slate-800">
+                        <span className="text-2xl lg:text-3xl font-bold text-white">
+                          {subreddit.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="pb-2">
+                        <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+                          r/{subreddit.name}
+                        </h1>
+                        {subreddit.description && (
+                          <p className="text-slate-600 dark:text-slate-400 text-base lg:text-lg">{subreddit.description}</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   
                   {user && (
@@ -110,6 +211,7 @@ const SubredditPage = () => {
                       <Button 
                         onClick={handleJoinLeave}
                         variant={isMember ? "outline" : "default"}
+                        className="transform hover:scale-105 transition-all duration-200 shadow-lg"
                       >
                         {isMember ? (
                           <>
@@ -125,7 +227,10 @@ const SubredditPage = () => {
                       </Button>
                       
                       {isMember && (
-                        <Button asChild>
+                        <Button 
+                          asChild
+                          className="transform hover:scale-105 transition-all duration-200 shadow-lg"
+                        >
                           <a href={`/r/${subredditName}/submit`}>
                             <Plus className="w-4 h-4 mr-2" />
                             Create Post
@@ -136,36 +241,41 @@ const SubredditPage = () => {
                   )}
                 </div>
 
-                {/* Stats */}
+                {/* Enhanced Stats */}
                 <div className="flex flex-wrap gap-4 lg:gap-6">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Users className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-lg">
+                    <Users className="w-4 h-4 lg:w-5 lg:h-5 text-primary-500" />
                     <span className="font-semibold">{memberCount || 0}</span>
                     <span className="hidden sm:inline">members</span>
                     <span className="sm:hidden">👥</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <CalendarDays className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-lg">
+                    <CalendarDays className="w-4 h-4 lg:w-5 lg:h-5 text-secondary-500" />
                     <span className="font-semibold">{posts?.length || 0}</span>
                     <span className="hidden sm:inline">posts</span>
                     <span className="sm:hidden">📝</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-lg">
+                    <CalendarDays className="w-4 h-4 lg:w-5 lg:h-5 text-green-500" />
+                    <span className="font-semibold">Created</span>
+                    <span className="text-sm">{new Date(subreddit._creationTime).toLocaleDateString()}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Posts */}
+            {/* Posts with Glowing Effects */}
             <div className="space-y-4 lg:space-y-6">
               {posts && posts.length === 0 ? (
-                <Card>
+                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800">
                   <CardContent className="p-8 lg:p-12 text-center">
                     <div className="text-4xl lg:text-6xl mb-4">📝</div>
-                    <h3 className="text-lg lg:text-xl font-semibold text-slate-900 mb-2">No posts yet</h3>
-                    <p className="text-slate-600 mb-6">
+                    <h3 className="text-lg lg:text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">No posts yet</h3>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6">
                       Be the first to post in r/{subredditName}
                     </p>
                     {user && isMember && (
-                      <Button asChild>
+                      <Button asChild className="transform hover:scale-105 transition-all duration-200 shadow-lg">
                         <a href={`/r/${subredditName}/submit`}>
                           <Plus className="w-4 h-4 mr-2" />
                           Create First Post
@@ -176,14 +286,29 @@ const SubredditPage = () => {
                 </Card>
               ) : (
                 <>
-                  {posts?.map((post) => (
-                    <PostCard key={post._id} post={post} />
+                  {posts?.map((post, index) => (
+                    <div 
+                      key={post._id} 
+                      className="transform hover:scale-[1.02] transition-all duration-300 hover:shadow-2xl"
+                      style={{
+                        filter: 'drop-shadow(0 0 20px rgba(99, 102, 241, 0.1))',
+                        animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
+                      }}
+                    >
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-2xl blur-xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                        <div className="relative bg-white dark:bg-slate-800 rounded-2xl border-2 border-primary-100 dark:border-primary-900 hover:border-primary-300 dark:hover:border-primary-700 transition-all duration-300">
+                          <PostCard post={post} />
+                        </div>
+                      </div>
+                    </div>
                   ))}
                   {status === "CanLoadMore" && (
                     <div className="text-center">
                       <Button 
                         onClick={() => loadMore(20)}
                         variant="outline"
+                        className="transform hover:scale-105 transition-all duration-200 shadow-lg"
                       >
                         Load More Posts
                       </Button>
@@ -194,25 +319,30 @@ const SubredditPage = () => {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Enhanced Sidebar */}
           <div className="space-y-6">
             {/* Community Info */}
-            <Card>
+            <Card className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border-2 border-primary-100 dark:border-primary-900 shadow-lg">
               <CardHeader>
-                <CardTitle>About Community</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
+                    <Users className="w-3 h-3 text-white" />
+                  </div>
+                  About Community
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Members</span>
-                  <span className="font-semibold">{memberCount || 0}</span>
+                <div className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <span className="text-slate-600 dark:text-slate-400 font-medium">Members</span>
+                  <span className="font-bold text-primary-600">{memberCount || 0}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Posts</span>
-                  <span className="font-semibold">{posts?.length || 0}</span>
+                <div className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <span className="text-slate-600 dark:text-slate-400 font-medium">Posts</span>
+                  <span className="font-bold text-secondary-600">{posts?.length || 0}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Created</span>
-                  <span className="font-semibold text-sm">
+                <div className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <span className="text-slate-600 dark:text-slate-400 font-medium">Created</span>
+                  <span className="font-semibold text-sm text-slate-700 dark:text-slate-300">
                     {new Date(subreddit._creationTime).toLocaleDateString()}
                   </span>
                 </div>
@@ -220,14 +350,20 @@ const SubredditPage = () => {
             </Card>
 
             {/* Members Section */}
-            <Card>
+            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800 shadow-lg">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Members</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                      <Users className="w-3 h-3 text-white" />
+                    </div>
+                    Members
+                  </CardTitle>
                   <Button
                     onClick={() => setShowMembers(!showMembers)}
                     variant="ghost"
                     size="sm"
+                    className="hover:bg-green-100 dark:hover:bg-green-900/30"
                   >
                     {showMembers ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
@@ -238,18 +374,18 @@ const SubredditPage = () => {
                   <div className="space-y-3 max-h-64 overflow-y-auto">
                     {members && members.length > 0 ? (
                       members.map((member) => (
-                        <div key={member._id} className="flex items-center justify-between">
+                        <div key={member._id} className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg">
                           <div className="flex items-center gap-3">
                             <Avatar className="w-6 h-6 lg:w-8 lg:h-8">
-                              <AvatarFallback className="text-xs lg:text-sm">
+                              <AvatarFallback className="text-xs lg:text-sm bg-gradient-to-br from-green-500 to-emerald-500 text-white">
                                 {member.user?.username.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-medium text-slate-900 text-sm lg:text-base">
+                              <p className="font-medium text-slate-900 dark:text-slate-100 text-sm lg:text-base">
                                 u/{member.user?.username}
                               </p>
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
                                 Joined {formatTimeAgo(member.joinedAt)}
                               </p>
                             </div>
@@ -257,11 +393,11 @@ const SubredditPage = () => {
                         </div>
                       ))
                     ) : (
-                      <p className="text-slate-500 text-sm">No members to display</p>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm">No members to display</p>
                     )}
                   </div>
                 ) : (
-                  <p className="text-slate-500 text-sm">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">
                     Click the eye icon to view community members
                   </p>
                 )}
@@ -269,15 +405,21 @@ const SubredditPage = () => {
             </Card>
 
             {/* Community Guidelines */}
-            <Card>
+            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-200 dark:border-purple-800 shadow-lg">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Community Guidelines</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                      <Edit className="w-3 h-3 text-white" />
+                    </div>
+                    Community Guidelines
+                  </CardTitle>
                   {isOwner && (
                     <Button
                       onClick={() => setShowGuidelinesModal(true)}
                       variant="ghost"
                       size="sm"
+                      className="hover:bg-purple-100 dark:hover:bg-purple-900/30"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -285,17 +427,32 @@ const SubredditPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm text-slate-600">
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                   {subreddit.guidelines && subreddit.guidelines.length > 0 ? (
                     subreddit.guidelines.map((guideline, index) => (
-                      <p key={index}>• {guideline}</p>
+                      <div key={index} className="flex items-start gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg">
+                        <span className="text-purple-500 font-bold text-xs mt-0.5">{index + 1}.</span>
+                        <span className="flex-1">{guideline}</span>
+                      </div>
                     ))
                   ) : (
                     <>
-                      <p>• Be respectful to other members</p>
-                      <p>• Stay on topic</p>
-                      <p>• No spam or self-promotion</p>
-                      <p>• Follow FragFeed's content policy</p>
+                      <div className="flex items-start gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg">
+                        <span className="text-purple-500 font-bold text-xs mt-0.5">1.</span>
+                        <span className="flex-1">Be respectful to other members</span>
+                      </div>
+                      <div className="flex items-start gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg">
+                        <span className="text-purple-500 font-bold text-xs mt-0.5">2.</span>
+                        <span className="flex-1">Stay on topic</span>
+                      </div>
+                      <div className="flex items-start gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg">
+                        <span className="text-purple-500 font-bold text-xs mt-0.5">3.</span>
+                        <span className="flex-1">No spam or self-promotion</span>
+                      </div>
+                      <div className="flex items-start gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg">
+                        <span className="text-purple-500 font-bold text-xs mt-0.5">4.</span>
+                        <span className="flex-1">Follow FragFeed's content policy</span>
+                      </div>
                     </>
                   )}
                 </div>

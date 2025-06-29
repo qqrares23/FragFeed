@@ -24,12 +24,17 @@ const Navbar = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   
-  const unreadCount = useQuery(api.notifications.getUnreadCount);
+  // Get notification count - only show badge if > 0
+  const unreadNotifications = useQuery(api.notifications.getUnreadCount);
+  const hasUnreadNotifications = unreadNotifications && unreadNotifications > 0;
+  
+  // Get following count - only show badge if > 0
   const currentUser = useQuery(api.users.current);
   const followingCount = useQuery(
     api.follows.getFollowingCount,
-    currentUser ? { userId: currentUser._id } : "skip"
+    currentUser?._id ? { userId: currentUser._id } : "skip"
   );
+  const hasFollowing = followingCount && followingCount > 0;
 
   // Close all dropdowns when screen size changes
   useEffect(() => {
@@ -148,7 +153,7 @@ const Navbar = () => {
                 >
                   <UserPlus className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
                 </Button>
-                {followingCount && followingCount > 0 && (
+                {hasFollowing && (
                   <Badge 
                     variant="secondary" 
                     className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
@@ -182,12 +187,12 @@ const Navbar = () => {
                 >
                   <Bell className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
                 </Button>
-                {unreadCount && unreadCount > 0 && (
+                {hasUnreadNotifications && (
                   <Badge 
                     variant="destructive" 
                     className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs animate-pulse"
                   >
-                    {unreadCount > 9 ? '9+' : unreadCount}
+                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
                   </Badge>
                 )}
               </div>
@@ -294,7 +299,7 @@ const Navbar = () => {
                     >
                       <UserPlus className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
                       Following
-                      {followingCount && followingCount > 0 && (
+                      {hasFollowing && (
                         <Badge 
                           variant="secondary" 
                           className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
@@ -326,12 +331,12 @@ const Navbar = () => {
                     >
                       <Bell className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
                       Notifications
-                      {unreadCount && unreadCount > 0 && (
+                      {hasUnreadNotifications && (
                         <Badge 
                           variant="destructive" 
                           className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs animate-pulse"
                         >
-                          {unreadCount > 9 ? '9+' : unreadCount}
+                          {unreadNotifications > 9 ? '9+' : unreadNotifications}
                         </Badge>
                       )}
                     </Button>
