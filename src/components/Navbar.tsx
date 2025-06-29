@@ -1,4 +1,4 @@
-import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs, FaBars, FaTimes } from "react-icons/fa";
+import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs, FaBars, FaTimes, FaCog } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -92,10 +92,14 @@ const Navbar = () => {
             <div className="relative">
               <button 
                 onClick={handleGamingDropdown}
-                className="btn btn-ghost p-2 relative group"
+                className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
+                  showGamingDropdown 
+                    ? 'bg-primary-100 text-primary-700 shadow-md' 
+                    : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                }`}
                 title="Gaming Hub"
               >
-                <FaGamepad className="w-5 h-5 text-primary-600 group-hover:text-primary-700" />
+                <FaGamepad className="w-5 h-5" />
               </button>
             </div>
 
@@ -112,7 +116,11 @@ const Navbar = () => {
               <div className="relative">
                 <button 
                   onClick={handleNotifications}
-                  className="btn btn-ghost p-2 relative"
+                  className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 relative ${
+                    showNotifications 
+                      ? 'bg-primary-100 text-primary-700 shadow-md' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
                   title="Notifications"
                 >
                   <FaBell className="w-5 h-5" />
@@ -128,17 +136,31 @@ const Navbar = () => {
               <div className="relative">
                 <button 
                   onClick={handleCreatePanel}
-                  className="btn btn-ghost p-2"
+                  className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
+                    showCreatePanel 
+                      ? 'bg-primary-100 text-primary-700 shadow-md' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
                   title="Create"
                 >
                   <FaPlus className="w-5 h-5" />
                 </button>
               </div>
 
+              {/* Settings */}
+              <div className="relative">
+                <button
+                  className="p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                  title="Settings"
+                >
+                  <FaCog className="w-5 h-5" />
+                </button>
+              </div>
+
               {/* Profile */}
               <button
                 onClick={() => user?.username && navigate(`/u/${user.username}`)}
-                className="btn btn-ghost p-2"
+                className="p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 title="Profile"
               >
                 <FaUser className="w-5 h-5" />
@@ -155,7 +177,7 @@ const Navbar = () => {
             </Authenticated>
             <button
               onClick={toggleMobileMenu}
-              className="btn btn-ghost p-2"
+              className="p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               title="Menu"
             >
               {showMobileMenu ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
@@ -214,6 +236,14 @@ const Navbar = () => {
                     Create
                   </button>
 
+                  {/* Settings */}
+                  <button
+                    className="btn btn-secondary flex items-center justify-center gap-2"
+                  >
+                    <FaCog className="w-4 h-4" />
+                    Settings
+                  </button>
+
                   {/* Profile */}
                   <button
                     onClick={() => {
@@ -222,7 +252,7 @@ const Navbar = () => {
                         setShowMobileMenu(false);
                       }
                     }}
-                    className="btn btn-secondary flex items-center justify-center gap-2"
+                    className="btn btn-secondary flex items-center justify-center gap-2 col-span-2"
                   >
                     <FaUser className="w-4 h-4" />
                     Profile

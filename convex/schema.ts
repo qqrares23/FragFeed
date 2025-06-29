@@ -5,6 +5,11 @@ export default defineSchema({
   users: defineTable({
     username: v.string(),
     externalId: v.string(),
+    profilePicture: v.optional(v.id("_storage")),
+    bannerImage: v.optional(v.id("_storage")),
+    bio: v.optional(v.string()),
+    location: v.optional(v.string()),
+    website: v.optional(v.string()),
     steamProfile: v.optional(v.object({
       steamId: v.string(),
       username: v.string(),

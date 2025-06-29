@@ -73,13 +73,45 @@ export const getPublicUser = query({
     if (!user) return {posts: 0}
 
     const postCount = await counts.count(ctx, postCountKey(user._id))
+    
+    // Get profile picture and banner URLs
+    const profilePictureUrl = user.profilePicture ? await ctx.storage.getUrl(user.profilePicture) : null;
+    const bannerImageUrl = user.bannerImage ? await ctx.storage.getUrl(user.bannerImage) : null;
+    
     return {
       posts: postCount,
+      bio: user.bio,
+      location: user.location,
+      website: user.website,
+      profilePictureUrl,
+      bannerImageUrl,
       steamProfile: user.steamProfile,
       riotProfile: user.riotProfile,
       epicProfile: user.epicProfile,
       ubisoftProfile: user.ubisoftProfile,
     }
+  },
+});
+
+export const updateProfile = mutation({
+  args: {
+    bio: v.optional(v.string()),
+    location: v.optional(v.string()),
+    website: v.optional(v.string()),
+    profilePicture: v.optional(v.id("_storage")),
+    bannerImage: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    
+    const updateData: any = {};
+    if (args.bio !== undefined) updateData.bio = args.bio;
+    if (args.location !== undefined) updateData.location = args.location;
+    if (args.website !== undefined) updateData.website = args.website;
+    if (args.profilePicture !== undefined) updateData.profilePicture = args.profilePicture;
+    if (args.bannerImage !== undefined) updateData.bannerImage = args.bannerImage;
+    
+    await ctx.db.patch(user._id, updateData);
   },
 });
 
