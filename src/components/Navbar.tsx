@@ -1,4 +1,4 @@
-import { Plus, User, Gamepad2, Bell, Menu, X, Settings, Users } from "lucide-react";
+import { Plus, User, Gamepad2, Bell, Menu, X, Settings, Users, UserPlus } from "lucide-react";
 import { FaCrosshairs } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
@@ -9,6 +9,7 @@ import CreatePanel from "./CreatePanel";
 import GamingDropdown from "./GamingDropdown";
 import NotificationDropdown from "./NotificationDropdown";
 import CommunityQuickPost from "./CommunityQuickPost";
+import FollowingDropdown from "./FollowingDropdown";
 import SearchBar from "./SearchBar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,11 +19,17 @@ const Navbar = () => {
   const [showGamingDropdown, setShowGamingDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCommunityQuickPost, setShowCommunityQuickPost] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { user } = useUser();
   const navigate = useNavigate();
   
   const unreadCount = useQuery(api.notifications.getUnreadCount);
+  const currentUser = useQuery(api.users.current);
+  const followingCount = useQuery(
+    api.follows.getFollowingCount,
+    currentUser ? { userId: currentUser._id } : "skip"
+  );
 
   // Close all dropdowns when screen size changes
   useEffect(() => {
@@ -31,6 +38,7 @@ const Navbar = () => {
       setShowGamingDropdown(false);
       setShowNotifications(false);
       setShowCommunityQuickPost(false);
+      setShowFollowing(false);
       setShowMobileMenu(false);
     };
 
@@ -43,6 +51,7 @@ const Navbar = () => {
     setShowGamingDropdown(false);
     setShowNotifications(false);
     setShowCommunityQuickPost(false);
+    setShowFollowing(false);
     setShowMobileMenu(false);
   };
 
@@ -52,6 +61,7 @@ const Navbar = () => {
     setShowGamingDropdown(false);
     setShowNotifications(false);
     setShowCommunityQuickPost(false);
+    setShowFollowing(false);
   };
 
   const handleGamingClick = () => {
@@ -72,6 +82,11 @@ const Navbar = () => {
   const handleCommunityQuickPostClick = () => {
     closeAllDropdowns();
     setShowCommunityQuickPost(true);
+  };
+
+  const handleFollowingClick = () => {
+    closeAllDropdowns();
+    setShowFollowing(true);
   };
 
   const handleSettingsClick = () => {
@@ -121,6 +136,28 @@ const Navbar = () => {
             </Unauthenticated>
             
             <Authenticated>
+              {/* Following */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleFollowingClick}
+                  className={`transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md ${
+                    showFollowing ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
+                  }`}
+                >
+                  <UserPlus className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
+                </Button>
+                {followingCount && followingCount > 0 && (
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
+                  >
+                    {followingCount > 99 ? '99+' : followingCount}
+                  </Badge>
+                )}
+              </div>
+
               {/* Community Quick Post */}
               <Button
                 variant="ghost"
@@ -248,6 +285,26 @@ const Navbar = () => {
                     </Button>
                   </div>
 
+                  {/* Following */}
+                  <div className="animate-slide-up" style={{ animationDelay: '325ms' }}>
+                    <Button 
+                      variant="secondary" 
+                      className="w-full flex items-center justify-center gap-2 relative transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      onClick={handleFollowingClick}
+                    >
+                      <UserPlus className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
+                      Following
+                      {followingCount && followingCount > 0 && (
+                        <Badge 
+                          variant="secondary" 
+                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
+                        >
+                          {followingCount > 99 ? '99+' : followingCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </div>
+
                   {/* Community Quick Post */}
                   <div className="animate-slide-up" style={{ animationDelay: '350ms' }}>
                     <Button 
@@ -344,6 +401,11 @@ const Navbar = () => {
       
       <CommunityQuickPost
         isOpen={showCommunityQuickPost}
+        onClose={closeAllDropdowns}
+      />
+      
+      <FollowingDropdown
+        isOpen={showFollowing}
         onClose={closeAllDropdowns}
       />
     </nav>
