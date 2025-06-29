@@ -5,6 +5,7 @@ import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GamingProfileModal from "../components/GamingProfileModal";
 import ProfileEditModal from "../components/ProfileEditModal";
+import OnlineStatusIndicator from "../components/OnlineStatusIndicator";
 import { User, Users, Minus, CalendarDays, Plus, Unlink, Edit, MapPin, Globe, Camera, Gamepad2 } from "lucide-react";
 import { SiEpicgames, SiRiotgames, SiUbisoft } from "react-icons/si";
 import { FaSteam } from "react-icons/fa";
@@ -12,7 +13,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -56,7 +56,7 @@ const ProfilePage = () => {
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading profile...</p>
+          <p className="text-slate-600 dark:text-slate-400">Loading profile...</p>
         </div>
       </div>
     );
@@ -96,25 +96,27 @@ const ProfilePage = () => {
             <div className="flex flex-col sm:flex-row sm:items-start gap-6">
               {/* Profile Picture */}
               <div className="relative -mt-16 sm:-mt-20">
-                <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-white">
+                <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-white dark:border-slate-800">
                   <AvatarImage src={stats?.profilePictureUrl} />
                   <AvatarFallback className="text-2xl">
                     <User className="w-8 h-8 sm:w-12 sm:h-12" />
                   </AvatarFallback>
                 </Avatar>
+                {/* Online Status Indicator */}
+                {username && <OnlineStatusIndicator username={username} />}
               </div>
 
               {/* User Info */}
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">u/{username}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">u/{username}</h1>
                     {stats?.bio && (
-                      <p className="text-slate-600 mt-2">{stats.bio}</p>
+                      <p className="text-slate-600 dark:text-slate-400 mt-2">{stats.bio}</p>
                     )}
                     <div className="flex flex-wrap gap-4 mt-3">
                       {stats?.location && (
-                        <div className="flex items-center gap-2 text-slate-600">
+                        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                           <MapPin className="w-4 h-4" />
                           <span className="text-sm">{stats.location}</span>
                         </div>
@@ -146,11 +148,11 @@ const ProfilePage = () => {
 
                 {/* Stats */}
                 <div className="flex gap-6 mt-4">
-                  <div className="flex items-center gap-2 text-slate-600">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                     <span className="font-semibold">{stats?.posts ?? 0}</span>
                     <span>posts</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                     <span className="font-semibold">{memberships?.length ?? 0}</span>
                     <span>communities</span>
                   </div>
@@ -184,15 +186,15 @@ const ProfilePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Steam Profile */}
               {stats?.steamProfile && (
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                         <FaSteam className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{stats.steamProfile.username}</p>
-                        <p className="text-sm text-slate-600">Steam</p>
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">{stats.steamProfile.username}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Steam</p>
                       </div>
                     </div>
                     {isOwnProfile && (
@@ -221,15 +223,15 @@ const ProfilePage = () => {
 
               {/* Riot Profile */}
               {stats?.riotProfile && (
-                <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
                         <SiRiotgames className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{stats.riotProfile.gameName}#{stats.riotProfile.tagLine}</p>
-                        <p className="text-sm text-slate-600">Riot Games</p>
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">{stats.riotProfile.gameName}#{stats.riotProfile.tagLine}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Riot Games</p>
                       </div>
                     </div>
                     {isOwnProfile && (
@@ -248,15 +250,15 @@ const ProfilePage = () => {
 
               {/* Epic Profile */}
               {stats?.epicProfile && (
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
                         <SiEpicgames className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{stats.epicProfile.displayName}</p>
-                        <p className="text-sm text-slate-600">Epic Games</p>
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">{stats.epicProfile.displayName}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Epic Games</p>
                       </div>
                     </div>
                     {isOwnProfile && (
@@ -275,15 +277,15 @@ const ProfilePage = () => {
 
               {/* Ubisoft Profile */}
               {stats?.ubisoftProfile && (
-                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 border border-indigo-200 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
                         <SiUbisoft className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{stats.ubisoftProfile.username}</p>
-                        <p className="text-sm text-slate-600">Ubisoft</p>
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">{stats.ubisoftProfile.username}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Ubisoft</p>
                       </div>
                     </div>
                     {isOwnProfile && (
@@ -302,7 +304,7 @@ const ProfilePage = () => {
 
               {/* No gaming profiles */}
               {!stats?.steamProfile && !stats?.riotProfile && !stats?.epicProfile && !stats?.ubisoftProfile && (
-                <div className="col-span-full text-center py-8 text-slate-500">
+                <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400">
                   <Gamepad2 className="w-12 h-12 mx-auto mb-3 text-slate-300" />
                   <p className="font-medium">No gaming profiles connected</p>
                   {isOwnProfile && (
@@ -326,16 +328,16 @@ const ProfilePage = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {memberships.map((membership) => (
-                  <div key={membership._id} className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <div key={membership._id} className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900">r/{membership.name}</h3>
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100">r/{membership.name}</h3>
                         {membership.description && (
-                          <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
                             {membership.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-2">
                           <CalendarDays className="w-3 h-3" />
                           <span>Joined {new Date(membership.joinedAt).toLocaleDateString()}</span>
                         </div>
@@ -358,15 +360,15 @@ const ProfilePage = () => {
 
         {/* Posts */}
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
             Posts by u/{username}
           </h2>
           
           {posts.length === 0 ? (
             <Card className="p-12 text-center">
               <div className="text-6xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No posts yet</h3>
-              <p className="text-slate-600">
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">No posts yet</h3>
+              <p className="text-slate-600 dark:text-slate-400">
                 {isOwnProfile 
                   ? "You haven't created any posts yet. Join a community and start sharing!"
                   : `${username} hasn't posted anything yet.`
