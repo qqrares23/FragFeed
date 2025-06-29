@@ -1,4 +1,4 @@
-import { FaPlus, FaUser, FaGamepad, FaBell, FaCrosshairs, FaBars, FaTimes, FaCog, FaUsers } from "react-icons/fa";
+import { Plus, User, Gamepad2, Bell, Target, Menu, X, Settings, Users } from "lucide-react";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,6 +9,8 @@ import GamingDropdown from "./GamingDropdown";
 import NotificationDropdown from "./NotificationDropdown";
 import CommunityQuickPost from "./CommunityQuickPost";
 import SearchBar from "./SearchBar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const Navbar = () => {
   const [showCreatePanel, setShowCreatePanel] = useState(false);
@@ -35,38 +37,6 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleCreatePanel = () => {
-    setShowCreatePanel(true);
-    setShowGamingDropdown(false);
-    setShowNotifications(false);
-    setShowCommunityQuickPost(false);
-    setShowMobileMenu(false);
-  };
-
-  const handleGamingDropdown = () => {
-    setShowGamingDropdown(true);
-    setShowCreatePanel(false);
-    setShowNotifications(false);
-    setShowCommunityQuickPost(false);
-    setShowMobileMenu(false);
-  };
-
-  const handleNotifications = () => {
-    setShowNotifications(true);
-    setShowCreatePanel(false);
-    setShowGamingDropdown(false);
-    setShowCommunityQuickPost(false);
-    setShowMobileMenu(false);
-  };
-
-  const handleCommunityQuickPost = () => {
-    setShowCommunityQuickPost(true);
-    setShowCreatePanel(false);
-    setShowGamingDropdown(false);
-    setShowNotifications(false);
-    setShowMobileMenu(false);
-  };
-
   const closeAllDropdowns = () => {
     setShowCreatePanel(false);
     setShowGamingDropdown(false);
@@ -83,14 +53,68 @@ const Navbar = () => {
     setShowCommunityQuickPost(false);
   };
 
+  const handleGamingClick = () => {
+    closeAllDropdowns();
+    setShowGamingDropdown(true);
+  };
+
+  const handleNotificationsClick = () => {
+    closeAllDropdowns();
+    setShowNotifications(true);
+  };
+
+  const handleCommunityQuickPostClick = () => {
+    closeAllDropdowns();
+    setShowCommunityQuickPost(true);
+  };
+
+  const handleCreateClick = () => {
+    closeAllDropdowns();
+    setShowCreatePanel(true);
+  };
+
+  const handleProfileClick = () => {
+    if (user?.username) {
+      navigate(`/u/${user.username}`);
+      closeAllDropdowns();
+    }
+  };
+
+  const handleMobileGamingClick = () => {
+    setShowMobileMenu(false);
+    setShowGamingDropdown(true);
+  };
+
+  const handleMobileCommunityClick = () => {
+    setShowMobileMenu(false);
+    setShowCommunityQuickPost(true);
+  };
+
+  const handleMobileNotificationsClick = () => {
+    setShowMobileMenu(false);
+    setShowNotifications(true);
+  };
+
+  const handleMobileCreateClick = () => {
+    setShowMobileMenu(false);
+    setShowCreatePanel(true);
+  };
+
+  const handleMobileProfileClick = () => {
+    if (user?.username) {
+      navigate(`/u/${user.username}`);
+      setShowMobileMenu(false);
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3 group" onClick={closeAllDropdowns}>
             <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-200">
-              <FaCrosshairs className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+              <Target className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
             </div>
             <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease-in-out_infinite] hidden sm:block">
               FragFeed
@@ -105,97 +129,75 @@ const Navbar = () => {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-2">
             {/* Gaming Hub */}
-            <div className="relative">
-              <button 
-                onClick={handleGamingDropdown}
-                className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
-                  showGamingDropdown 
-                    ? 'bg-primary-100 text-primary-700 shadow-md' 
-                    : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
-                }`}
-                title="Gaming Hub"
-              >
-                <FaGamepad className="w-5 h-5" />
-              </button>
-            </div>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleGamingClick}
+              className="relative"
+            >
+              <Gamepad2 className="w-5 h-5" />
+            </Button>
 
             <Unauthenticated>
               <SignInButton mode="modal">
-                <button className="btn btn-primary">
-                  Sign In
-                </button>
+                <Button>Sign In</Button>
               </SignInButton>
             </Unauthenticated>
             
             <Authenticated>
               {/* Community Quick Post */}
-              <div className="relative">
-                <button 
-                  onClick={handleCommunityQuickPost}
-                  className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
-                    showCommunityQuickPost 
-                      ? 'bg-primary-100 text-primary-700 shadow-md' 
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                  title="Quick Post to Communities"
-                >
-                  <FaUsers className="w-5 h-5" />
-                </button>
-              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleCommunityQuickPostClick}
+                className="relative"
+              >
+                <Users className="w-5 h-5" />
+              </Button>
 
               {/* Notifications */}
               <div className="relative">
-                <button 
-                  onClick={handleNotifications}
-                  className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 relative ${
-                    showNotifications 
-                      ? 'bg-primary-100 text-primary-700 shadow-md' 
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                  title="Notifications"
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={handleNotificationsClick}
+                  className="relative"
                 >
-                  <FaBell className="w-5 h-5" />
-                  {unreadCount && unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
-                </button>
+                  <Bell className="w-5 h-5" />
+                </Button>
+                {unreadCount && unreadCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                )}
               </div>
 
               {/* Create */}
-              <div className="relative">
-                <button 
-                  onClick={handleCreatePanel}
-                  className={`p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
-                    showCreatePanel 
-                      ? 'bg-primary-100 text-primary-700 shadow-md' 
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                  title="Create"
-                >
-                  <FaPlus className="w-5 h-5" />
-                </button>
-              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleCreateClick}
+                className="relative"
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
 
               {/* Settings */}
-              <div className="relative">
-                <button
-                  className="p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                  title="Settings"
-                >
-                  <FaCog className="w-5 h-5" />
-                </button>
-              </div>
+              <Button variant="ghost" size="icon">
+                <Settings className="w-5 h-5" />
+              </Button>
 
               {/* Profile */}
-              <button
-                onClick={() => user?.username && navigate(`/u/${user.username}`)}
-                className="p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                title="Profile"
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleProfileClick}
               >
-                <FaUser className="w-5 h-5" />
-              </button>
+                <User className="w-5 h-5" />
+              </Button>
 
               <UserButton />
             </Authenticated>
@@ -206,13 +208,13 @@ const Navbar = () => {
             <Authenticated>
               <UserButton />
             </Authenticated>
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={toggleMobileMenu}
-              className="p-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              title="Menu"
             >
-              {showMobileMenu ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
-            </button>
+              {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
           </div>
         </div>
 
@@ -227,76 +229,74 @@ const Navbar = () => {
 
               <Unauthenticated>
                 <SignInButton mode="modal">
-                  <button className="btn btn-primary w-full">
-                    Sign In
-                  </button>
+                  <Button className="w-full">Sign In</Button>
                 </SignInButton>
               </Unauthenticated>
 
               <Authenticated>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Gaming Hub */}
-                  <button 
-                    onClick={handleGamingDropdown}
-                    className="btn btn-secondary flex items-center justify-center gap-2"
+                  <Button 
+                    variant="secondary" 
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleMobileGamingClick}
                   >
-                    <FaGamepad className="w-4 h-4" />
+                    <Gamepad2 className="w-4 h-4" />
                     Gaming
-                  </button>
+                  </Button>
 
                   {/* Community Quick Post */}
-                  <button 
-                    onClick={handleCommunityQuickPost}
-                    className="btn btn-secondary flex items-center justify-center gap-2"
+                  <Button 
+                    variant="secondary" 
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleMobileCommunityClick}
                   >
-                    <FaUsers className="w-4 h-4" />
+                    <Users className="w-4 h-4" />
                     Quick Post
-                  </button>
+                  </Button>
 
                   {/* Notifications */}
-                  <button 
-                    onClick={handleNotifications}
-                    className="btn btn-secondary flex items-center justify-center gap-2 relative"
+                  <Button 
+                    variant="secondary" 
+                    className="flex items-center justify-center gap-2 relative"
+                    onClick={handleMobileNotificationsClick}
                   >
-                    <FaBell className="w-4 h-4" />
+                    <Bell className="w-4 h-4" />
                     Notifications
                     {unreadCount && unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                      >
                         {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
+                      </Badge>
                     )}
-                  </button>
+                  </Button>
 
                   {/* Create */}
-                  <button 
-                    onClick={handleCreatePanel}
-                    className="btn btn-primary flex items-center justify-center gap-2"
+                  <Button 
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleMobileCreateClick}
                   >
-                    <FaPlus className="w-4 h-4" />
+                    <Plus className="w-4 h-4" />
                     Create
-                  </button>
+                  </Button>
 
                   {/* Settings */}
-                  <button
-                    className="btn btn-secondary flex items-center justify-center gap-2"
-                  >
-                    <FaCog className="w-4 h-4" />
+                  <Button variant="secondary" className="flex items-center justify-center gap-2">
+                    <Settings className="w-4 h-4" />
                     Settings
-                  </button>
+                  </Button>
 
                   {/* Profile */}
-                  <button
-                    onClick={() => {
-                      if (user?.username) {
-                        navigate(`/u/${user.username}`);
-                        setShowMobileMenu(false);
-                      }
-                    }}
-                    className="btn btn-secondary flex items-center justify-center gap-2"
+                  <Button
+                    variant="secondary"
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleMobileProfileClick}
                   >
-                    <FaUser className="w-4 h-4" />
+                    <User className="w-4 h-4" />
                     Profile
-                  </button>
+                  </Button>
                 </div>
               </Authenticated>
             </div>
@@ -304,31 +304,26 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* Single set of dropdowns that work for both mobile and desktop */}
-      {showGamingDropdown && (
-        <GamingDropdown
-          isOpen={showGamingDropdown}
-          onClose={closeAllDropdowns}
-        />
-      )}
-      {showNotifications && (
-        <NotificationDropdown
-          isOpen={showNotifications}
-          onClose={closeAllDropdowns}
-        />
-      )}
-      {showCreatePanel && (
-        <CreatePanel
-          isOpen={showCreatePanel}
-          onClose={closeAllDropdowns}
-        />
-      )}
-      {showCommunityQuickPost && (
-        <CommunityQuickPost
-          isOpen={showCommunityQuickPost}
-          onClose={closeAllDropdowns}
-        />
-      )}
+      {/* Dropdown Components */}
+      <GamingDropdown
+        isOpen={showGamingDropdown}
+        onClose={closeAllDropdowns}
+      />
+      
+      <NotificationDropdown
+        isOpen={showNotifications}
+        onClose={closeAllDropdowns}
+      />
+      
+      <CommunityQuickPost
+        isOpen={showCommunityQuickPost}
+        onClose={closeAllDropdowns}
+      />
+      
+      <CreatePanel
+        isOpen={showCreatePanel}
+        onClose={closeAllDropdowns}
+      />
     </nav>
   );
 };
