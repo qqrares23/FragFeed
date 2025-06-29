@@ -73,6 +73,11 @@ const Navbar = () => {
     setShowCommunityQuickPost(true);
   };
 
+  const handleSettingsClick = () => {
+    navigate('/settings');
+    closeAllDropdowns();
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,7 +157,11 @@ const Navbar = () => {
               </Button>
 
               {/* Settings */}
-              <Button variant="ghost" size="icon">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleSettingsClick}
+              >
                 <Settings className="w-5 h-5" />
               </Button>
 
@@ -249,7 +258,11 @@ const Navbar = () => {
                   </Button>
 
                   {/* Settings */}
-                  <Button variant="secondary" className="flex items-center justify-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    className="flex items-center justify-center gap-2"
+                    onClick={handleSettingsClick}
+                  >
                     <Settings className="w-4 h-4" />
                     Settings
                   </Button>
