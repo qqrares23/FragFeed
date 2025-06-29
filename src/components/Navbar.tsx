@@ -88,7 +88,7 @@ const Navbar = () => {
             <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 ease-out group-hover:shadow-lg">
               <FaCrosshairs className="w-4 h-4 lg:w-5 lg:h-5 text-white transform group-hover:rotate-180 transition-transform duration-500 ease-in-out" />
             </div>
-            <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent bg-[length:200%_100%] animate-gradient hidden sm:block group-hover:scale-105 transition-transform duration-200">
+            <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent hidden sm:block group-hover:scale-105 transition-transform duration-200">
               FragFeed
             </span>
           </Link>
@@ -105,14 +105,18 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={handleGamingClick}
-              className={showGamingDropdown ? "bg-slate-100 dark:bg-slate-800" : ""}
+              className={`transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md ${
+                showGamingDropdown ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
+              }`}
             >
-              <Gamepad2 className="w-5 h-5" />
+              <Gamepad2 className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
             </Button>
 
             <Unauthenticated>
               <SignInButton mode="modal">
-                <Button>Sign In</Button>
+                <Button className="transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out hover:shadow-lg">
+                  Sign In
+                </Button>
               </SignInButton>
             </Unauthenticated>
             
@@ -122,9 +126,11 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={handleCommunityQuickPostClick}
-                className={showCommunityQuickPost ? "bg-slate-100 dark:bg-slate-800" : ""}
+                className={`transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md ${
+                  showCommunityQuickPost ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
+                }`}
               >
-                <Users className="w-5 h-5" />
+                <Users className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
               </Button>
 
               {/* Notifications */}
@@ -133,14 +139,16 @@ const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   onClick={handleNotificationsClick}
-                  className={showNotifications ? "bg-slate-100 dark:bg-slate-800" : ""}
+                  className={`transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md ${
+                    showNotifications ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
+                  }`}
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
                 </Button>
                 {unreadCount && unreadCount > 0 && (
                   <Badge 
                     variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse"
                   >
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </Badge>
@@ -152,9 +160,11 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={handleCreateClick}
-                className={showCreatePanel ? "bg-slate-100 dark:bg-slate-800" : ""}
+                className={`transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md ${
+                  showCreatePanel ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
+                }`}
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 transition-transform duration-200 hover:rotate-90" />
               </Button>
 
               {/* Settings */}
@@ -162,8 +172,9 @@ const Navbar = () => {
                 variant="ghost" 
                 size="icon"
                 onClick={handleSettingsClick}
+                className="transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md"
               >
-                <Settings className="w-5 h-5" />
+                <Settings className="w-5 h-5 transition-transform duration-200 hover:rotate-90" />
               </Button>
 
               {/* Profile */}
@@ -171,117 +182,143 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => user?.username && navigate(`/u/${user.username}`)}
+                className="transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md"
               >
-                <User className="w-5 h-5" />
+                <User className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
               </Button>
 
-              <UserButton />
+              <div className="transform hover:scale-105 transition-transform duration-200">
+                <UserButton />
+              </div>
             </Authenticated>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
             <Authenticated>
-              <UserButton />
+              <div className="transform hover:scale-105 transition-transform duration-200">
+                <UserButton />
+              </div>
             </Authenticated>
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleMobileMenu}
+              className="transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md"
             >
-              {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {showMobileMenu ? (
+                <X className="w-5 h-5 transition-transform duration-200 hover:rotate-90" />
+              ) : (
+                <Menu className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
+              )}
             </Button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+          <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 animate-fade-in">
             <div className="px-4 py-4 space-y-4">
               {/* Mobile Search */}
-              <div className="w-full">
+              <div className="w-full animate-slide-up" style={{ animationDelay: '100ms' }}>
                 <SearchBar />
               </div>
 
               <Unauthenticated>
-                <SignInButton mode="modal">
-                  <Button className="w-full">Sign In</Button>
-                </SignInButton>
+                <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+                  <SignInButton mode="modal">
+                    <Button className="w-full transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out">
+                      Sign In
+                    </Button>
+                  </SignInButton>
+                </div>
               </Unauthenticated>
 
               <Authenticated>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Gaming Hub */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleGamingClick}
-                  >
-                    <Gamepad2 className="w-4 h-4" />
-                    Gaming
-                  </Button>
+                  <div className="animate-slide-up" style={{ animationDelay: '300ms' }}>
+                    <Button 
+                      variant="secondary" 
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      onClick={handleGamingClick}
+                    >
+                      <Gamepad2 className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
+                      Gaming
+                    </Button>
+                  </div>
 
                   {/* Community Quick Post */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleCommunityQuickPostClick}
-                  >
-                    <Users className="w-4 h-4" />
-                    Quick Post
-                  </Button>
+                  <div className="animate-slide-up" style={{ animationDelay: '350ms' }}>
+                    <Button 
+                      variant="secondary" 
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      onClick={handleCommunityQuickPostClick}
+                    >
+                      <Users className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
+                      Quick Post
+                    </Button>
+                  </div>
 
                   {/* Notifications */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2 relative"
-                    onClick={handleNotificationsClick}
-                  >
-                    <Bell className="w-4 h-4" />
-                    Notifications
-                    {unreadCount && unreadCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                      >
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </Badge>
-                    )}
-                  </Button>
+                  <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
+                    <Button 
+                      variant="secondary" 
+                      className="w-full flex items-center justify-center gap-2 relative transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      onClick={handleNotificationsClick}
+                    >
+                      <Bell className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
+                      Notifications
+                      {unreadCount && unreadCount > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse"
+                        >
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </div>
 
                   {/* Create */}
-                  <Button 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleCreateClick}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create
-                  </Button>
+                  <div className="animate-slide-up" style={{ animationDelay: '450ms' }}>
+                    <Button 
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      onClick={handleCreateClick}
+                    >
+                      <Plus className="w-4 h-4 transition-transform duration-200 hover:rotate-90" />
+                      Create
+                    </Button>
+                  </div>
 
                   {/* Settings */}
-                  <Button 
-                    variant="secondary" 
-                    className="flex items-center justify-center gap-2"
-                    onClick={handleSettingsClick}
-                  >
-                    <Settings className="w-4 h-4" />
-                    Settings
-                  </Button>
+                  <div className="animate-slide-up" style={{ animationDelay: '500ms' }}>
+                    <Button 
+                      variant="secondary" 
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      onClick={handleSettingsClick}
+                    >
+                      <Settings className="w-4 h-4 transition-transform duration-200 hover:rotate-90" />
+                      Settings
+                    </Button>
+                  </div>
 
                   {/* Profile */}
-                  <Button
-                    variant="secondary"
-                    className="flex items-center justify-center gap-2"
-                    onClick={() => {
-                      if (user?.username) {
-                        navigate(`/u/${user.username}`);
-                        setShowMobileMenu(false);
-                      }
-                    }}
-                  >
-                    <User className="w-4 h-4" />
-                    Profile
-                  </Button>
+                  <div className="animate-slide-up" style={{ animationDelay: '550ms' }}>
+                    <Button
+                      variant="secondary"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      onClick={() => {
+                        if (user?.username) {
+                          navigate(`/u/${user.username}`);
+                          setShowMobileMenu(false);
+                        }
+                      }}
+                    >
+                      <User className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
+                      Profile
+                    </Button>
+                  </div>
                 </div>
               </Authenticated>
             </div>
