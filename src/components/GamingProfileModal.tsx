@@ -48,8 +48,8 @@ const GamingProfileModal = ({ isOpen, onClose }: GamingProfileModalProps) => {
 
   const handleSteamConnect = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!steamData.steamId || !steamData.username) {
-      setError("Steam ID and username are required");
+    if (!steamData.steamId || !steamData.username || !steamData.profileUrl) {
+      setError("Steam ID, username, and profile URL are required");
       return;
     }
 
@@ -60,7 +60,7 @@ const GamingProfileModal = ({ isOpen, onClose }: GamingProfileModalProps) => {
       await connectSteam({
         steamId: steamData.steamId,
         username: steamData.username,
-        profileUrl: steamData.profileUrl || `https://steamcommunity.com/id/${steamData.steamId}`,
+        profileUrl: steamData.profileUrl,
         avatarUrl: steamData.avatarUrl
       });
       setSteamData({ steamId: "", username: "", profileUrl: "", avatarUrl: "" });
@@ -246,7 +246,7 @@ const GamingProfileModal = ({ isOpen, onClose }: GamingProfileModalProps) => {
                 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Profile URL (optional)
+                    Profile URL
                   </label>
                   <input
                     type="url"
@@ -256,11 +256,14 @@ const GamingProfileModal = ({ isOpen, onClose }: GamingProfileModalProps) => {
                     className="input"
                     disabled={isLoading}
                   />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Your complete Steam profile URL is required
+                  </p>
                 </div>
                 
                 <button
                   type="submit"
-                  disabled={isLoading || !steamData.steamId || !steamData.username}
+                  disabled={isLoading || !steamData.steamId || !steamData.username || !steamData.profileUrl}
                   className="btn btn-primary w-full"
                 >
                   {isLoading ? (
