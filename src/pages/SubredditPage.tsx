@@ -38,7 +38,7 @@ const SubredditPage = () => {
     subreddit && showMembers ? { subredditId: subreddit._id, limit: 20 } : "skip"
   );
   const isOwner = useQuery(api.subreddit.isOwner,
-    subreddit ? { subredditId: subredditId: subreddit._id } : "skip"
+    subreddit ? { subredditId: subreddit._id } : "skip"
   );
   
   const joinSubreddit = useMutation(api.subreddit.join);
