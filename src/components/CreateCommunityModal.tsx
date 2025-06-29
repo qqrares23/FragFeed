@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { FaTimes, FaUsers, FaPlus, FaSparkles, FaRocket } from "react-icons/fa";
+import { FaTimes, FaUsers, FaPlus, FaRocket } from "react-icons/fa";
+import { IoSparkles } from "react-icons/io5";
 
 interface CreateCommunityModalProps {
   isOpen: boolean;
@@ -74,7 +75,7 @@ const CreateCommunityModal = ({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                    <FaSparkles className="w-6 h-6" />
+                    <IoSparkles className="w-6 h-6" />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold">Create Community</h2>
