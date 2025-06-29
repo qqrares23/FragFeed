@@ -1,5 +1,4 @@
 import { internalMutation, query, QueryCtx, mutation } from "./_generated/server";
-import { UserJSON } from "@clerk/backend";
 import { v, Validator } from "convex/values";
 import { counts, postCountKey } from "./counter";
 
@@ -11,7 +10,7 @@ export const current = query({
 });
 
 export const upsertFromClerk = internalMutation({
-  args: { data: v.any() as Validator<UserJSON> }, // no runtime validation, trust Clerk
+  args: { data: v.any() }, // no runtime validation, trust Clerk
   async handler(ctx, { data }) {
     const userAttributes = {
       username: data.username || "",

@@ -1,7 +1,6 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
-import type { WebhookEvent } from "@clerk/backend";
 import { Webhook } from "svix";
 
 const http = httpRouter();
@@ -35,7 +34,7 @@ http.route({
   }),
 });
 
-async function validateRequest(req: Request): Promise<WebhookEvent | null> {
+async function validateRequest(req: Request): Promise<any | null> {
   const payloadString = await req.text();
   const svixHeaders = {
     "svix-id": req.headers.get("svix-id")!,
@@ -44,7 +43,7 @@ async function validateRequest(req: Request): Promise<WebhookEvent | null> {
   };
   const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET!);
   try {
-    return wh.verify(payloadString, svixHeaders) as unknown as WebhookEvent;
+    return wh.verify(payloadString, svixHeaders) as unknown as any;
   } catch (error) {
     console.error("Error verifying webhook event", error);
     return null;
