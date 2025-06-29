@@ -99,11 +99,11 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 ease-out group-hover:shadow-lg">
-              <FaCrosshairs className="w-4 h-4 lg:w-5 lg:h-5 text-white transform group-hover:rotate-180 transition-transform duration-500 ease-in-out" />
+          <Link to="/" className="flex items-center gap-2 lg:gap-3 group">
+            <div className="w-7 h-7 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 ease-out group-hover:shadow-lg">
+              <FaCrosshairs className="w-3 h-3 lg:w-5 lg:h-5 text-white transform group-hover:rotate-180 transition-transform duration-500 ease-in-out" />
             </div>
-            <span className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent hidden sm:block group-hover:scale-105 transition-transform duration-200">
+            <span className="text-base lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent hidden sm:block group-hover:scale-105 transition-transform duration-200">
               FragFeed
             </span>
           </Link>
@@ -114,7 +114,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-2 relative">
+          <div className="hidden md:flex items-center gap-1 lg:gap-2 relative">
             {/* Gaming Hub */}
             <Button
               variant="ghost"
@@ -124,12 +124,12 @@ const Navbar = () => {
                 showGamingDropdown ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
               }`}
             >
-              <Gamepad2 className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
+              <Gamepad2 className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
             </Button>
 
             <Unauthenticated>
               <SignInButton mode="modal">
-                <Button className="transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out hover:shadow-lg">
+                <Button className="transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out hover:shadow-lg text-sm lg:text-base px-3 lg:px-4">
                   Sign In
                 </Button>
               </SignInButton>
@@ -146,12 +146,12 @@ const Navbar = () => {
                     showFollowing ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
                   }`}
                 >
-                  <UserPlus className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
+                  <UserPlus className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
                 </Button>
                 {followingCount && followingCount > 0 && (
                   <Badge 
                     variant="secondary" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
+                    className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
                   >
                     {followingCount > 99 ? '99+' : followingCount}
                   </Badge>
@@ -167,7 +167,7 @@ const Navbar = () => {
                   showCommunityQuickPost ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
                 }`}
               >
-                <Users className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
+                <Users className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
               </Button>
 
               {/* Notifications */}
@@ -180,12 +180,12 @@ const Navbar = () => {
                     showNotifications ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
                   }`}
                 >
-                  <Bell className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
+                  <Bell className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
                 </Button>
                 {unreadCount && unreadCount > 0 && (
                   <Badge 
                     variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse"
+                    className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs animate-pulse"
                   >
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </Badge>
@@ -201,7 +201,7 @@ const Navbar = () => {
                   showCreatePanel ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
                 }`}
               >
-                <Plus className="w-5 h-5 transition-transform duration-200 hover:rotate-90" />
+                <Plus className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-90" />
               </Button>
 
               {/* Settings */}
@@ -211,7 +211,7 @@ const Navbar = () => {
                 onClick={handleSettingsClick}
                 className="transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md"
               >
-                <Settings className="w-5 h-5 transition-transform duration-200 hover:rotate-90" />
+                <Settings className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-90" />
               </Button>
 
               {/* Profile */}
@@ -221,7 +221,7 @@ const Navbar = () => {
                 onClick={() => user?.username && navigate(`/u/${user.username}`)}
                 className="transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md"
               >
-                <User className="w-5 h-5 transition-transform duration-200 hover:rotate-12" />
+                <User className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
               </Button>
 
               <div className="transform hover:scale-105 transition-transform duration-200">
@@ -277,7 +277,7 @@ const Navbar = () => {
                   <div className="animate-slide-up" style={{ animationDelay: '300ms' }}>
                     <Button 
                       variant="secondary" 
-                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
                       onClick={handleGamingClick}
                     >
                       <Gamepad2 className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
@@ -289,7 +289,7 @@ const Navbar = () => {
                   <div className="animate-slide-up" style={{ animationDelay: '325ms' }}>
                     <Button 
                       variant="secondary" 
-                      className="w-full flex items-center justify-center gap-2 relative transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      className="w-full flex items-center justify-center gap-2 relative transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
                       onClick={handleFollowingClick}
                     >
                       <UserPlus className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
@@ -297,7 +297,7 @@ const Navbar = () => {
                       {followingCount && followingCount > 0 && (
                         <Badge 
                           variant="secondary" 
-                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
+                          className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
                         >
                           {followingCount > 99 ? '99+' : followingCount}
                         </Badge>
@@ -309,7 +309,7 @@ const Navbar = () => {
                   <div className="animate-slide-up" style={{ animationDelay: '350ms' }}>
                     <Button 
                       variant="secondary" 
-                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
                       onClick={handleCommunityQuickPostClick}
                     >
                       <Users className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
@@ -321,7 +321,7 @@ const Navbar = () => {
                   <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
                     <Button 
                       variant="secondary" 
-                      className="w-full flex items-center justify-center gap-2 relative transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      className="w-full flex items-center justify-center gap-2 relative transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
                       onClick={handleNotificationsClick}
                     >
                       <Bell className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
@@ -329,7 +329,7 @@ const Navbar = () => {
                       {unreadCount && unreadCount > 0 && (
                         <Badge 
                           variant="destructive" 
-                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse"
+                          className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs animate-pulse"
                         >
                           {unreadCount > 9 ? '9+' : unreadCount}
                         </Badge>
@@ -340,7 +340,7 @@ const Navbar = () => {
                   {/* Create */}
                   <div className="animate-slide-up" style={{ animationDelay: '450ms' }}>
                     <Button 
-                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
                       onClick={handleCreateClick}
                     >
                       <Plus className="w-4 h-4 transition-transform duration-200 hover:rotate-90" />
@@ -352,7 +352,7 @@ const Navbar = () => {
                   <div className="animate-slide-up" style={{ animationDelay: '500ms' }}>
                     <Button 
                       variant="secondary" 
-                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
                       onClick={handleSettingsClick}
                     >
                       <Settings className="w-4 h-4 transition-transform duration-200 hover:rotate-90" />
@@ -361,10 +361,10 @@ const Navbar = () => {
                   </div>
 
                   {/* Profile */}
-                  <div className="animate-slide-up" style={{ animationDelay: '550ms' }}>
+                  <div className="animate-slide-up col-span-2" style={{ animationDelay: '550ms' }}>
                     <Button
                       variant="secondary"
-                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
                       onClick={() => {
                         if (user?.username) {
                           navigate(`/u/${user.username}`);

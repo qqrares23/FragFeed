@@ -44,6 +44,9 @@ export default {
         'gradient': 'gradient 4s ease-in-out infinite',
         'wave-text': 'waveText 2s ease-in-out infinite',
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+        'mobile-bounce': 'mobileBounce 1.5s ease-in-out infinite',
+        'mobile-slide': 'mobileSlide 0.6s ease-out forwards',
+        'mobile-scale': 'mobileScale 0.4s ease-out forwards',
       },
       keyframes: {
         fadeIn: {
@@ -96,6 +99,40 @@ export default {
             boxShadow: '0 0 30px rgba(99, 102, 241, 0.6)',
           },
         },
+        mobileBounce: {
+          '0%, 20%, 50%, 80%, 100%': { 
+            transform: 'translateY(0) scale(1)',
+          },
+          '40%': { 
+            transform: 'translateY(-8px) scale(1.05)',
+          },
+          '60%': { 
+            transform: 'translateY(-4px) scale(1.02)',
+          },
+        },
+        mobileSlide: {
+          '0%': { 
+            opacity: '0', 
+            transform: 'translateX(-20px) scale(0.95)' 
+          },
+          '100%': { 
+            opacity: '1', 
+            transform: 'translateX(0) scale(1)' 
+          },
+        },
+        mobileScale: {
+          '0%': { 
+            opacity: '0', 
+            transform: 'scale(0.8) rotate(-5deg)' 
+          },
+          '100%': { 
+            opacity: '1', 
+            transform: 'scale(1) rotate(0deg)' 
+          },
+        },
+      },
+      screens: {
+        'xs': '475px',
       },
     },
   },
