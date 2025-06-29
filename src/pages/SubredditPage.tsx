@@ -5,7 +5,7 @@ import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GuidelinesEditModal from "../components/GuidelinesEditModal";
 import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Camera, Upload, Image } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,6 +17,10 @@ const SubredditPage = () => {
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  
+  // File input refs
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   
   const subreddit = useQuery(api.subreddit.get, { name: subredditName || "" });
   const {results: posts, loadMore, status} = usePaginatedQuery(api.post.getSubredditPosts, {
@@ -109,6 +113,10 @@ const SubredditPage = () => {
       alert("Failed to upload banner image");
     } finally {
       setIsUploadingBanner(false);
+      // Reset the input
+      if (bannerInputRef.current) {
+        bannerInputRef.current.value = '';
+      }
     }
   };
 
@@ -142,6 +150,22 @@ const SubredditPage = () => {
       alert("Failed to upload logo image");
     } finally {
       setIsUploadingLogo(false);
+      // Reset the input
+      if (logoInputRef.current) {
+        logoInputRef.current.value = '';
+      }
+    }
+  };
+
+  const triggerBannerUpload = () => {
+    if (bannerInputRef.current) {
+      bannerInputRef.current.click();
+    }
+  };
+
+  const triggerLogoUpload = () => {
+    if (logoInputRef.current) {
+      logoInputRef.current.click();
     }
   };
 
@@ -185,33 +209,34 @@ const SubredditPage = () => {
                 {/* Banner Upload Button for Owner */}
                 {isOwner && (
                   <div className="absolute top-4 right-4">
-                    <label className="cursor-pointer">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="bg-white/90 hover:bg-white text-slate-700 shadow-lg backdrop-blur-sm"
-                        disabled={isUploadingBanner}
-                      >
-                        {isUploadingBanner ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin mr-2" />
-                            Uploading...
-                          </>
-                        ) : (
-                          <>
-                            <Camera className="w-4 h-4 mr-2" />
-                            Change Banner
-                          </>
-                        )}
-                      </Button>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleBannerUpload}
-                        className="hidden"
-                        disabled={isUploadingBanner}
-                      />
-                    </label>
+                    <Button
+                      onClick={triggerBannerUpload}
+                      variant="secondary"
+                      size="sm"
+                      className="bg-white/90 hover:bg-white text-slate-700 shadow-lg backdrop-blur-sm"
+                      disabled={isUploadingBanner}
+                    >
+                      {isUploadingBanner ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin mr-2" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-4 h-4 mr-2" />
+                          Change Banner
+                        </>
+                      )}
+                    </Button>
+                    {/* Hidden file input for banner */}
+                    <input
+                      ref={bannerInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBannerUpload}
+                      className="hidden"
+                      disabled={isUploadingBanner}
+                    />
                   </div>
                 )}
                 
@@ -234,28 +259,30 @@ const SubredditPage = () => {
                         
                         {/* Logo Upload Button for Owner */}
                         {isOwner && (
-                          <label className="absolute -bottom-1 -right-1 cursor-pointer">
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              className="w-8 h-8 p-0 rounded-full bg-white/90 hover:bg-white text-slate-700 shadow-lg"
-                              disabled={isUploadingLogo}
-                            >
-                              {isUploadingLogo ? (
-                                <div className="w-3 h-3 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin" />
-                              ) : (
-                                <Image className="w-3 h-3" />
-                              )}
-                            </Button>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleLogoUpload}
-                              className="hidden"
-                              disabled={isUploadingLogo}
-                            />
-                          </label>
+                          <Button
+                            onClick={triggerLogoUpload}
+                            variant="secondary"
+                            size="sm"
+                            className="absolute -bottom-1 -right-1 w-8 h-8 p-0 rounded-full bg-white/90 hover:bg-white text-slate-700 shadow-lg"
+                            disabled={isUploadingLogo}
+                          >
+                            {isUploadingLogo ? (
+                              <div className="w-3 h-3 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin" />
+                            ) : (
+                              <Image className="w-3 h-3" />
+                            )}
+                          </Button>
                         )}
+                        
+                        {/* Hidden file input for logo */}
+                        <input
+                          ref={logoInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          className="hidden"
+                          disabled={isUploadingLogo}
+                        />
                       </div>
                       
                       <div className="pb-2">
