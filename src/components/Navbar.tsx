@@ -1,4 +1,4 @@
-import { Plus, User, Gamepad2, Bell, Menu, X, Settings, Users, UserPlus } from "lucide-react";
+import { Plus, User, Gamepad2, Bell, Menu, X, Settings, Users, UserPlus, Search, Bookmark, History } from "lucide-react";
 import { FaCrosshairs } from "react-icons/fa";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
@@ -13,6 +13,7 @@ import FollowingDropdown from "./FollowingDropdown";
 import SearchBar from "./SearchBar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const [showCreatePanel, setShowCreatePanel] = useState(false);
@@ -21,6 +22,7 @@ const Navbar = () => {
   const [showCommunityQuickPost, setShowCommunityQuickPost] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { user } = useUser();
   const navigate = useNavigate();
   
@@ -35,6 +37,16 @@ const Navbar = () => {
     currentUser?._id ? { userId: currentUser._id } : "skip"
   );
   const hasFollowing = followingCount && followingCount > 0;
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Close all dropdowns when screen size changes
   useEffect(() => {
@@ -100,48 +112,60 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border-b border-slate-200/50 dark:border-slate-700/50' 
+        : 'bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+          {/* Enhanced Logo */}
           <Link to="/" className="flex items-center gap-2 lg:gap-3 group">
-            <div className="w-7 h-7 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 ease-out group-hover:shadow-lg">
+            <div className={`w-7 h-7 lg:w-10 lg:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 ease-out group-hover:shadow-lg ${
+              isScrolled ? 'shadow-md' : ''
+            }`}>
               <FaCrosshairs className="w-3 h-3 lg:w-5 lg:h-5 text-white transform group-hover:rotate-180 transition-transform duration-500 ease-in-out" />
             </div>
-            <span className="text-base lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent hidden sm:block group-hover:scale-105 transition-transform duration-200">
-              FragFeed
-            </span>
+            <div className="hidden sm:block">
+              <span className="text-base lg:text-xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-200">
+                FragFeed
+              </span>
+              <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Share Your World
+              </div>
+            </div>
           </Link>
 
-          {/* Search Bar - Hidden on mobile, shown in mobile menu */}
+          {/* Enhanced Search Bar - Hidden on mobile, shown in mobile menu */}
           <div className="hidden md:flex flex-1 max-w-2xl mx-4">
             <SearchBar />
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-1 lg:gap-2 relative">
-            {/* Gaming Hub */}
+            {/* Enhanced Gaming Hub */}
             <Button
               variant="ghost"
               size="icon"
               onClick={handleGamingClick}
-              className={`transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md ${
+              className={`transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md relative ${
                 showGamingDropdown ? "bg-slate-100 dark:bg-slate-800 scale-105" : ""
               }`}
             >
               <Gamepad2 className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             </Button>
 
             <Unauthenticated>
               <SignInButton mode="modal">
-                <Button className="transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out hover:shadow-lg text-sm lg:text-base px-3 lg:px-4">
+                <Button className="transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out hover:shadow-lg text-sm lg:text-base px-3 lg:px-4 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700">
                   Sign In
                 </Button>
               </SignInButton>
             </Unauthenticated>
             
             <Authenticated>
-              {/* Following */}
+              {/* Enhanced Following */}
               <div className="relative">
                 <Button
                   variant="ghost"
@@ -156,14 +180,14 @@ const Navbar = () => {
                 {hasFollowing && (
                   <Badge 
                     variant="secondary" 
-                    className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700"
+                    className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs bg-primary-100 text-primary-700 animate-bounce"
                   >
                     {followingCount > 99 ? '99+' : followingCount}
                   </Badge>
                 )}
               </div>
 
-              {/* Community Quick Post */}
+              {/* Enhanced Community Quick Post */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -175,7 +199,7 @@ const Navbar = () => {
                 <Users className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
               </Button>
 
-              {/* Notifications */}
+              {/* Enhanced Notifications */}
               <div className="relative">
                 <Button
                   variant="ghost"
@@ -190,14 +214,23 @@ const Navbar = () => {
                 {hasUnreadNotifications && (
                   <Badge 
                     variant="destructive" 
-                    className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs animate-pulse"
+                    className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs animate-pulse shadow-lg"
                   >
                     {unreadNotifications > 9 ? '9+' : unreadNotifications}
                   </Badge>
                 )}
               </div>
 
-              {/* Create */}
+              {/* Enhanced Bookmarks */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md"
+              >
+                <Bookmark className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
+              </Button>
+
+              {/* Enhanced Create */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -209,7 +242,7 @@ const Navbar = () => {
                 <Plus className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-90" />
               </Button>
 
-              {/* Settings */}
+              {/* Enhanced Settings */}
               <Button 
                 variant="ghost" 
                 size="icon"
@@ -219,7 +252,7 @@ const Navbar = () => {
                 <Settings className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-90" />
               </Button>
 
-              {/* Profile */}
+              {/* Enhanced Profile */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -230,16 +263,28 @@ const Navbar = () => {
               </Button>
 
               <div className="transform hover:scale-105 transition-transform duration-200">
-                <UserButton />
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8 lg:w-10 lg:h-10 rounded-full ring-2 ring-primary-200 hover:ring-primary-400 transition-all duration-200"
+                    }
+                  }}
+                />
               </div>
             </Authenticated>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Enhanced Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
             <Authenticated>
               <div className="transform hover:scale-105 transition-transform duration-200">
-                <UserButton />
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8 rounded-full ring-2 ring-primary-200"
+                    }
+                  }}
+                />
               </div>
             </Authenticated>
             <Button
@@ -257,9 +302,9 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Enhanced Mobile Menu */}
         {showMobileMenu && (
-          <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 animate-fade-in">
+          <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md animate-fade-in">
             <div className="px-4 py-4 space-y-4">
               {/* Mobile Search */}
               <div className="w-full animate-slide-up" style={{ animationDelay: '100ms' }}>
@@ -269,7 +314,7 @@ const Navbar = () => {
               <Unauthenticated>
                 <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
                   <SignInButton mode="modal">
-                    <Button className="w-full transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out">
+                    <Button className="w-full transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out bg-gradient-to-r from-primary-600 to-secondary-600">
                       Sign In
                     </Button>
                   </SignInButton>
@@ -282,11 +327,12 @@ const Navbar = () => {
                   <div className="animate-slide-up" style={{ animationDelay: '300ms' }}>
                     <Button 
                       variant="secondary" 
-                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm relative"
                       onClick={handleGamingClick}
                     >
                       <Gamepad2 className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
                       Gaming
+                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     </Button>
                   </div>
 
@@ -342,10 +388,21 @@ const Navbar = () => {
                     </Button>
                   </div>
 
+                  {/* Bookmarks */}
+                  <div className="animate-slide-up" style={{ animationDelay: '425ms' }}>
+                    <Button 
+                      variant="secondary" 
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
+                    >
+                      <Bookmark className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
+                      Saved
+                    </Button>
+                  </div>
+
                   {/* Create */}
                   <div className="animate-slide-up" style={{ animationDelay: '450ms' }}>
                     <Button 
-                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
+                      className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm bg-gradient-to-r from-primary-600 to-secondary-600"
                       onClick={handleCreateClick}
                     >
                       <Plus className="w-4 h-4 transition-transform duration-200 hover:rotate-90" />

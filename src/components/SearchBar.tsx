@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, X, Clock, Users, TrendingUp, User } from "lucide-react";
+import { Search, X, Clock, Users, TrendingUp, User, Filter, SortAsc, History } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SearchResult {
   _id: string;
@@ -25,6 +26,7 @@ interface RecentSearch {
   query: string;
   timestamp: number;
   type: 'community' | 'post' | 'user';
+  resultCount?: number;
 }
 
 const SearchBar = () => {
@@ -41,42 +43,51 @@ const SearchBar = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<'relevance' | 'recent' | 'popular'>('relevance');
+  const [filterType, setFilterType] = useState<'all' | 'users' | 'communities' | 'posts'>('all');
 
   // Search queries
   const subredditSearch = useQuery(
     api.subreddit.search, 
-    searchQuery.length >= 2 && !currentSubreddit ? { queryStr: searchQuery } : "skip"
+    searchQuery.length >= 2 && !currentSubreddit && (filterType === 'all' || filterType === 'communities') ? { queryStr: searchQuery } : "skip"
   );
   
   const userSearch = useQuery(
     api.users.searchUsers,
-    searchQuery.length >= 2 && !currentSubreddit ? { queryStr: searchQuery } : "skip"
+    searchQuery.length >= 2 && !currentSubreddit && (filterType === 'all' || filterType === 'users') ? { queryStr: searchQuery } : "skip"
   );
   
   const postSearch = useQuery(
     api.post.search, 
-    searchQuery.length >= 2 && currentSubreddit ? {
+    searchQuery.length >= 2 && currentSubreddit && (filterType === 'all' || filterType === 'posts') ? {
       queryStr: searchQuery,
       subreddit: currentSubreddit,
     } : "skip"
   );
 
-  // Combine results
+  // Combine and sort results
   const allResults = currentSubreddit 
     ? postSearch || []
     : [
         ...(subredditSearch || []),
         ...(userSearch || [])
       ].sort((a, b) => {
-        // Prioritize exact matches
-        const aExact = a.title.toLowerCase() === searchQuery.toLowerCase();
-        const bExact = b.title.toLowerCase() === searchQuery.toLowerCase();
-        if (aExact && !bExact) return -1;
-        if (!aExact && bExact) return 1;
-        
-        // Then prioritize users, then communities, then posts
-        const typeOrder = { user: 0, community: 1, post: 2 };
-        return (typeOrder[a.type as keyof typeof typeOrder] || 3) - (typeOrder[b.type as keyof typeof typeOrder] || 3);
+        if (sortBy === 'relevance') {
+          // Prioritize exact matches
+          const aExact = a.title.toLowerCase() === searchQuery.toLowerCase();
+          const bExact = b.title.toLowerCase() === searchQuery.toLowerCase();
+          if (aExact && !bExact) return -1;
+          if (!aExact && bExact) return 1;
+          
+          // Then prioritize users, then communities, then posts
+          const typeOrder = { user: 0, community: 1, post: 2 };
+          return (typeOrder[a.type as keyof typeof typeOrder] || 3) - (typeOrder[b.type as keyof typeof typeOrder] || 3);
+        } else if (sortBy === 'recent') {
+          return b._id.localeCompare(a._id); // Assuming newer IDs are lexicographically larger
+        } else {
+          // Popular - could be based on member count, post count, etc.
+          return Math.random() - 0.5; // Placeholder random sort
+        }
       });
 
   useEffect(() => {
@@ -133,6 +144,7 @@ const SearchBar = () => {
   };
 
   const performSearch = (query: string) => {
+    const resultCount = allResults.length;
     const newHistory = [query, ...searchHistory.filter(h => h !== query)].slice(0, 10);
     setSearchHistory(newHistory);
     localStorage.setItem('fragfeed-search-history', JSON.stringify(newHistory));
@@ -140,7 +152,8 @@ const SearchBar = () => {
     const newRecent: RecentSearch = {
       query,
       timestamp: Date.now(),
-      type: currentSubreddit ? 'post' : 'community'
+      type: currentSubreddit ? 'post' : 'community',
+      resultCount
     };
     const updatedRecent = [newRecent, ...recentSearches.filter(r => r.query !== query)].slice(0, 5);
     setRecentSearches(updatedRecent);
@@ -254,7 +267,7 @@ const SearchBar = () => {
   return (
     <div className="relative w-full max-w-2xl" ref={searchRef}>
       <div className={`relative flex items-center bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl transition-all duration-200 ${
-        isFocused ? 'ring-2 ring-primary-500 border-primary-500' : 'hover:border-slate-400 dark:hover:border-slate-500'
+        isFocused ? 'ring-2 ring-primary-500 border-primary-500 shadow-lg' : 'hover:border-slate-400 dark:hover:border-slate-500'
       }`}>
         <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 ml-4" />
         <Input
@@ -277,35 +290,65 @@ const SearchBar = () => {
             variant="ghost"
             size="sm"
             onClick={clearSearchQuery}
-            className="mr-2 p-2"
+            className="mr-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-700"
           >
             <X className="w-4 h-4" />
           </Button>
         )}
 
         {currentSubreddit && (
-          <Badge variant="secondary" className="mr-3">
+          <Badge variant="secondary" className="mr-3 bg-primary-100 text-primary-700">
             r/{currentSubreddit}
           </Badge>
         )}
       </div>
 
       {isActive && (
-        <Card className="absolute top-full left-0 right-0 mt-2 max-h-96 overflow-hidden z-50 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <Card className="absolute top-full left-0 right-0 mt-2 max-h-96 overflow-hidden z-50 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-xl">
           <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-700">
             <h4 className="font-semibold text-slate-700 dark:text-slate-300">
               {searchQuery ? 'Search Results' : 'Recent & Suggestions'}
             </h4>
-            {(searchHistory.length > 0 || recentSearches.length > 0) && (
-              <Button 
-                variant="ghost"
-                size="sm"
-                onClick={clearSearchHistory}
-                className="text-xs"
-              >
-                Clear All
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {searchQuery && !currentSubreddit && (
+                <>
+                  <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                    <SelectTrigger className="w-24 h-8">
+                      <Filter className="w-3 h-3 mr-1" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="users">Users</SelectItem>
+                      <SelectItem value="communities">Communities</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                    <SelectTrigger className="w-28 h-8">
+                      <SortAsc className="w-3 h-3 mr-1" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="relevance">Relevance</SelectItem>
+                      <SelectItem value="recent">Recent</SelectItem>
+                      <SelectItem value="popular">Popular</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
+              
+              {(searchHistory.length > 0 || recentSearches.length > 0) && (
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSearchHistory}
+                  className="text-xs h-8"
+                >
+                  Clear All
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="max-h-80 overflow-y-auto">
@@ -322,13 +365,24 @@ const SearchBar = () => {
                         key={index}
                         variant="ghost"
                         onClick={() => handleHistoryClick(recent.query)}
-                        className="w-full justify-start p-2 h-auto"
+                        className="w-full justify-start p-2 h-auto hover:bg-slate-50 dark:hover:bg-slate-700"
                       >
-                        <div className="text-sm">
-                          <div className="font-medium text-slate-900 dark:text-slate-100">{recent.query}</div>
-                          <div className="text-slate-500 dark:text-slate-400">
-                            {recent.type} • {formatTimeAgo(recent.timestamp)}
+                        <div className="text-sm flex items-center justify-between w-full">
+                          <div>
+                            <div className="font-medium text-slate-900 dark:text-slate-100">{recent.query}</div>
+                            <div className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                              <span>{recent.type}</span>
+                              <span>•</span>
+                              <span>{formatTimeAgo(recent.timestamp)}</span>
+                              {recent.resultCount !== undefined && (
+                                <>
+                                  <span>•</span>
+                                  <span>{recent.resultCount} results</span>
+                                </>
+                              )}
+                            </div>
                           </div>
+                          <History className="w-3 h-3 text-slate-400" />
                         </div>
                       </Button>
                     ))}
@@ -346,7 +400,7 @@ const SearchBar = () => {
                         key={index}
                         variant="ghost"
                         onClick={() => handleHistoryClick(query)}
-                        className="w-full justify-start p-2 h-auto"
+                        className="w-full justify-start p-2 h-auto hover:bg-slate-50 dark:hover:bg-slate-700"
                       >
                         <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{query}</span>
                       </Button>
@@ -366,12 +420,15 @@ const SearchBar = () => {
               </div>
             ) : allResults && allResults.length > 0 ? (
               <div className="p-2">
+                <div className="text-xs text-slate-500 dark:text-slate-400 px-3 py-2">
+                  {allResults.length} result{allResults.length !== 1 ? 's' : ''} found
+                </div>
                 {allResults.map((result) => (
                   <Button
                     key={`${result.type}-${result._id}`}
                     variant="ghost"
                     onClick={() => handleResultClick(result)}
-                    className="w-full justify-start p-3 h-auto"
+                    className="w-full justify-start p-3 h-auto hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
                     <div className="flex items-center gap-3 w-full">
                       {getResultIcon(result)}
@@ -380,7 +437,9 @@ const SearchBar = () => {
                           {getResultTitle(result)}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                          <span>{getResultLabel(result)}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {getResultLabel(result)}
+                          </Badge>
                           {getResultDescription(result) && (
                             <>
                               <span>•</span>
@@ -400,11 +459,28 @@ const SearchBar = () => {
                 <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
                   Try different keywords or check spelling
                 </p>
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs text-slate-400">Suggestions:</p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    <Badge variant="outline" className="cursor-pointer" onClick={() => setSearchQuery('gaming')}>
+                      gaming
+                    </Badge>
+                    <Badge variant="outline" className="cursor-pointer" onClick={() => setSearchQuery('tech')}>
+                      tech
+                    </Badge>
+                    <Badge variant="outline" className="cursor-pointer" onClick={() => setSearchQuery('news')}>
+                      news
+                    </Badge>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="text-center py-8">
                 <Search className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                 <p className="text-slate-500 dark:text-slate-400 font-medium">Keep typing...</p>
+                <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
+                  At least 2 characters needed
+                </p>
               </div>
             )}
           </div>
