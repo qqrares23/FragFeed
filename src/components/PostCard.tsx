@@ -1,4 +1,4 @@
-import { MessageCircle, Trash2, ArrowUp, ArrowDown, Share2, Bookmark, Bookmark as BookmarkCheck, Flag, Edit2, Eye, Clock, TrendingUp } from "lucide-react";
+import { MessageCircle, Trash2, ArrowUp, ArrowDown, Share2, Bookmark, BookmarkCheck, Flag, Edit2, Eye, Clock, TrendingUp, ExternalLink, MoreHorizontal } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { PaginationStatus, useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface Post {
   _id: Id<"post">;
@@ -43,6 +44,7 @@ const PostCard = ({
   const [showComments, setShowComments] = useState(expandedView);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [viewCount, setViewCount] = useState(Math.floor(Math.random() * 1000) + 50);
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
   const navigate = useNavigate();
   const { user } = useUser();
   const ownedByCurrentUser = post.author?.username === user?.username;
@@ -179,307 +181,338 @@ const PostCard = ({
 
   return (
     <TooltipProvider>
-      <Card className={`${expandedView ? 'p-0' : 'p-4 lg:p-6'} ${expandedView ? '' : 'hover:-translate-y-1 transition-all duration-300 hover:shadow-xl'} ${
-        engagementLevel === 'high' ? 'ring-2 ring-yellow-200 dark:ring-yellow-800' : 
+      <Card className={`group relative overflow-hidden transition-all duration-300 ${
+        expandedView 
+          ? 'bg-white dark:bg-slate-900 shadow-xl' 
+          : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-900 hover:shadow-xl hover:-translate-y-1'
+      } ${
+        engagementLevel === 'high' ? 'ring-2 ring-yellow-200 dark:ring-yellow-800 shadow-yellow-100 dark:shadow-yellow-900/20' : 
         engagementLevel === 'medium' ? 'ring-1 ring-blue-200 dark:ring-blue-800' : ''
       }`}>
-        <CardContent className={expandedView ? "p-0" : ""}>
-          <div className="flex gap-3 lg:gap-4">
-            {/* Enhanced Vote Section */}
-            <div className="flex flex-col items-center gap-1 pt-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={user ? onUpvote : () => {}}
-                    disabled={!user}
-                    className={`p-1.5 lg:p-2 transition-all duration-200 ${
-                      hasUpvoted
-                        ? 'bg-orange-100 text-orange-600 hover:bg-orange-200 scale-110'
-                        : 'text-slate-400 hover:bg-slate-100 hover:text-orange-500 hover:scale-110'
-                    } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <ArrowUp className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{user ? 'Upvote' : 'Sign in to vote'}</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <span className={`text-xs lg:text-sm font-bold transition-colors ${
-                (voteCounts?.total || 0) > 0 ? 'text-orange-600' : 
-                (voteCounts?.total || 0) < 0 ? 'text-blue-600' : 'text-slate-500'
-              }`}>
-                {voteCounts?.total || 0}
-              </span>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={user ? onDownvote : () => {}}
-                    disabled={!user}
-                    className={`p-1.5 lg:p-2 transition-all duration-200 ${
-                      hasDownvoted
-                        ? 'bg-blue-100 text-blue-600 hover:bg-blue-200 scale-110'
-                        : 'text-slate-400 hover:bg-slate-100 hover:text-blue-500 hover:scale-110'
-                    } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <ArrowDown className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{user ? 'Downvote' : 'Sign in to vote'}</p>
-                </TooltipContent>
-              </Tooltip>
+        
+        {/* Engagement Indicator */}
+        {engagementLevel === 'high' && (
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500"></div>
+        )}
+
+        <CardContent className={`${expandedView ? 'p-6 lg:p-8' : 'p-4 lg:p-6'}`}>
+          <div className="flex gap-4">
+            {/* Vote Section - Redesigned */}
+            <div className="flex flex-col items-center gap-2 pt-1">
+              <div className="flex flex-col items-center bg-slate-50 dark:bg-slate-800 rounded-2xl p-2 shadow-sm">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={user ? onUpvote : () => {}}
+                      disabled={!user}
+                      className={`p-2 rounded-xl transition-all duration-200 ${
+                        hasUpvoted
+                          ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-lg scale-110'
+                          : 'text-slate-400 hover:bg-orange-100 hover:text-orange-600 hover:scale-110'
+                      } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{user ? 'Upvote' : 'Sign in to vote'}</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <span className={`text-sm font-bold py-1 transition-colors ${
+                  (voteCounts?.total || 0) > 0 ? 'text-orange-600' : 
+                  (voteCounts?.total || 0) < 0 ? 'text-blue-600' : 'text-slate-500'
+                }`}>
+                  {Math.abs(voteCounts?.total || 0) > 999 
+                    ? `${((voteCounts?.total || 0) / 1000).toFixed(1)}k`
+                    : (voteCounts?.total || 0)
+                  }
+                </span>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={user ? onDownvote : () => {}}
+                      disabled={!user}
+                      className={`p-2 rounded-xl transition-all duration-200 ${
+                        hasDownvoted
+                          ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg scale-110'
+                          : 'text-slate-400 hover:bg-blue-100 hover:text-blue-600 hover:scale-110'
+                      } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <ArrowDown className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{user ? 'Downvote' : 'Sign in to vote'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
 
-            {/* Enhanced Content */}
+            {/* Main Content */}
             <div className="flex-1 min-w-0">
-              {/* Enhanced Header */}
-              <div className="flex items-center gap-2 text-xs lg:text-sm text-slate-500 mb-2 flex-wrap">
-                {post.author ? (
-                  <div className="flex items-center gap-2">
-                    <Avatar className="w-5 h-5">
-                      <AvatarFallback className="text-xs">
-                        {post.author.username.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <Link 
-                      to={`/u/${post.author.username}`}
-                      className="font-medium text-slate-700 hover:text-primary-600 transition-colors"
-                    >
-                      u/{post.author.username}
-                    </Link>
-                  </div>
-                ) : (
-                  <span className="text-slate-400">u/deleted</span>
-                )}
-
-                {showSubreddit && post.subreddit && (
-                  <>
-                    <span>•</span>
-                    <Link 
-                      to={`/r/${post.subreddit.name}`}
-                      className="font-medium text-primary-600 hover:text-primary-700 transition-colors"
-                    >
-                      r/{post.subreddit.name}
-                    </Link>
-                  </>
-                )}
-                
-                <span>•</span>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>{formatTimeAgo(post._creationTime)}</span>
+              {/* Header with Author Info */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  {post.author ? (
+                    <div className="flex items-center gap-2">
+                      <Avatar className="w-8 h-8 ring-2 ring-white dark:ring-slate-800 shadow-sm">
+                        <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-primary-500 to-secondary-500 text-white">
+                          {post.author.username.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <Link 
+                          to={`/u/${post.author.username}`}
+                          className="font-semibold text-slate-900 dark:text-slate-100 hover:text-primary-600 transition-colors text-sm"
+                        >
+                          u/{post.author.username}
+                        </Link>
+                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                          <Clock className="w-3 h-3" />
+                          <span>{formatTimeAgo(post._creationTime)}</span>
+                          
+                          {showSubreddit && post.subreddit && (
+                            <>
+                              <span>in</span>
+                              <Link 
+                                to={`/r/${post.subreddit.name}`}
+                                className="font-medium text-primary-600 hover:text-primary-700 transition-colors"
+                              >
+                                r/{post.subreddit.name}
+                              </Link>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Avatar className="w-8 h-8">
+                        <AvatarFallback className="bg-slate-300">?</AvatarFallback>
+                      </Avatar>
+                      <span className="text-slate-400 text-sm">u/deleted</span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Engagement Badge */}
-                {engagementLevel === 'high' && (
-                  <>
-                    <span>•</span>
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      Hot
+                {/* Engagement Badges */}
+                <div className="flex items-center gap-2">
+                  {engagementLevel === 'high' && (
+                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs animate-pulse">
+                      🔥 Hot
                     </Badge>
-                  </>
-                )}
-
-                {expandedView && (
-                  <>
-                    <span>•</span>
-                    <div className="flex items-center gap-1">
+                  )}
+                  {expandedView && (
+                    <div className="flex items-center gap-1 text-xs text-slate-500">
                       <Eye className="w-3 h-3" />
-                      <span>{viewCount} views</span>
+                      <span>{viewCount.toLocaleString()}</span>
                     </div>
-                  </>
+                  )}
+                </div>
+              </div>
+
+              {/* Post Title */}
+              <div className="mb-4">
+                {expandedView ? (
+                  <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                    {post.subject}
+                  </h1>
+                ) : (
+                  <h2 
+                    className="text-lg lg:text-xl font-bold text-slate-900 dark:text-slate-100 line-clamp-2 hover:text-primary-600 transition-colors cursor-pointer leading-tight"
+                    onClick={() => navigate(`/post/${post._id}`)}
+                  >
+                    {post.subject}
+                  </h2>
                 )}
               </div>
 
-              {/* Enhanced Title and Content */}
-              {expandedView ? (
-                <div className="space-y-4">
-                  <h1 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100">{post.subject}</h1>
-                  {post.imageUrl && (
-                    <div className="rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800">
+              {/* Post Content */}
+              <div className="space-y-4 mb-6">
+                {/* Text Content */}
+                {post.body && (
+                  <div className={`prose prose-slate dark:prose-invert max-w-none ${expandedView ? '' : 'line-clamp-3'}`}>
+                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                      {post.body}
+                    </p>
+                  </div>
+                )}
+
+                {/* Image Content */}
+                {post.imageUrl && (
+                  <div className={`relative ${expandedView ? 'max-w-full' : 'max-w-sm'}`}>
+                    <div className="relative overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800 shadow-lg">
                       <img 
                         src={post.imageUrl} 
                         alt="Post content" 
-                        className="w-full max-h-96 object-contain cursor-pointer hover:scale-105 transition-transform duration-300"
-                        onClick={() => window.open(post.imageUrl, '_blank')}
+                        className={`w-full object-cover cursor-pointer transition-all duration-300 hover:scale-105 ${
+                          expandedView ? 'max-h-96' : 'h-48'
+                        }`}
+                        onClick={() => {
+                          if (expandedView) {
+                            setIsImageExpanded(true);
+                          } else {
+                            navigate(`/post/${post._id}`);
+                          }
+                        }}
                       />
-                    </div>
-                  )}
-                  {post.body && (
-                    <div className="prose prose-slate max-w-none dark:prose-invert">
-                      <p className="whitespace-pre-wrap text-sm lg:text-base leading-relaxed">{post.body}</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <h2 className="text-base lg:text-lg font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 hover:text-primary-600 transition-colors cursor-pointer"
-                      onClick={() => navigate(`/post/${post._id}`)}>
-                    {post.subject}
-                  </h2>
-                  <div className="flex gap-3 lg:gap-4">
-                    <div className="flex-1">
-                      {post.body && (
-                        <p className="text-slate-600 dark:text-slate-400 line-clamp-3 text-sm lg:text-base">{post.body}</p>
-                      )}
-                    </div>
-                    {post.imageUrl && (
-                      <div className="w-16 h-16 lg:w-24 lg:h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer hover:scale-105 transition-transform duration-300">
-                        <img 
-                          src={post.imageUrl} 
-                          alt="Post content" 
-                          className="w-full h-full object-cover"
-                          onClick={() => navigate(`/post/${post._id}`)}
-                        />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-4">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="bg-white/90 hover:bg-white text-slate-900"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(post.imageUrl, '_blank');
+                          }}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* Enhanced Actions - Fixed Layout */}
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-slate-700">
-                {/* Left side actions */}
-                <div className="flex items-center gap-2 lg:gap-3">
+              {/* Action Bar */}
+              <div className="flex items-center justify-between py-3 border-t border-slate-100 dark:border-slate-700">
+                {/* Left Actions */}
+                <div className="flex items-center gap-1">
                   <Button 
                     variant="ghost"
                     size="sm"
                     onClick={handleComment}
-                    className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 rounded-xl px-3 py-2"
                   >
-                    <MessageCircle className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="text-xs lg:text-sm font-medium">{commentCount || 0}</span>
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="text-sm font-medium">{commentCount || 0}</span>
+                    <span className="text-sm hidden sm:inline">Comments</span>
                   </Button>
 
-                  <div className="relative">
-                    <Button 
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowShareMenu(!showShareMenu)}
-                      className="flex items-center gap-2 hover:bg-green-50 hover:text-green-600 transition-colors"
-                    >
-                      <Share2 className="w-3 h-3 lg:w-4 lg:h-4" />
-                      <span className="text-xs lg:text-sm font-medium">Share</span>
-                    </Button>
-
-                    {showShareMenu && (
-                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-10 min-w-[150px]">
-                        <button
-                          onClick={() => handleShare('copy')}
-                          className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
-                        >
-                          Copy Link
-                        </button>
-                        <button
-                          onClick={() => handleShare('twitter')}
-                          className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
-                        >
-                          Share on Twitter
-                        </button>
-                        <button
-                          onClick={() => handleShare('reddit')}
-                          className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
-                        >
-                          Share on Reddit
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <DropdownMenu open={showShareMenu} onOpenChange={setShowShareMenu}>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-2 hover:bg-green-50 hover:text-green-600 transition-all duration-200 rounded-xl px-3 py-2"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        <span className="text-sm hidden sm:inline">Share</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-48">
+                      <DropdownMenuItem onClick={() => handleShare('copy')}>
+                        Copy Link
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleShare('twitter')}>
+                        Share on Twitter
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleShare('reddit')}>
+                        Share on Reddit
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
                   {user && (
                     <Button 
                       variant="ghost"
                       size="sm"
                       onClick={toggleBookmark}
-                      className={`flex items-center gap-2 transition-colors ${
+                      className={`flex items-center gap-2 transition-all duration-200 rounded-xl px-3 py-2 ${
                         isPostSaved 
-                          ? 'text-yellow-600 hover:bg-yellow-50' 
+                          ? 'text-yellow-600 bg-yellow-50 hover:bg-yellow-100' 
                           : 'hover:bg-yellow-50 hover:text-yellow-600'
                       }`}
                     >
                       {isPostSaved ? (
-                        <BookmarkCheck className="w-3 h-3 lg:w-4 lg:h-4" />
+                        <BookmarkCheck className="w-4 h-4" />
                       ) : (
-                        <Bookmark className="w-3 h-3 lg:w-4 lg:h-4" />
+                        <Bookmark className="w-4 h-4" />
                       )}
+                      <span className="text-sm hidden sm:inline">
+                        {isPostSaved ? 'Saved' : 'Save'}
+                      </span>
                     </Button>
                   )}
                 </div>
 
-                {/* Right side actions */}
-                <div className="flex items-center gap-2">
+                {/* Right Actions */}
+                <div className="flex items-center gap-1">
                   {ownedByCurrentUser ? (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleEdit}
-                        className="flex items-center gap-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                      >
-                        <Edit2 className="w-3 h-3 lg:w-4 lg:h-4" />
-                        <span className="text-xs lg:text-sm font-medium hidden sm:inline">Edit</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleDelete}
-                        className="flex items-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-3 h-3 lg:w-4 lg:h-4" />
-                        <span className="text-xs lg:text-sm font-medium hidden sm:inline">Delete</span>
-                      </Button>
-                    </>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl p-2"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={handleEdit} className="text-blue-600">
+                          <Edit2 className="w-4 h-4 mr-2" />
+                          Edit Post
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete Post
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   ) : (
                     user && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="flex items-center gap-2 text-orange-500 hover:text-orange-700 hover:bg-orange-50"
+                        className="hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 rounded-xl px-3 py-2"
                       >
-                        <Flag className="w-3 h-3 lg:w-4 lg:h-4" />
-                        <span className="text-xs lg:text-sm font-medium hidden sm:inline">Report</span>
+                        <Flag className="w-4 h-4" />
+                        <span className="text-sm hidden sm:inline">Report</span>
                       </Button>
                     )
                   )}
                 </div>
               </div>
 
-              {/* Enhanced Comments Section */}
+              {/* Comments Section */}
               {(showComments || expandedView) && (
-                <div className="mt-6 space-y-4">
+                <div className="mt-6 space-y-6 border-t border-slate-100 dark:border-slate-700 pt-6">
                   {user && (
-                    <form onSubmit={handleSubmitComment} className="space-y-3">
-                      <Textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="What are your thoughts?"
-                        rows={3}
-                        className="resize-none"
-                      />
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-slate-500">
-                          {newComment.length}/1000 characters
-                        </span>
-                        <Button
-                          type="submit"
-                          disabled={!newComment.trim() || newComment.length > 1000}
-                          size="sm"
-                        >
-                          Comment
-                        </Button>
-                      </div>
-                    </form>
+                    <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4">
+                      <form onSubmit={handleSubmitComment} className="space-y-4">
+                        <Textarea
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="What are your thoughts?"
+                          rows={3}
+                          className="resize-none border-0 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 rounded-xl"
+                        />
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-slate-500">
+                            {newComment.length}/1000 characters
+                          </span>
+                          <Button
+                            type="submit"
+                            disabled={!newComment.trim() || newComment.length > 1000}
+                            size="sm"
+                            className="rounded-xl"
+                          >
+                            Comment
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
                   )}
                   
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {comments?.map((comment) => (
                       <Comment 
                         key={comment._id} 
@@ -491,19 +524,45 @@ const PostCard = ({
                   </div>
                   
                   {status === "CanLoadMore" && (
-                    <Button 
-                      variant="outline"
-                      onClick={() => loadMore(20)}
-                      className="w-full"
-                    >
-                      Load More Comments
-                    </Button>
+                    <div className="text-center">
+                      <Button 
+                        variant="outline"
+                        onClick={() => loadMore(20)}
+                        className="rounded-xl"
+                      >
+                        Load More Comments
+                      </Button>
+                    </div>
                   )}
                 </div>
               )}
             </div>
           </div>
         </CardContent>
+
+        {/* Image Expanded Modal */}
+        {isImageExpanded && post.imageUrl && (
+          <div 
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+            onClick={() => setIsImageExpanded(false)}
+          >
+            <div className="relative max-w-full max-h-full">
+              <img 
+                src={post.imageUrl} 
+                alt="Post content" 
+                className="max-w-full max-h-full object-contain"
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                className="absolute top-4 right-4"
+                onClick={() => setIsImageExpanded(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
     </TooltipProvider>
   );
