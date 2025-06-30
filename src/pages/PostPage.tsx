@@ -2,8 +2,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import PostCard from "../components/PostCard";
-import { FaArrowLeft } from "react-icons/fa";
+import { ArrowLeft } from "lucide-react";
 import { Id } from "../../convex/_generated/dataModel";
+import { Button } from "@/components/ui/button";
 
 const PostPage = () => {
   const { postId } = useParams<{ postId: Id<"post"> }>();
@@ -24,13 +25,14 @@ const PostPage = () => {
   return (
     <div className="min-h-screen pt-20 pb-8">
       <div className="max-w-4xl mx-auto px-4">
-        <button
+        <Button
           onClick={() => navigate(-1)}
-          className="btn btn-ghost mb-6 group"
+          variant="ghost"
+          className="mb-6 group hover:bg-slate-100 dark:hover:bg-slate-800"
         >
-          <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back
-        </button>
+        </Button>
         
         <PostCard post={post} showSubreddit={true} expandedView={true} />
       </div>
