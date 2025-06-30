@@ -345,105 +345,111 @@ const PostCard = ({
                 </div>
               )}
 
-              {/* Enhanced Actions */}
-              <div className="flex items-center gap-2 lg:gap-3 mt-4 pt-3 border-t border-slate-100 dark:border-slate-700">
-                <Button 
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleComment}
-                  className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                >
-                  <MessageCircle className="w-3 h-3 lg:w-4 lg:h-4" />
-                  <span className="text-xs lg:text-sm font-medium">{commentCount || 0}</span>
-                </Button>
-
-                <div className="relative">
+              {/* Enhanced Actions - Fixed Layout */}
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-slate-700">
+                {/* Left side actions */}
+                <div className="flex items-center gap-2 lg:gap-3">
                   <Button 
                     variant="ghost"
                     size="sm"
-                    onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="flex items-center gap-2 hover:bg-green-50 hover:text-green-600 transition-colors"
+                    onClick={handleComment}
+                    className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                   >
-                    <Share2 className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="text-xs lg:text-sm font-medium">Share</span>
+                    <MessageCircle className="w-3 h-3 lg:w-4 lg:h-4" />
+                    <span className="text-xs lg:text-sm font-medium">{commentCount || 0}</span>
                   </Button>
 
-                  {showShareMenu && (
-                    <div className="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-10 min-w-[150px]">
-                      <button
-                        onClick={() => handleShare('copy')}
-                        className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
-                      >
-                        Copy Link
-                      </button>
-                      <button
-                        onClick={() => handleShare('twitter')}
-                        className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
-                      >
-                        Share on Twitter
-                      </button>
-                      <button
-                        onClick={() => handleShare('reddit')}
-                        className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
-                      >
-                        Share on Reddit
-                      </button>
-                    </div>
+                  <div className="relative">
+                    <Button 
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowShareMenu(!showShareMenu)}
+                      className="flex items-center gap-2 hover:bg-green-50 hover:text-green-600 transition-colors"
+                    >
+                      <Share2 className="w-3 h-3 lg:w-4 lg:h-4" />
+                      <span className="text-xs lg:text-sm font-medium">Share</span>
+                    </Button>
+
+                    {showShareMenu && (
+                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-10 min-w-[150px]">
+                        <button
+                          onClick={() => handleShare('copy')}
+                          className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
+                        >
+                          Copy Link
+                        </button>
+                        <button
+                          onClick={() => handleShare('twitter')}
+                          className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
+                        >
+                          Share on Twitter
+                        </button>
+                        <button
+                          onClick={() => handleShare('reddit')}
+                          className="w-full px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-sm"
+                        >
+                          Share on Reddit
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {user && (
+                    <Button 
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleBookmark}
+                      className={`flex items-center gap-2 transition-colors ${
+                        isPostSaved 
+                          ? 'text-yellow-600 hover:bg-yellow-50' 
+                          : 'hover:bg-yellow-50 hover:text-yellow-600'
+                      }`}
+                    >
+                      {isPostSaved ? (
+                        <BookmarkCheck className="w-3 h-3 lg:w-4 lg:h-4" />
+                      ) : (
+                        <Bookmark className="w-3 h-3 lg:w-4 lg:h-4" />
+                      )}
+                    </Button>
                   )}
                 </div>
 
-                {user && (
-                  <Button 
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleBookmark}
-                    className={`flex items-center gap-2 transition-colors ${
-                      isPostSaved 
-                        ? 'text-yellow-600 hover:bg-yellow-50' 
-                        : 'hover:bg-yellow-50 hover:text-yellow-600'
-                    }`}
-                  >
-                    {isPostSaved ? (
-                      <BookmarkCheck className="w-3 h-3 lg:w-4 lg:h-4" />
-                    ) : (
-                      <Bookmark className="w-3 h-3 lg:w-4 lg:h-4" />
-                    )}
-                  </Button>
-                )}
-                
-                {ownedByCurrentUser && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleEdit}
-                      className="flex items-center gap-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                    >
-                      <Edit2 className="w-3 h-3 lg:w-4 lg:h-4" />
-                      <span className="text-xs lg:text-sm font-medium">Edit</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleDelete}
-                      className="flex items-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-3 h-3 lg:w-4 lg:h-4" />
-                      <span className="text-xs lg:text-sm font-medium">Delete</span>
-                    </Button>
-                  </>
-                )}
-
-                {!ownedByCurrentUser && user && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2 text-orange-500 hover:text-orange-700 hover:bg-orange-50 ml-auto"
-                  >
-                    <Flag className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="text-xs lg:text-sm font-medium">Report</span>
-                  </Button>
-                )}
+                {/* Right side actions */}
+                <div className="flex items-center gap-2">
+                  {ownedByCurrentUser ? (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleEdit}
+                        className="flex items-center gap-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                      >
+                        <Edit2 className="w-3 h-3 lg:w-4 lg:h-4" />
+                        <span className="text-xs lg:text-sm font-medium hidden sm:inline">Edit</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDelete}
+                        className="flex items-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-3 h-3 lg:w-4 lg:h-4" />
+                        <span className="text-xs lg:text-sm font-medium hidden sm:inline">Delete</span>
+                      </Button>
+                    </>
+                  ) : (
+                    user && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-2 text-orange-500 hover:text-orange-700 hover:bg-orange-50"
+                      >
+                        <Flag className="w-3 h-3 lg:w-4 lg:h-4" />
+                        <span className="text-xs lg:text-sm font-medium hidden sm:inline">Report</span>
+                      </Button>
+                    )
+                  )}
+                </div>
               </div>
 
               {/* Enhanced Comments Section */}
