@@ -196,8 +196,106 @@ const PostCard = ({
         )}
 
         <CardContent className={`${expandedView ? 'p-6 lg:p-8' : 'p-4 lg:p-6'}`}>
+          {/* Header with Author Info and Post Actions */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              {post.author ? (
+                <div className="flex items-center gap-2">
+                  <Avatar className="w-8 h-8 ring-2 ring-white dark:ring-slate-800 shadow-sm">
+                    <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-primary-500 to-secondary-500 text-white">
+                      {post.author.username.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <Link 
+                      to={`/u/${post.author.username}`}
+                      className="font-semibold text-slate-900 dark:text-slate-100 hover:text-primary-600 transition-colors text-sm"
+                    >
+                      u/{post.author.username}
+                    </Link>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <Clock className="w-3 h-3" />
+                      <span>{formatTimeAgo(post._creationTime)}</span>
+                      
+                      {showSubreddit && post.subreddit && (
+                        <>
+                          <span>in</span>
+                          <Link 
+                            to={`/r/${post.subreddit.name}`}
+                            className="font-medium text-primary-600 hover:text-primary-700 transition-colors"
+                          >
+                            r/{post.subreddit.name}
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-slate-300">?</AvatarFallback>
+                  </Avatar>
+                  <span className="text-slate-400 text-sm">u/deleted</span>
+                </div>
+              )}
+            </div>
+
+            {/* Top Right Actions - Post Management */}
+            <div className="flex items-center gap-2">
+              {/* Engagement Badges */}
+              {engagementLevel === 'high' && (
+                <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs animate-pulse">
+                  🔥 Hot
+                </Badge>
+              )}
+              {expandedView && (
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <Eye className="w-3 h-3" />
+                  <span>{viewCount.toLocaleString()}</span>
+                </div>
+              )}
+
+              {/* Post Management Dropdown */}
+              {ownedByCurrentUser ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl p-2"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleEdit} className="text-blue-600">
+                      <Edit2 className="w-4 h-4 mr-2" />
+                      Edit Post
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Post
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                user && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 rounded-xl p-2"
+                  >
+                    <Flag className="w-4 h-4" />
+                  </Button>
+                )
+              )}
+            </div>
+          </div>
+
           <div className="flex gap-4">
-            {/* Vote Section - Redesigned */}
+            {/* Vote Section - Left Side */}
             <div className="flex flex-col items-center gap-2 pt-1">
               <div className="flex flex-col items-center bg-slate-50 dark:bg-slate-800 rounded-2xl p-2 shadow-sm">
                 <Tooltip>
@@ -256,67 +354,6 @@ const PostCard = ({
 
             {/* Main Content */}
             <div className="flex-1 min-w-0">
-              {/* Header with Author Info */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  {post.author ? (
-                    <div className="flex items-center gap-2">
-                      <Avatar className="w-8 h-8 ring-2 ring-white dark:ring-slate-800 shadow-sm">
-                        <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-primary-500 to-secondary-500 text-white">
-                          {post.author.username.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <Link 
-                          to={`/u/${post.author.username}`}
-                          className="font-semibold text-slate-900 dark:text-slate-100 hover:text-primary-600 transition-colors text-sm"
-                        >
-                          u/{post.author.username}
-                        </Link>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatTimeAgo(post._creationTime)}</span>
-                          
-                          {showSubreddit && post.subreddit && (
-                            <>
-                              <span>in</span>
-                              <Link 
-                                to={`/r/${post.subreddit.name}`}
-                                className="font-medium text-primary-600 hover:text-primary-700 transition-colors"
-                              >
-                                r/{post.subreddit.name}
-                              </Link>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Avatar className="w-8 h-8">
-                        <AvatarFallback className="bg-slate-300">?</AvatarFallback>
-                      </Avatar>
-                      <span className="text-slate-400 text-sm">u/deleted</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Engagement Badges */}
-                <div className="flex items-center gap-2">
-                  {engagementLevel === 'high' && (
-                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs animate-pulse">
-                      🔥 Hot
-                    </Badge>
-                  )}
-                  {expandedView && (
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Eye className="w-3 h-3" />
-                      <span>{viewCount.toLocaleString()}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
               {/* Post Title */}
               <div className="mb-4">
                 {expandedView ? (
@@ -380,9 +417,9 @@ const PostCard = ({
                 )}
               </div>
 
-              {/* Action Bar */}
+              {/* Action Bar - Bottom */}
               <div className="flex items-center justify-between py-3 border-t border-slate-100 dark:border-slate-700">
-                {/* Left Actions */}
+                {/* Left Actions - Interaction */}
                 <div className="flex items-center gap-1">
                   <Button 
                     variant="ghost"
@@ -418,7 +455,10 @@ const PostCard = ({
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                </div>
 
+                {/* Right Actions - Save */}
+                <div className="flex items-center gap-1">
                   {user && (
                     <Button 
                       variant="ghost"
@@ -439,45 +479,6 @@ const PostCard = ({
                         {isPostSaved ? 'Saved' : 'Save'}
                       </span>
                     </Button>
-                  )}
-                </div>
-
-                {/* Right Actions */}
-                <div className="flex items-center gap-1">
-                  {ownedByCurrentUser ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl p-2"
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={handleEdit} className="text-blue-600">
-                          <Edit2 className="w-4 h-4 mr-2" />
-                          Edit Post
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete Post
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : (
-                    user && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 rounded-xl px-3 py-2"
-                      >
-                        <Flag className="w-4 h-4" />
-                        <span className="text-sm hidden sm:inline">Report</span>
-                      </Button>
-                    )
                   )}
                 </div>
               </div>
