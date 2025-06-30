@@ -1,4 +1,4 @@
-import { MessageCircle, Trash2, ArrowUp, ArrowDown, Share2, Bookmark, BookmarkCheck, Flag, Edit2, Eye, Clock, TrendingUp, ExternalLink, MoreHorizontal } from "lucide-react";
+import { MessageCircle, Trash2, ArrowUp, ArrowDown, Share2, Bookmark, Bookmark as BookmarkCheck, Flag, Edit2, Eye, Clock, TrendingUp, ExternalLink, MoreHorizontal } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { PaginationStatus, useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
