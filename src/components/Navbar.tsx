@@ -111,6 +111,11 @@ const Navbar = () => {
     closeAllDropdowns();
   };
 
+  const handleSavedClick = () => {
+    navigate('/saved');
+    closeAllDropdowns();
+  };
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       isScrolled 
@@ -225,6 +230,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="icon"
+                onClick={handleSavedClick}
                 className="transform hover:scale-110 hover:rotate-3 transition-all duration-200 ease-out hover:shadow-md"
               >
                 <Bookmark className="w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 hover:rotate-12" />
@@ -393,6 +399,7 @@ const Navbar = () => {
                     <Button 
                       variant="secondary" 
                       className="w-full flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 ease-out text-sm"
+                      onClick={handleSavedClick}
                     >
                       <Bookmark className="w-4 h-4 transition-transform duration-200 hover:rotate-12" />
                       Saved

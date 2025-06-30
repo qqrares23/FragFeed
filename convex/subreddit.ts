@@ -40,6 +40,40 @@ export const create = mutation({
   },
 });
 
+export const updateName = mutation({
+  args: {
+    subredditId: v.id("subreddit"),
+    newName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    const subreddit = await ctx.db.get(args.subredditId);
+    
+    if (!subreddit) {
+      throw new ConvexError({ message: "Subreddit not found" });
+    }
+    
+    // Only the owner can update the name
+    if (subreddit.authorId !== user._id) {
+      throw new ConvexError({ message: "Only the community owner can update the name" });
+    }
+    
+    // Check if new name is already taken
+    const existingSubreddit = await ctx.db
+      .query("subreddit")
+      .withIndex("byName", (q) => q.eq("name", args.newName))
+      .unique();
+    
+    if (existingSubreddit && existingSubreddit._id !== args.subredditId) {
+      throw new ConvexError({ message: "Community name already taken" });
+    }
+    
+    await ctx.db.patch(args.subredditId, {
+      name: args.newName,
+    });
+  },
+});
+
 export const get = query({
   args: { name: v.string() },
   handler: async (ctx, args) => {

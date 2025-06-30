@@ -41,7 +41,6 @@ const PostCard = ({
   expandedView = false,
 }: PostCardProps) => {
   const [showComments, setShowComments] = useState(expandedView);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [viewCount, setViewCount] = useState(Math.floor(Math.random() * 1000) + 50);
   const navigate = useNavigate();
@@ -53,10 +52,13 @@ const PostCard = ({
   const deleteComment = useMutation(api.comments.deleteComment);
   const toggleUpvote = useMutation(api.vote.toggleUpvote);
   const toggleDownvote = useMutation(api.vote.toggleDownvote);
+  const savePost = useMutation(api.savedPosts.savePost);
+  const unsavePost = useMutation(api.savedPosts.unsavePost);
 
   const voteCounts = useQuery(api.vote.getVoteCounts, { postId: post._id });
   const hasUpvoted = useQuery(api.vote.hasUpvoted, { postId: post._id });
   const hasDownvoted = useQuery(api.vote.hasDownvoted, { postId: post._id });
+  const isPostSaved = useQuery(api.savedPosts.isPostSaved, { postId: post._id });
 
   const { results: comments, loadMore, status } = usePaginatedQuery(
     api.comments.getComments,
@@ -85,6 +87,10 @@ const PostCard = ({
     } else {
       setShowComments(!showComments);
     }
+  };
+
+  const handleEdit = () => {
+    navigate(`/post/${post._id}/edit`);
   };
 
   const handleDelete = async () => {
@@ -135,9 +141,16 @@ const PostCard = ({
     setShowShareMenu(false);
   };
 
-  const toggleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    // In a real app, this would save to backend
+  const toggleBookmark = async () => {
+    try {
+      if (isPostSaved) {
+        await unsavePost({ postId: post._id });
+      } else {
+        await savePost({ postId: post._id });
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+    }
   };
 
   const formatTimeAgo = (timestamp: number) => {
@@ -385,12 +398,12 @@ const PostCard = ({
                     size="sm"
                     onClick={toggleBookmark}
                     className={`flex items-center gap-2 transition-colors ${
-                      isBookmarked 
+                      isPostSaved 
                         ? 'text-yellow-600 hover:bg-yellow-50' 
                         : 'hover:bg-yellow-50 hover:text-yellow-600'
                     }`}
                   >
-                    {isBookmarked ? (
+                    {isPostSaved ? (
                       <BookmarkCheck className="w-3 h-3 lg:w-4 lg:h-4" />
                     ) : (
                       <Bookmark className="w-3 h-3 lg:w-4 lg:h-4" />
@@ -403,6 +416,7 @@ const PostCard = ({
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={handleEdit}
                       className="flex items-center gap-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
                     >
                       <Edit2 className="w-3 h-3 lg:w-4 lg:h-4" />

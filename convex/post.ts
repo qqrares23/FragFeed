@@ -20,6 +20,7 @@ const ERROR_MESSAGES = {
   POST_NOT_FOUND: "Post not found",
   SUBREDDIT_NOT_FOUND: "Subreddit not found",
   UNAUTHORIZED_DELETE: "You can't delete this post",
+  UNAUTHORIZED_EDIT: "You can't edit this post",
   USER_NOT_FOUND: "User not found",
   NOT_MEMBER: "You must join this subreddit before posting",
 } as const;
@@ -106,6 +107,34 @@ export const create = mutation({
     await Promise.all([...memberNotificationPromises, ...followerNotificationPromises]);
     
     return postId;
+  },
+});
+
+export const updatePost = mutation({
+  args: {
+    postId: v.id("post"),
+    subject: v.string(),
+    body: v.string(),
+    storageId: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    const post = await ctx.db.get(args.postId);
+    
+    if (!post) {
+      throw new ConvexError({ message: ERROR_MESSAGES.POST_NOT_FOUND });
+    }
+    
+    // Only allow the author to edit their own posts
+    if (post.authorId !== user._id) {
+      throw new ConvexError({ message: ERROR_MESSAGES.UNAUTHORIZED_EDIT });
+    }
+    
+    await ctx.db.patch(args.postId, {
+      subject: args.subject,
+      body: args.body,
+      image: args.storageId || post.image,
+    });
   },
 });
 

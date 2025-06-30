@@ -92,6 +92,14 @@ export default defineSchema({
     userId: v.id("users"),
   })
     .index("byPost", ["postId", "userId"]),
+  savedPosts: defineTable({
+    userId: v.id("users"),
+    postId: v.id("post"),
+    savedAt: v.number(),
+  })
+    .index("byUser", ["userId"])
+    .index("byPost", ["postId"])
+    .index("byUserAndPost", ["userId", "postId"]),
   notifications: defineTable({
     userId: v.id("users"),
     type: v.string(),

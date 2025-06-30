@@ -4,7 +4,8 @@ import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/clerk-react";
 import PostCard from "../components/PostCard";
 import GuidelinesEditModal from "../components/GuidelinesEditModal";
-import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Image } from "lucide-react";
+import CommunityNameEditModal from "../components/CommunityNameEditModal";
+import { Users, Plus, Minus, CalendarDays, Eye, EyeOff, Edit, Image, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ const SubredditPage = () => {
   const { user } = useUser();
   const [showMembers, setShowMembers] = useState(false);
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
+  const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   
@@ -209,10 +211,22 @@ const SubredditPage = () => {
                         )}
                       </div>
                       
-                      <div>
-                        <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
-                          r/{subreddit.name}
-                        </h1>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100">
+                            r/{subreddit.name}
+                          </h1>
+                          {isOwner && (
+                            <Button
+                              onClick={() => setShowNameEditModal(true)}
+                              variant="ghost"
+                              size="sm"
+                              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
                         {subreddit.description && (
                           <p className="text-slate-600 dark:text-slate-400 text-base lg:text-lg">{subreddit.description}</p>
                         )}
@@ -220,39 +234,53 @@ const SubredditPage = () => {
                     </div>
                   </div>
                   
-                  {user && (
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <Button 
-                        onClick={handleJoinLeave}
-                        variant={isMember ? "outline" : "default"}
-                        className="transform hover:scale-105 transition-all duration-200 shadow-lg"
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    {isOwner && (
+                      <Button
+                        onClick={() => setShowGuidelinesModal(true)}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
                       >
-                        {isMember ? (
-                          <>
-                            <Minus className="w-4 h-4 mr-2" />
-                            Leave
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Join
-                          </>
-                        )}
+                        <Settings className="w-4 h-4" />
+                        Manage
                       </Button>
-                      
-                      {isMember && (
+                    )}
+                    
+                    {user && (
+                      <>
                         <Button 
-                          asChild
+                          onClick={handleJoinLeave}
+                          variant={isMember ? "outline" : "default"}
                           className="transform hover:scale-105 transition-all duration-200 shadow-lg"
                         >
-                          <a href={`/r/${subredditName}/submit`}>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Create Post
-                          </a>
+                          {isMember ? (
+                            <>
+                              <Minus className="w-4 h-4 mr-2" />
+                              Leave
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="w-4 h-4 mr-2" />
+                              Join
+                            </>
+                          )}
                         </Button>
-                      )}
-                    </div>
-                  )}
+                        
+                        {isMember && (
+                          <Button 
+                            asChild
+                            className="transform hover:scale-105 transition-all duration-200 shadow-lg"
+                          >
+                            <a href={`/r/${subredditName}/submit`}>
+                              <Plus className="w-4 h-4 mr-2" />
+                              Create Post
+                            </a>
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* Error Display */}
@@ -500,6 +528,16 @@ const SubredditPage = () => {
           subredditId={subreddit._id}
           subredditName={subreddit.name}
           currentGuidelines={subreddit.guidelines || []}
+        />
+      )}
+
+      {/* Community Name Edit Modal */}
+      {showNameEditModal && subreddit && (
+        <CommunityNameEditModal
+          isOpen={showNameEditModal}
+          onClose={() => setShowNameEditModal(false)}
+          subredditId={subreddit._id}
+          currentName={subreddit.name}
         />
       )}
     </div>
