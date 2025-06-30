@@ -24,124 +24,276 @@ interface TwitchGame {
   viewer_count?: number;
 }
 
+interface TwitchTokenResponse {
+  access_token: string;
+  expires_in: number;
+  token_type: string;
+}
+
 const TwitchSidebar = () => {
   const [topStreams, setTopStreams] = useState<TwitchStream[]>([]);
   const [topGames, setTopGames] = useState<TwitchGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // Twitch API credentials - In production, these should be environment variables
+  const CLIENT_ID = 'your_twitch_client_id'; // Replace with actual client ID
+  const CLIENT_SECRET = 'your_twitch_client_secret'; // Replace with actual client secret
+
+  const getAccessToken = async (): Promise<string> => {
+    if (accessToken) return accessToken;
+
+    try {
+      const response = await fetch('https://id.twitch.tv/oauth2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
+          grant_type: 'client_credentials',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Token request failed: ${response.statusText}`);
+      }
+
+      const data: TwitchTokenResponse = await response.json();
+      setAccessToken(data.access_token);
+      return data.access_token;
+    } catch (error) {
+      console.error('Failed to get Twitch access token:', error);
+      throw error;
+    }
+  };
+
+  const fetchTwitchStreams = async (token: string): Promise<TwitchStream[]> => {
+    const response = await fetch('https://api.twitch.tv/helix/streams?first=5&language=en', {
+      headers: {
+        'Client-ID': CLIENT_ID,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Streams API failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data.map((stream: any) => ({
+      ...stream,
+      thumbnail_url: stream.thumbnail_url.replace('{width}', '320').replace('{height}', '180'),
+    }));
+  };
+
+  const fetchTwitchGames = async (token: string): Promise<TwitchGame[]> => {
+    const response = await fetch('https://api.twitch.tv/helix/games/top?first=5', {
+      headers: {
+        'Client-ID': CLIENT_ID,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Games API failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data.map((game: any) => ({
+      ...game,
+      box_art_url: game.box_art_url.replace('{width}', '80').replace('{height}', '106'),
+    }));
+  };
 
   const fetchTwitchData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Enhanced mock data with more realistic streaming content
-      const mockStreams: TwitchStream[] = [
-        {
-          id: "1",
-          user_name: "Ninja",
-          user_login: "ninja",
-          game_name: "Fortnite",
-          title: "🔥 INSANE BUILD BATTLES! Playing with viewers! !discord !youtube",
-          viewer_count: 45230,
-          thumbnail_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          started_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          is_mature: false,
-          language: "en"
-        },
-        {
-          id: "2",
-          user_name: "shroud",
-          user_login: "shroud",
-          game_name: "Valorant",
-          title: "🎯 RADIANT RANK GRIND - Insane Aim Training Session",
-          viewer_count: 38420,
-          thumbnail_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          started_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-          is_mature: false,
-          language: "en"
-        },
-        {
-          id: "3",
-          user_name: "pokimane",
-          user_login: "pokimane",
-          game_name: "League of Legends",
-          title: "✨ Climbing to Challenger! Road to Rank 1 💪",
-          viewer_count: 32100,
-          thumbnail_url: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
-          started_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-          is_mature: false,
-          language: "en"
-        },
-        {
-          id: "4",
-          user_name: "xQcOW",
-          user_login: "xqcow",
-          game_name: "Grand Theft Auto V",
-          title: "🚗 NoPixel RP - New character arc begins! CHAOS MODE",
-          viewer_count: 28750,
-          thumbnail_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          started_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-          is_mature: true,
-          language: "en"
-        },
-        {
-          id: "5",
-          user_name: "TimTheTatman",
-          user_login: "timthetatman",
-          game_name: "Call of Duty: Warzone",
-          title: "🎮 Warzone with the boys - Victory Royale hunting!",
-          viewer_count: 25600,
-          thumbnail_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          started_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-          is_mature: false,
-          language: "en"
-        }
-      ];
+      // Check if we have valid credentials
+      if (!CLIENT_ID || CLIENT_ID === 'your_twitch_client_id') {
+        // Fall back to enhanced mock data if no real credentials
+        const mockStreams: TwitchStream[] = [
+          {
+            id: "1",
+            user_name: "Ninja",
+            user_login: "ninja",
+            game_name: "Fortnite",
+            title: "🔥 INSANE BUILD BATTLES! Playing with viewers! !discord !youtube",
+            viewer_count: 45230,
+            thumbnail_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+            started_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            is_mature: false,
+            language: "en"
+          },
+          {
+            id: "2",
+            user_name: "shroud",
+            user_login: "shroud",
+            game_name: "Valorant",
+            title: "🎯 RADIANT RANK GRIND - Insane Aim Training Session",
+            viewer_count: 38420,
+            thumbnail_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+            started_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+            is_mature: false,
+            language: "en"
+          },
+          {
+            id: "3",
+            user_name: "pokimane",
+            user_login: "pokimane",
+            game_name: "League of Legends",
+            title: "✨ Climbing to Challenger! Road to Rank 1 💪",
+            viewer_count: 32100,
+            thumbnail_url: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
+            started_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+            is_mature: false,
+            language: "en"
+          },
+          {
+            id: "4",
+            user_name: "xQcOW",
+            user_login: "xqcow",
+            game_name: "Grand Theft Auto V",
+            title: "🚗 NoPixel RP - New character arc begins! CHAOS MODE",
+            viewer_count: 28750,
+            thumbnail_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+            started_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+            is_mature: true,
+            language: "en"
+          },
+          {
+            id: "5",
+            user_name: "TimTheTatman",
+            user_login: "timthetatman",
+            game_name: "Call of Duty: Warzone",
+            title: "🎮 Warzone with the boys - Victory Royale hunting!",
+            viewer_count: 25600,
+            thumbnail_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+            started_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+            is_mature: false,
+            language: "en"
+          }
+        ];
 
-      const mockGames: TwitchGame[] = [
-        {
-          id: "1",
-          name: "League of Legends",
-          box_art_url: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
-          viewer_count: 234567
-        },
-        {
-          id: "2",
-          name: "Fortnite",
-          box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          viewer_count: 198432
-        },
-        {
-          id: "3",
-          name: "Valorant",
-          box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          viewer_count: 156789
-        },
-        {
-          id: "4",
-          name: "Grand Theft Auto V",
-          box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
-          viewer_count: 134567
-        },
-        {
-          id: "5",
-          name: "Call of Duty: Warzone",
-          box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
-          viewer_count: 98765
-        }
-      ];
+        const mockGames: TwitchGame[] = [
+          {
+            id: "1",
+            name: "League of Legends",
+            box_art_url: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg",
+            viewer_count: 234567
+          },
+          {
+            id: "2",
+            name: "Fortnite",
+            box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+            viewer_count: 198432
+          },
+          {
+            id: "3",
+            name: "Valorant",
+            box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+            viewer_count: 156789
+          },
+          {
+            id: "4",
+            name: "Grand Theft Auto V",
+            box_art_url: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+            viewer_count: 134567
+          },
+          {
+            id: "5",
+            name: "Call of Duty: Warzone",
+            box_art_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+            viewer_count: 98765
+          }
+        ];
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+        // Add some randomization to simulate real-time updates
+        const randomizedStreams = mockStreams.map(stream => ({
+          ...stream,
+          viewer_count: stream.viewer_count + Math.floor(Math.random() * 2000) - 1000,
+        }));
 
-      setTopStreams(mockStreams);
-      setTopGames(mockGames);
+        const randomizedGames = mockGames.map(game => ({
+          ...game,
+          viewer_count: (game.viewer_count || 0) + Math.floor(Math.random() * 10000) - 5000,
+        }));
+
+        setTopStreams(randomizedStreams);
+        setTopGames(randomizedGames);
+        setLastUpdate(new Date());
+        return;
+      }
+
+      // Get access token and fetch real data
+      const token = await getAccessToken();
+      
+      // Fetch streams and games in parallel
+      const [streams, games] = await Promise.all([
+        fetchTwitchStreams(token),
+        fetchTwitchGames(token)
+      ]);
+
+      // Get viewer counts for top games by fetching streams for each game
+      const gamesWithViewers = await Promise.all(
+        games.map(async (game) => {
+          try {
+            const gameStreamsResponse = await fetch(
+              `https://api.twitch.tv/helix/streams?game_id=${game.id}&first=100`,
+              {
+                headers: {
+                  'Client-ID': CLIENT_ID,
+                  'Authorization': `Bearer ${token}`,
+                },
+              }
+            );
+            
+            if (gameStreamsResponse.ok) {
+              const gameStreamsData = await gameStreamsResponse.json();
+              const totalViewers = gameStreamsData.data.reduce(
+                (sum: number, stream: any) => sum + stream.viewer_count,
+                0
+              );
+              return { ...game, viewer_count: totalViewers };
+            }
+            return game;
+          } catch (error) {
+            console.error(`Failed to get viewer count for ${game.name}:`, error);
+            return game;
+          }
+        })
+      );
+
+      setTopStreams(streams);
+      setTopGames(gamesWithViewers);
       setLastUpdate(new Date());
     } catch (err) {
       setError('Failed to load Twitch data');
       console.error('Twitch API error:', err);
+      
+      // Fall back to mock data on error
+      const fallbackStreams: TwitchStream[] = [
+        {
+          id: "fallback1",
+          user_name: "StreamerOne",
+          user_login: "streamerone",
+          game_name: "Popular Game",
+          title: "Live streaming now! Come join the fun!",
+          viewer_count: Math.floor(Math.random() * 50000) + 10000,
+          thumbnail_url: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+          started_at: new Date(Date.now() - Math.random() * 6 * 60 * 60 * 1000).toISOString(),
+          is_mature: false,
+          language: "en"
+        }
+      ];
+      
+      setTopStreams(fallbackStreams);
+      setTopGames([]);
     } finally {
       setLoading(false);
     }
@@ -150,7 +302,7 @@ const TwitchSidebar = () => {
   useEffect(() => {
     fetchTwitchData();
     
-    // Refresh data every 2 minutes
+    // Refresh data every 2 minutes for real-time updates
     const interval = setInterval(fetchTwitchData, 2 * 60 * 1000);
     
     return () => clearInterval(interval);
@@ -180,6 +332,10 @@ const TwitchSidebar = () => {
 
   const openTwitchStream = (userLogin: string) => {
     window.open(`https://twitch.tv/${userLogin}`, '_blank');
+  };
+
+  const openTwitchGame = (gameName: string) => {
+    window.open(`https://twitch.tv/directory/game/${encodeURIComponent(gameName)}`, '_blank');
   };
 
   const getStreamBadgeColor = (index: number) => {
@@ -281,61 +437,67 @@ const TwitchSidebar = () => {
                   className="group cursor-pointer hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl p-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-transparent hover:border-purple-200 dark:hover:border-purple-700"
                   onClick={() => openTwitchStream(stream.user_login)}
                 >
-                  <div className="flex gap-3">
-                    <div className="relative flex-shrink-0">
-                      <img 
-                        src={stream.thumbnail_url} 
-                        alt={stream.title}
-                        className="w-16 h-10 rounded-lg object-cover shadow-md"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
-                        }}
-                      />
-                      <div className="absolute -top-1 -left-1">
-                        <div className={`w-6 h-6 bg-gradient-to-br ${getStreamBadgeColor(index)} rounded-full flex items-center justify-center shadow-lg`}>
+                  <div className="space-y-2">
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-4 h-4 bg-gradient-to-br ${getStreamBadgeColor(index)} rounded flex items-center justify-center`}>
                           {index === 0 ? (
-                            <Crown className="w-3 h-3 text-white" />
+                            <Crown className="w-2 h-2 text-white" />
                           ) : (
                             <span className="text-white font-bold text-xs">#{index + 1}</span>
                           )}
                         </div>
+                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">
+                          {stream.game_name}
+                        </span>
                       </div>
-                      <div className="absolute bottom-0 right-0">
-                        <Badge variant="destructive" className="text-xs px-1.5 py-0.5 h-5 font-bold shadow-md">
-                          LIVE
-                        </Badge>
-                      </div>
+                      <Badge className="text-xs px-1.5 py-0.5 h-5 bg-red-500 text-white">
+                        LIVE
+                      </Badge>
                     </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
-                          {stream.user_name}
-                        </h4>
-                        {stream.is_mature && (
-                          <Badge variant="outline" className="text-xs px-1 py-0 h-4">
-                            18+
-                          </Badge>
-                        )}
+
+                    {/* Stream Info */}
+                    <div className="flex gap-3">
+                      <div className="relative flex-shrink-0">
+                        <img 
+                          src={stream.thumbnail_url} 
+                          alt={stream.title}
+                          className="w-16 h-10 rounded-lg object-cover shadow-md"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg";
+                          }}
+                        />
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-2 leading-relaxed">
-                        {stream.title}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
-                            {stream.game_name}
-                          </Badge>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
+                            {stream.user_name}
+                          </h4>
+                          {stream.is_mature && (
+                            <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                              18+
+                            </Badge>
+                          )}
                         </div>
-                        <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
-                          <Eye className="w-3 h-3" />
-                          <span className="text-xs font-semibold">{formatViewerCount(stream.viewer_count)}</span>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-2 leading-relaxed">
+                          {stream.title}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                            <Eye className="w-3 h-3" />
+                            <span className="text-xs font-semibold">{formatViewerCount(stream.viewer_count)}</span>
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            {formatStreamDuration(stream.started_at)}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">
-                      <ExternalLink className="w-4 h-4 text-purple-500" />
+                      
+                      <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">
+                        <ExternalLink className="w-4 h-4 text-purple-500" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -363,7 +525,7 @@ const TwitchSidebar = () => {
               <div 
                 key={game.id}
                 className="group cursor-pointer hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl p-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-transparent hover:border-green-200 dark:hover:border-green-700"
-                onClick={() => window.open(`https://twitch.tv/directory/game/${encodeURIComponent(game.name)}`, '_blank')}
+                onClick={() => openTwitchGame(game.name)}
               >
                 <div className="flex items-center gap-3">
                   <div className="relative flex-shrink-0">
