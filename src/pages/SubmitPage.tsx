@@ -2,8 +2,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { FaImage, FaExclamationTriangle } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
+import { Image, AlertTriangle } from "lucide-react";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const SubmitPage = () => {
   const { subredditName } = useParams();
@@ -48,19 +53,21 @@ const SubmitPage = () => {
   if (isMember === false) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center px-4">
-        <div className="card p-12 text-center max-w-md">
-          <FaExclamationTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Membership Required</h1>
-          <p className="text-slate-600 mb-6">
-            You must join r/{subredditName} before you can create posts.
-          </p>
-          <button 
-            onClick={() => navigate(`/r/${subredditName}`)}
-            className="btn btn-primary"
-          >
-            Go to r/{subredditName}
-          </button>
-        </div>
+        <Card className="p-12 text-center max-w-md">
+          <CardContent>
+            <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Membership Required</h1>
+            <p className="text-slate-600 mb-6">
+              You must join r/{subredditName} before you can create posts.
+            </p>
+            <Button 
+              onClick={() => navigate(`/r/${subredditName}`)}
+              className="w-full"
+            >
+              Go to r/{subredditName}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -135,106 +142,110 @@ const SubmitPage = () => {
   return (
     <div className="min-h-screen pt-20 pb-8">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="card p-8">
-          <h1 className="text-2xl font-bold text-slate-900 mb-6">
-            Create a post in r/{subredditName}
-          </h1>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-2">
-                Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="An interesting title"
-                className="input"
-                maxLength={100}
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Image (optional)
-              </label>
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-6">
-                <label className="btn btn-secondary cursor-pointer">
-                  <FaImage />
-                  Upload Image
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="hidden"
-                    disabled={isSubmitting}
-                  />
-                </label>
-                
-                {imagePreview && (
-                  <div className="mt-4 relative inline-block">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="max-w-full max-h-64 rounded-xl"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
-                      disabled={isSubmitting}
-                    >
-                      <IoMdClose />
-                    </button>
-                  </div>
-                )}
+        <Card className="p-8">
+          <CardHeader className="px-0 pt-0">
+            <CardTitle className="text-2xl font-bold text-slate-900">
+              Create a post in r/{subredditName}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-0 pb-0">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Title
+                </Label>
+                <Input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="An interesting title"
+                  maxLength={100}
+                  disabled={isSubmitting}
+                />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="body" className="block text-sm font-semibold text-slate-700 mb-2">
-                Text (optional)
-              </label>
-              <textarea
-                id="body"
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                placeholder="What's on your mind?"
-                className="input resize-none"
-                rows={6}
-                disabled={isSubmitting}
-              />
-            </div>
+              <div>
+                <Label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Image (optional)
+                </Label>
+                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6">
+                  <label className="cursor-pointer">
+                    <Button type="button" variant="secondary" className="pointer-events-none">
+                      <Image className="w-4 h-4 mr-2" />
+                      Upload Image
+                    </Button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                      disabled={isSubmitting}
+                    />
+                  </label>
+                  
+                  {imagePreview && (
+                    <div className="mt-4 relative inline-block">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="max-w-full max-h-64 rounded-xl"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                        disabled={isSubmitting}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-            <div className="flex gap-4 pt-4">
-              <button
-                type="button"
-                onClick={() => navigate(`/r/${subredditName}`)}
-                className="btn btn-secondary flex-1"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary flex-1"
-                disabled={isSubmitting || !title.trim()}
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Posting...
-                  </>
-                ) : (
-                  "Post"
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+              <div>
+                <Label htmlFor="body" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Text (optional)
+                </Label>
+                <Textarea
+                  id="body"
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  placeholder="What's on your mind?"
+                  rows={6}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <Button
+                  type="button"
+                  onClick={() => navigate(`/r/${subredditName}`)}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={isSubmitting || !title.trim()}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      Posting...
+                    </>
+                  ) : (
+                    "Post"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
